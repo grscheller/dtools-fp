@@ -2,7 +2,7 @@
 
 The grscheller.fp PyPI project provides functional programming tools.
 
-## Semantic Versioning
+## Semantic versioning
 
 * first digit:
   * major event, epoch, or paradigm shift
@@ -17,8 +17,11 @@ The grscheller.fp PyPI project provides functional programming tools.
 * forth digit (development environment only):
   * not to be taken too seriously
 
-## Releases and Important Milestones
+## Releases and other important milestones
 
-### Version 0.1.0 - Initial PyPI Release: TBD
+### Version 0.1.0 - Initial PyPI Release: TBA
 
-* Package implementing data structures which do not throw exceptions
+* replicated functionality from grscheller.datastructures
+  * grscheller.datastructures.fp.MB
+  * grscheller.datastructures.fp.XOR
+  * grscheller.core.iterlib

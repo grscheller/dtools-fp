@@ -1,10 +1,9 @@
-# PyPI grscheller.fp Project
+# Python Functional Programming (FP) Package 
 
-Python package to facilitate functional programming in a pythonic way.
+Python package to facilitate functional programming while endeavoring to
+remain Pythonic.
 
-* Functional & imperative programming styles supported
-* FP supported but project endeavors to remain Pythonic
-* Methods which mutate objects don't return anything
+* Source code for the grscheller.fp PyPI Package
 * [grscheller.fp][1] project on PyPI
 * [Detailed API documentation][2] on GH-Pages
 * [Source code][3] on GitHub
@@ -14,34 +13,34 @@ Python package to facilitate functional programming in a pythonic way.
 This package does not force functional programming paradigms on client
 code, but provide functional tools to opt into.
 
-### Some of the main benefit of the functional programming style are:
+### Benefits of FP
 
-* avoid unnecessary exception driven code paths upon client code
+* avoid exception driven code paths
 * data sharing becomes trivial due to immutability
 
-### Modules provided
+### Modules
 
 * module grscheller.fp.wo\_exception
-  * class `MB[T]`
+  * class `MB[T](t: Optional[T])`
     * the maybe monad
     * represents a potentially missing value
       * result of a calculation that could fail
       * user input which could be missing
-  * class `XOR[L,R]`
+  * class `XOR[L, R](left: Optional[L], right: R)`
     * the either monad
     * one of two possible exclusive categories of values
     * either one or the other, not both
     * left biased
 * module grscheller.fp.iterators
   * Combining multiple iterators
-    * *function* `concat(*t)`
-      * DEPRECATED - use itertools.chain instead
+    * function `concat(*t: [Iterable[T]]): Iterator[T]`
       * sequentially concatenate multiple iterables
+      * DEPRECATED - use itertools.chain instead
       * still performant
       * proof of concept
-    * *function* `merge(*t)`
+    * function `merge(*t: [Iterable[T]]): Iterator[T]`
       * merge iterables until one is exhausted
-    * *function* `exhaust(*t)`
+    * function `exhaust(*t: [Iterable[T]]): Iterator[T]`
       * merge iterables until all are exhausted
 
 ---
