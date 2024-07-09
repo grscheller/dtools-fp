@@ -1,0 +1,5 @@
+# Minimal version - only add to when necessary
+**/__pycache__/
+.pytest_cache/
+.mypy_cache
+dist/

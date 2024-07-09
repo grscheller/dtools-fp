@@ -1,0 +1,53 @@
+[build-system]
+requires = ["flit_core>=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "grscheller.fp"
+authors = [
+    { name = "Geoffrey R. Scheller", email = "geoffrey@scheller.com" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = []
+dynamic = ["version", "description"]
+keywords = [
+    "functional", "functional programming", "fp",
+    "monad", "iterators",
+    "maybe", "either"
+] 
+
+[project.optional-dependencies]
+test = ["pytest >=7.4"]
+
+[project.urls]
+Source = "https://github.com/grscheller/fp"
+Changelog = "https://github.com/grscheller/fp/blob/main/CHANGELOG.md"
+Documentation = "https://grscheller.github.io/fp/"
+
+[tool.flit.sdist]
+exclude = ["docs/*", ".github/*", ".gitignore", ".mypy_cache"]
+
+[tool.pylsp-mypy]
+live-mode = true
+strict = true
+report_progress = true
+
+[tool.ruff]
+target-version = "py313"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
