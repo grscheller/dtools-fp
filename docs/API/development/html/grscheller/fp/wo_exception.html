@@ -63,11 +63,11 @@ hljs.highlightAll();
 <div class="desc"><p>Class representing a potentially missing value.</p>
 <ul>
 <li>implements the Maybe Monad</li>
-<li>where <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>(value)</code> contains a value of type _T</li>
-<li>and <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>( )</code> &amp; <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>(None)</code> both semantically represent "Nothing"</li>
-<li>above two imply <code>None</code> as a value cannot be stored in a <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a></code></li>
-<li>immutable, a <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a></code> does not change after being created</li>
-<li>immutable semantics, <code>map</code> &amp; <code>flatMap</code> never change <code>self</code></li>
+<li>where MB(value) contains a possible value of type _T</li>
+<li>and MB( ) &amp; MB(None) both semantically represent "Nothing"</li>
+<li>above two imply None, as a value, cannot be stored in a MB</li>
+<li>immutable, a MB does not change after being created</li>
+<li>immutable semantics, map &amp; flatMap produce new instances</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -77,11 +77,11 @@ hljs.highlightAll();
     &#34;&#34;&#34;Class representing a potentially missing value.
 
     * implements the Maybe Monad
-    * where `MB(value)` contains a value of type _T
-    * and `MB( )` &amp; `MB(None)` both semantically represent &#34;Nothing&#34;
-    * above two imply `None` as a value cannot be stored in a `MB`
-    * immutable, a `MB` does not change after being created
-    * immutable semantics, `map` &amp; `flatMap` never change `self`
+    * where MB(value) contains a possible value of type _T
+    * and MB( ) &amp; MB(None) both semantically represent &#34;Nothing&#34;
+    * above two imply None, as a value, cannot be stored in a MB
+    * immutable, a MB does not change after being created
+    * immutable semantics, map &amp; flatMap produce new instances
     &#34;&#34;&#34;
     __slots__ = &#39;_value&#39;,
 

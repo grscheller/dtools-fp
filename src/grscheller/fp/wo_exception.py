@@ -35,11 +35,11 @@ class MB(Generic[_T]):
     """Class representing a potentially missing value.
 
     * implements the Maybe Monad
-    * where `MB(value)` contains a value of type _T
-    * and `MB( )` & `MB(None)` both semantically represent "Nothing"
-    * above two imply `None` as a value cannot be stored in a `MB`
-    * immutable, a `MB` does not change after being created
-    * immutable semantics, `map` & `flatMap` never change `self`
+    * where MB(value) contains a possible value of type _T
+    * and MB( ) & MB(None) both semantically represent "Nothing"
+    * above two imply None, as a value, cannot be stored in a MB
+    * immutable, a MB does not change after being created
+    * immutable semantics, map & flatMap produce new instances
     """
     __slots__ = '_value',
 

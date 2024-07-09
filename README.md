@@ -3,15 +3,12 @@
 Python package to facilitate functional programming while endeavoring to
 remain Pythonic.
 
+## Overview
+
 * Source code for the grscheller.fp PyPI Package
 * [grscheller.fp][1] project on PyPI
 * [Detailed API documentation][2] on GH-Pages
 * [Source code][3] on GitHub
-
-## Overview
-
-This package does not force functional programming paradigms on client
-code, but provide functional tools to opt into.
 
 ### Benefits of FP
 
@@ -35,9 +32,8 @@ code, but provide functional tools to opt into.
   * Combining multiple iterators
     * function `concat(*t: [Iterable[T]]): Iterator[T]`
       * sequentially concatenate multiple iterables
-      * DEPRECATED - use itertools.chain instead
+      * use itertools.chain instead
       * still performant
-      * proof of concept
     * function `merge(*t: [Iterable[T]]): Iterator[T]`
       * merge iterables until one is exhausted
     * function `exhaust(*t: [Iterable[T]]): Iterator[T]`

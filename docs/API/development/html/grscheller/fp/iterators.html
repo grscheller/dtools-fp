@@ -35,26 +35,29 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="grscheller.fp.iterators.concat"><code class="name flex">
-<span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[Any]) ‑> Iterator[Any]</span>
+<span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sequentially concatenate multiple iterators into one.</p>
-<p>DEPRECATED - Better to use <code>itertools.chain</code> function instead</p></div>
+<ul>
+<li>you may want to use the standard library's itertools.chain instead</li>
+<li>concat is still performant</li>
+</ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.exhaust"><code class="name flex">
-<span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[Any]) ‑> Iterator[Any]</span>
+<span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Merge multiple iterator streams until all are exhausted.</p></div>
 </dd>
 <dt id="grscheller.fp.iterators.merge"><code class="name flex">
-<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[Any], yield_partial: bool = False) ‑> Iterator[Any]</span>
+<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partial: bool = False) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Merge multiple iterator streams until one is exhausted.</p>
-<p>If <code>yield_partial</code> is <code>True,</code> also yield any unmatched extracted values from any
-of the other iterators. This is useful to prevent data lose if there are
-other references to any of the non-exhausted iterators floating around.</p></div>
+<div class="desc"><p>Merge multiple iterable streams until one is exhausted.</p>
+<p>If yield_partial is true, yield any unmatched values from the other
+iterators. This prevents data lose if there are other references to
+non-exhausted iterators floating around.</p></div>
 </dd>
 </dl>
 </section>
