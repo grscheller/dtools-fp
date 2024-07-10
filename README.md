@@ -1,7 +1,6 @@
 # Python Functional Programming (FP) Package 
 
-Python package to facilitate functional programming while endeavoring to
-remain Pythonic.
+Functional programming tools which endeavor to be Pythonic.
 
 ## Overview
 
@@ -29,7 +28,7 @@ remain Pythonic.
     * either one or the other, not both
     * left biased
 * module grscheller.fp.iterators
-  * Combining multiple iterators
+  * Functions for combining multiple iterators
     * function `concat(*t: [Iterable[T]]): Iterator[T]`
       * sequentially concatenate multiple iterables
       * use itertools.chain instead
