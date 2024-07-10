@@ -51,13 +51,13 @@ hljs.highlightAll();
 <div class="desc"><p>Merge multiple iterator streams until all are exhausted.</p></div>
 </dd>
 <dt id="grscheller.fp.iterators.merge"><code class="name flex">
-<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partial: bool = False) ‑> Iterator[~_T]</span>
+<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partials: bool = False) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Merge multiple iterable streams until one is exhausted.</p>
-<p>If yield_partial is true, yield any unmatched values from the other
-iterators. This prevents data lose if there are other references to
-non-exhausted iterators floating around.</p></div>
+<p>If yield_partials is true, yield any unmatched values yielded from the other
+iterables. This prevents data lose if any of the iterables are iterators
+with external references.</p></div>
 </dd>
 </dl>
 </section>
