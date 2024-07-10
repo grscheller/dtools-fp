@@ -41,5 +41,5 @@ Functional programming tools which endeavor to be Pythonic.
 ---
 
 [1]: https://pypi.org/project/grscheller.fp/
-[2]: https://grscheller.github.io/fp/API/development/html/grscheller/datastructures/index.html
+[2]: https://grscheller.github.io/fp/
 [3]: https://github.com/grscheller/fp/
