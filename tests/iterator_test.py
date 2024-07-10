@@ -47,7 +47,7 @@ class Test_fp_iterators:
         assert mixed_tup_exhaust[0:8] == ('a', 0, 'b', 1, 'c', 2, 'd', 3)
         assert mixed_tup_exhaust[46:54] == ('x', 23, 'y' ,24 ,'z', 25, 26, 27)
 
-    def test_s(self) -> None:
+    def test_yield_partials(self) -> None:
         i0, i1, i2 = iter(['a0', 'b0', 'c0', 'd0', 'e0']), iter(['a1', 'b1', 'c1']), iter(['a2', 'b2', 'c2', 'd2', 'e2'])
         assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2') == tuple(merge(i0, i1, i2))
         assert i0.__next__() == 'e0'        # 'd0' is lost!
@@ -55,7 +55,66 @@ class Test_fp_iterators:
         assert i2.__next__() == 'e2'
 
         i0, i1, i2 = iter(['a0', 'b0', 'c0', 'd0', 'e0']), iter(['a1', 'b1', 'c1']), iter(['a2', 'b2', 'c2', 'd2', 'e2'])
-        assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2', 'd0') == tuple(merge(i0, i1, i2, yield_partial=True))
+        assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2', 'd0') == tuple(merge(i0, i1, i2, yield_partials=True))
         assert i0.__next__() == 'e0'
         assert i2.__next__() == 'd2'
         assert i2.__next__() == 'e2'
+
+    def test_edge_cases(self) -> None:
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(concat(i3, i0, i4))) == 7
+        assert tup == ('a3', 'b3', 'c3', 'a4', 'b4', 'c4', 'd4')
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(concat(i0, i3, i4))) == 7
+        assert tup == ('a3', 'b3', 'c3', 'a4', 'b4', 'c4', 'd4')
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(concat(i4, i3, i0))) == 7
+        assert tup == ('a4', 'b4', 'c4', 'd4', 'a3', 'b3', 'c3')
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(exhaust(i3, i0, i4))) == 7
+        assert tup == ('a3', 'a4', 'b3', 'b4', 'c3', 'c4', 'd4')
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(exhaust(i0, i3, i4))) == 7
+        assert tup == ('a3', 'a4', 'b3', 'b4', 'c3', 'c4', 'd4')
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(exhaust(i4, i3, i0))) == 7
+        assert tup == ('a4', 'a3', 'b4', 'b3', 'c4', 'c3', 'd4')
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(merge(i3, i0, i4))) == 0
+        assert tup == ()
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(merge(i0, i3, i4))) == 0
+        assert tup == ()
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(merge(i4, i3, i0))) == 0
+        assert tup == ()
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(merge(i3, i0, i4, yield_partials=True))) == 1
+        assert tup == ('a3',)
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(merge(i0, i3, i4, yield_partials=True))) == 0
+        assert tup == ()
+
+        i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
+        assert len(tup := tuple(merge(i4, i3, i0, yield_partials=True))) == 2
+        assert tup == ('a4', 'a3')
+
+    def test_mixed_cases(self) -> None:
+        i3, ih, i4 = iter(('a3', 'b3', 'c3')), iter('hello'), iter([1, 2, 3, 4])
+        assert len(tup1 := tuple(concat(i3, ih, i4))) == 12
+        assert tup1 == ('a3', 'b3', 'c3', 'h', 'e', 'l', 'l', 'o', 1, 2, 3, 4)
+
+        i3, ih, i4 = iter(('a3', 'b3', 'c3')), iter('hello'), iter([1, 2, 3, 4])
+        tup2: tuple[int|str, ...] = tuple(concat(i3, ih, i4))
+        assert len(tup2) == 12
+        assert tup2 == ('a3', 'b3', 'c3', 'h', 'e', 'l', 'l', 'o', 1, 2, 3, 4)

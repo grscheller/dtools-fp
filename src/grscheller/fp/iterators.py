@@ -19,10 +19,12 @@ from typing import Iterator, Iterable, Iterator, TypeVar
 
 _T = TypeVar('_T')
 
-__all__ = ['concat', 'exhaust', 'merge']
+__all__ = ['concat', 'merge', 'exhaust']
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
+
+## Iterate over multiple Iterables
 
 def concat(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Sequentially concatenate multiple iterators into one.
@@ -38,31 +40,6 @@ def concat(*iterables: Iterable[_T]) -> Iterator[_T]:
                 yield value
             except StopIteration:
                 break
-
-def merge(*iterables: Iterable[_T], yield_partial: bool=False) -> Iterator[_T]:
-    """Merge multiple iterable streams until one is exhausted.
-
-    If yield_partial is true, yield any unmatched values from the other
-    iterators. This prevents data lose if there are other references to
-    non-exhausted iterators floating around.
-    """
-    iterList = list(map(lambda x: iter(x), iterables))
-    if (numIters := len(iterList)) > 0:
-        values = []
-        # Break when first iterator is exhausted
-        while True:
-            try:
-                for ii in range(numIters):
-                    values.append(next(iterList[ii]))
-                for value in values:
-                    yield value
-                values.clear()
-            except StopIteration:
-                break
-        # Yield any remaining values
-        if yield_partial:
-            for value in values:
-                yield value
 
 def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Merge multiple iterator streams until all are exhausted."""
@@ -88,3 +65,28 @@ def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
         # Yield any remaining values
         for value in values:
             yield value
+
+def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
+    """Merge multiple iterable streams until one is exhausted.
+
+    If yield_partials is true, yield any unmatched values yielded from the other
+    iterables. This prevents data lose if any of the iterables are iterators
+    with external references.
+    """
+    iterList = list(map(lambda x: iter(x), iterables))
+    if (numIters := len(iterList)) > 0:
+        values = []
+        # Break when first iterator is exhausted
+        while True:
+            try:
+                for ii in range(numIters):
+                    values.append(next(iterList[ii]))
+                for value in values:
+                    yield value
+                values.clear()
+            except StopIteration:
+                break
+        # Yield any remaining values
+        if yield_partials:
+            for value in values:
+                yield value

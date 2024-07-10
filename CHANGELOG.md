@@ -19,7 +19,7 @@ The grscheller.fp PyPI project provides functional programming tools.
 
 ## Releases and other important milestones
 
-### Version 0.1.0 - Initial PyPI Release: TBA
+### Version 0.1.0 - Initial PyPI Release: 2024-07-10
 
 * replicated functionality from grscheller.datastructures
   * grscheller.datastructures.fp.MB

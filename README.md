@@ -31,12 +31,12 @@ Functional programming tools which endeavor to be Pythonic.
   * Functions for combining multiple iterators
     * function `concat(*t: [Iterable[T]]): Iterator[T]`
       * sequentially concatenate multiple iterables
-      * use itertools.chain instead
+      * you may want to use the standard lib's itertools.chain instead
       * still performant
-    * function `merge(*t: [Iterable[T]]): Iterator[T]`
-      * merge iterables until one is exhausted
     * function `exhaust(*t: [Iterable[T]]): Iterator[T]`
       * merge iterables until all are exhausted
+    * function `merge(*t: [Iterable[T]]): Iterator[T]`
+      * merge iterables until one is exhausted
 
 ---
 
