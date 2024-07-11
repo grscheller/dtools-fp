@@ -1,6 +1,6 @@
 # CHANGELOG
 
-The grscheller.fp PyPI project provides functional programming tools.
+PyPI grscheller.fp project provides functional programming tools.
 
 ## Semantic versioning
 
@@ -19,9 +19,9 @@ The grscheller.fp PyPI project provides functional programming tools.
 
 ## Releases and other important milestones
 
-### Version 0.1.0 - Initial PyPI Release: 2024-07-10
+### Version 0.1.0 - Initial PyPI Release: 2024-07-11
 
 * replicated functionality from grscheller.datastructures
-  * grscheller.datastructures.fp.MB
-  * grscheller.datastructures.fp.XOR
-  * grscheller.core.iterlib
+  * grscheller.datastructures.fp.MB  -> grscheller.fp.wo_exception.MB
+  * grscheller.datastructures.fp.XOR -> grscheller.fp.wo_exception.XOR
+  * grscheller.core.iterlib          -> grscheller.fp.iterators

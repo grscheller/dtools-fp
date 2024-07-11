@@ -156,12 +156,13 @@ class XOR(Generic[_L,_R]):
         """Get value if a Left.
 
         * if the XOR is a left, return its value
-        * otherwise return an alternate value of type `_L|NoneType`
-        * default alternate value is None
+        * otherwise, return alt if it is not None
+        * otherwise, return None
         """
         if self._left is None:
             return alt
-        return self._left
+        else:
+            return self._left
 
     def getRight(self, alt: Optional[_R]=None) -> Optional[_R]:
         """Get value if a Right.
@@ -172,20 +173,34 @@ class XOR(Generic[_L,_R]):
         """
         if self._left is None:
             return self._right
-        return alt
+        else:
+            return alt
 
-    def map(self, f: Callable[[_L], Optional[_S]], right: _R) -> XOR[_S, _R]:
+    def map(self, f: Callable[[_L], Optional[_S]], right: Optional[_R]=None) -> XOR[_S, _R]:
         """Map over an `XOR`.
 
         * if a "left", apply f to the value, use `right` only if f returns `None`
         * if a "right", propagate existing "right" value
+
+        * if a "left" apply f and return a "left" if f successful
+        * otherwise if f unsuccessful return a "right" with right if not None
+        * otherwise return a "right" with the self._right default value
+        * if a "right" return a  "right" with right if not right None
+        * otherwise propagate the "right"
         """
         if self._left is None:
-            return XOR(None, self._right)
-        return XOR(f(self._left), right)
+            if right is None:
+                return XOR(None, self._right)
+            else:
+                return XOR(None, right)
+        else:
+            if right is None:
+                return XOR(f(self._left), self._right)
+            else:
+                return XOR(f(self._left), right)
 
     def mapRight(self, g: Callable[[_R], _R]) -> XOR[_L, _R]:
-        """Map over a `Right(value)`."""
+        """Map over a "right" value."""
         if self._left is None:
             return XOR(None, g(self._right))
         return self

@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
+from typing import Optional
 from grscheller.fp.wo_exception import MB, XOR, mb_to_xor, xor_to_mb
 
 def add2(x: int) -> int:
     return x + 2
+
+def gt42(x: int) -> Optional[bool]:
+    if x > 42:
+        return True
+    if x == 42:
+        return False
+    return None
 
 class TestMB:
     def test_identity(self) -> None:
@@ -155,6 +165,31 @@ class TestXOR:
         thing1: XOR[int, str] = xor42.map(lambda _: None, 'none').mapRight(lambda s: s + '?')
         thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(None, 'none?'))
         assert thing1 == thing2
+
+        xor_99 = XOR(99, 'orig 99')
+        xor_86 = XOR(86, 'orig 86')
+        xor_42 = XOR(42, 'orig 42')
+        xor_21 = XOR(21, 'orig 21')
+        xor_12 = XOR(12, 'orig 12')
+
+        assert xor_99.map(gt42) == xor_86.map(gt42)
+        assert xor_21.map(gt42, 'lt 42') == xor_12.map(gt42, 'lt 42')
+        assert xor_21.map(gt42) != xor_12.map(gt42)
+
+        hymie = xor_86.map(gt42).mapRight(lambda s: f'Hymie says: {s}')
+        chief = xor_86.map(gt42).mapRight(lambda s: f'Chief says: {s}')
+        ratton = xor_21.map(gt42).mapRight(lambda s: f'Dr. Ratton says: {s}')
+        seigfried = xor_21.map(gt42).mapRight(lambda s: f'Seigfried says: {s}')
+
+        assert hymie == chief
+        assert ratton != seigfried
+
+        assert repr(hymie) == "XOR(True, 'orig 86')"
+        assert repr(chief) == "XOR(True, 'orig 86')"
+        assert repr(ratton) == "XOR(None, 'Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(None, 'Seigfried says: orig 21')"
+
+        assert xor_12.map(gt42, 'not greater than 42') == XOR(None, 'not greater than 42')
 
     def test_either_right(self) -> None:
         def noMoreThan5(x: int) -> int|None:

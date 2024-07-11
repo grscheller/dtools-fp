@@ -248,12 +248,13 @@ hljs.highlightAll();
         &#34;&#34;&#34;Get value if a Left.
 
         * if the XOR is a left, return its value
-        * otherwise return an alternate value of type `_L|NoneType`
-        * default alternate value is None
+        * otherwise, return alt if it is not None
+        * otherwise, return None
         &#34;&#34;&#34;
         if self._left is None:
             return alt
-        return self._left
+        else:
+            return self._left
 
     def getRight(self, alt: Optional[_R]=None) -&gt; Optional[_R]:
         &#34;&#34;&#34;Get value if a Right.
@@ -264,20 +265,34 @@ hljs.highlightAll();
         &#34;&#34;&#34;
         if self._left is None:
             return self._right
-        return alt
+        else:
+            return alt
 
-    def map(self, f: Callable[[_L], Optional[_S]], right: _R) -&gt; XOR[_S, _R]:
+    def map(self, f: Callable[[_L], Optional[_S]], right: Optional[_R]=None) -&gt; XOR[_S, _R]:
         &#34;&#34;&#34;Map over an `XOR`.
 
         * if a &#34;left&#34;, apply f to the value, use `right` only if f returns `None`
         * if a &#34;right&#34;, propagate existing &#34;right&#34; value
+
+        * if a &#34;left&#34; apply f and return a &#34;left&#34; if f successful
+        * otherwise if f unsuccessful return a &#34;right&#34; with right if not None
+        * otherwise return a &#34;right&#34; with the self._right default value
+        * if a &#34;right&#34; return a  &#34;right&#34; with right if not right None
+        * otherwise propagate the &#34;right&#34;
         &#34;&#34;&#34;
         if self._left is None:
-            return XOR(None, self._right)
-        return XOR(f(self._left), right)
+            if right is None:
+                return XOR(None, self._right)
+            else:
+                return XOR(None, right)
+        else:
+            if right is None:
+                return XOR(f(self._left), self._right)
+            else:
+                return XOR(f(self._left), right)
 
     def mapRight(self, g: Callable[[_R], _R]) -&gt; XOR[_L, _R]:
-        &#34;&#34;&#34;Map over a `Right(value)`.&#34;&#34;&#34;
+        &#34;&#34;&#34;Map over a &#34;right&#34; value.&#34;&#34;&#34;
         if self._left is None:
             return XOR(None, g(self._right))
         return self
@@ -308,8 +323,8 @@ hljs.highlightAll();
 <div class="desc"><p>Get value if a Left.</p>
 <ul>
 <li>if the XOR is a left, return its value</li>
-<li>otherwise return an alternate value of type <code>_L|NoneType</code></li>
-<li>default alternate value is None</li>
+<li>otherwise, return alt if it is not None</li>
+<li>otherwise, return None</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.getRight"><code class="name flex">
@@ -324,20 +339,30 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], Optional[_S]], right: _R) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_S, ~_R]</span>
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], Optional[_S]], right: Optional[_R] = None) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_S, ~_R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map over an <code><a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a></code>.</p>
 <ul>
 <li>if a "left", apply f to the value, use <code>right</code> only if f returns <code>None</code></li>
-<li>if a "right", propagate existing "right" value</li>
+<li>
+<p>if a "right", propagate existing "right" value</p>
+</li>
+<li>
+<p>if a "left" apply f and return a "left" if f successful</p>
+</li>
+<li>otherwise if f unsuccessful return a "right" with right if not None</li>
+<li>otherwise return a "right" with the self._right default value</li>
+<li>if a "right" return a
+"right" with right if not right None</li>
+<li>otherwise propagate the "right"</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.mapRight"><code class="name flex">
 <span>def <span class="ident">mapRight</span></span>(<span>self, g: Callable[[_R], _R]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_L, ~_R]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map over a <code>Right(value)</code>.</p></div>
+<div class="desc"><p>Map over a "right" value.</p></div>
 </dd>
 </dl>
 </dd>
