@@ -36,10 +36,10 @@ class MB(Generic[_T]):
 
     * implements the Maybe Monad
     * where MB(value) contains a possible value of type _T
-    * and MB( ) & MB(None) both semantically represent "Nothing"
-    * above two imply None, as a value, cannot be stored in a MB
-    * immutable, a MB does not change after being created
-    * immutable semantics, map & flatMap produce new instances
+    * MB( ) semantically represent "Nothing"
+    * therefore None, as a value, cannot be put into a MB
+    * immutable - a MB does not change after being created
+    * immutable - map & flatMap produce new instances
     """
     __slots__ = '_value',
 
@@ -85,7 +85,7 @@ class MB(Generic[_T]):
         """Get contents if they exist
 
         * otherwise return an alternate value of type `_T|NoneType`
-        * default alternate value is `None`
+        * alternate value defaults to `None`
         """
         if self._value is None:
             return alt
@@ -104,14 +104,14 @@ class MB(Generic[_T]):
             return MB()
         return f(self._value)
 
-class XOR(Generic[_L,_R]):
+class XOR(Generic[_L, _R]):
     """Class that either contains a "left" value or "right" value, but not both.
 
     * implements a left biased Either Monad
     * semantically containing 1 of 2 possible types of values
-    * `XOR(l: _T, r: _S)` produces "left" value
-    * `XOR(None, r: _S)` produces a "right" value
-    * therefore `None` (as a value, not implementation detail) can't be stored in a "left"
+    * XOR(left: _L, right: _R) produces "left" value
+    * XOR(None, right: _R) produces a "right" value
+    * therefore None as a value, not implementation detail, can't be put into a "left"
     * in a Boolean context, returns `True` if a "left", `False` if a "right"
     * immutable, an `XOR` does not change after being created
     * immutable semantics, `map` & `flatMap` never mutate `self`
@@ -167,7 +167,7 @@ class XOR(Generic[_L,_R]):
     def getRight(self, alt: Optional[_R]=None) -> Optional[_R]:
         """Get value if a Right.
 
-        * if the XOR is a right, return its value
+        * if XOR is a right, return its value
         * otherwise return an alternate value of type `_R|NoneType`
         * default alternate value is None
         """
@@ -179,14 +179,11 @@ class XOR(Generic[_L,_R]):
     def map(self, f: Callable[[_L], Optional[_S]], right: Optional[_R]=None) -> XOR[_S, _R]:
         """Map over an `XOR`.
 
-        * if a "left", apply f to the value, use `right` only if f returns `None`
-        * if a "right", propagate existing "right" value
-
         * if a "left" apply f and return a "left" if f successful
-        * otherwise if f unsuccessful return a "right" with right if not None
-        * otherwise return a "right" with the self._right default value
-        * if a "right" return a  "right" with right if not right None
-        * otherwise propagate the "right"
+        * otherwise, if f unsuccessful, return a "right" with non-None right
+        * otherwise, if right None, return a "right" with the default right value
+        * if a "right" return a  "right" with non-None right
+        * otherwise, if right None, propagate the "right"
         """
         if self._left is None:
             if right is None:
