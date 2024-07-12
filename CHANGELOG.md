@@ -2,7 +2,7 @@
 
 PyPI grscheller.fp project provides functional programming tools.
 
-## Semantic versioning
+## Semantic Versioning
 
 * first digit:
   * major event, epoch, or paradigm shift
@@ -14,10 +14,10 @@ PyPI grscheller.fp project provides functional programming tools.
   * bug fixes
   * minor changes
   * significant documentation updates
-* forth digit (development environment only):
-  * not to be taken too seriously
+* forth digit:
+  * development only
 
-## Releases and other important milestones
+## Releases and Important Milestones
 
 ### Version 0.1.0 - Initial PyPI Release: 2024-07-11
 

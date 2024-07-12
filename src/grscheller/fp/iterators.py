@@ -29,8 +29,7 @@ __license__ = "Apache License 2.0"
 def concat(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Sequentially concatenate multiple iterators into one.
 
-    * you may want to use the standard library's itertools.chain instead
-    * concat is still performant
+    * performant to the standard library's itertools.chain
     """
     iterator: Iterator[_T]
     for iterator in map(lambda x: iter(x), iterables):
@@ -69,9 +68,8 @@ def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
 def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
     """Merge multiple iterable streams until one is exhausted.
 
-    If yield_partials is true, yield any unmatched values yielded from the other
-    iterables. This prevents data lose if any of the iterables are iterators
-    with external references.
+    * if yield_partials is true, yield any unmatched yielded values from the other iterables
+    * this prevents data lose if any of the iterables are iterators with external references
     """
     iterList = list(map(lambda x: iter(x), iterables))
     if (numIters := len(iterList)) > 0:
