@@ -1,4 +1,4 @@
-# Python Functional Programming (FP) Package 
+# Python Functional Programming (FP)
 
 Functional programming tools which endeavor to be Pythonic.
 
@@ -14,9 +14,12 @@ Functional programming tools which endeavor to be Pythonic.
 * avoid exception driven code paths
 * data sharing becomes trivial due to immutability
 
-### Modules
+## Modules
 
-* module grscheller.fp.wo\_exception
+* [grscheller.fp.wo_exception](#grschellerfpwoexception)
+* [grscheller.fp.iterators](#grschellerfpiterators)
+
+### grscheller.fp.wo\_exception
   * class `MB[T](t: Optional[T])`
     * the maybe monad
     * represents a potentially missing value
@@ -27,7 +30,10 @@ Functional programming tools which endeavor to be Pythonic.
     * one of two possible exclusive categories of values
     * either one or the other, not both
     * left biased
-* module grscheller.fp.iterators
+
+---
+
+### grscheller.fp.iterators
   * Functions for combining multiple iterators
     * function `concat(*t: [Iterable[T]]): Iterator[T]`
       * sequentially concatenate multiple iterables
