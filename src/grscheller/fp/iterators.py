@@ -15,9 +15,13 @@
 """Library of iterator related functions."""
 
 from __future__ import annotations
-from typing import Iterator, Iterable, Iterator, TypeVar
+from typing import Any, Callable, Iterator, Iterable, Iterator
+from typing import Optional, overload, TypeVar
 
 _T = TypeVar('_T')
+_S = TypeVar('_S')
+_R = TypeVar('_R')
+_Q = TypeVar('_Q')
 
 __all__ = ['concat', 'merge', 'exhaust']
 __author__ = "Geoffrey R. Scheller"
@@ -88,3 +92,39 @@ def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
         if yield_partials:
             for value in values:
                 yield value
+
+## accumulate - itertools.accumulate is giving me mypy issues 
+
+@overload
+def accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]:
+    it = iter(it)
+    try:
+        acc = next(it)
+    except StopIteration:
+        return
+
+    for ii in it:
+        yield acc
+        acc = f(acc, ii)
+    yield acc
+
+@overload
+def accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]:
+    it = iter(it)
+    acc = s
+    for ii in it:
+        yield acc
+        acc = f(acc, ii)
+    yield acc
+
+def accumulate(it: Iterable[_R], f: Callable[[_Q, _R], _Q], s: Optional[_Q]=None) -> Never:
+    if s is not None:
+        raise ValueError
+
+    it = iter(it)
+    try:
+        acc = next(it)
+    except StopIteration:
+        raise ValueError
+
+    raise TypeError
