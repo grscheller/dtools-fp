@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Functional tools
+"""Functional data types to use in lieu of exceptions."""
 
-* class **MB**: Implements the Maybe Monad
-* class **XOR**: Implements a left biased Either Monad (rigid right type)
-"""
 from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]

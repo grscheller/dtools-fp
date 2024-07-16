@@ -38,7 +38,12 @@ hljs.highlightAll();
 <span>def <span class="ident">accumulate</span></span>(<span>it: Iterable[Any], f: Callable[[Any, Any], Any], s: Optional[Any] = None) ‑> Iterator[Any]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns an iterator of accumulated value.</p>
+<ul>
+<li>accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -&gt; Iterator[_T]</li>
+<li>accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -&gt; Iterator[_S]</li>
+<li>f does not default to addition</li>
+</ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.concat"><code class="name flex">
 <span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[_T]</span>

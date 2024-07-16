@@ -95,12 +95,20 @@ def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
 ## accumulate - itertools.accumulate is giving me mypy issues 
 
 @overload
-def accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]: ...
+def accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]:
+    ...
 
 @overload
-def accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]: ...
+def accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]:
+    ...
 
 def accumulate(it: Iterable[Any], f: Callable[[Any, Any], Any], s: Optional[Any]=None) -> Iterator[Any]:
+    """Returns an iterator of accumulated value.
+
+    * accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]
+    * accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]
+    * f does not default to addition
+    """
     it = iter(it)
     if s is None:
         try:
