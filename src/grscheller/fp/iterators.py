@@ -16,12 +16,11 @@
 
 from __future__ import annotations
 from typing import Any, Callable, Iterator, Iterable, Iterator
-from typing import Optional, overload, TypeVar
+from typing import Never, Optional, overload, TypeVar
+import itertools as IT
 
 _T = TypeVar('_T')
 _S = TypeVar('_S')
-_R = TypeVar('_R')
-_Q = TypeVar('_Q')
 
 __all__ = ['concat', 'merge', 'exhaust']
 __author__ = "Geoffrey R. Scheller"
@@ -96,35 +95,22 @@ def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
 ## accumulate - itertools.accumulate is giving me mypy issues 
 
 @overload
-def accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]:
-    it = iter(it)
-    try:
-        acc = next(it)
-    except StopIteration:
-        return
-
-    for ii in it:
-        yield acc
-        acc = f(acc, ii)
-    yield acc
+def accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]: ...
 
 @overload
-def accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]:
+def accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]: ...
+
+def accumulate(it: Iterable[Any], f: Callable[[Any, Any], Any], s: Optional[Any]=None) -> Iterator[Any]:
     it = iter(it)
-    acc = s
+    if s is None:
+        try:
+            acc = next(it)
+        except StopIteration:
+            return
+    else:
+        acc = s
+
     for ii in it:
         yield acc
         acc = f(acc, ii)
     yield acc
-
-def accumulate(it: Iterable[_R], f: Callable[[_Q, _R], _Q], s: Optional[_Q]=None) -> Never:
-    if s is not None:
-        raise ValueError
-
-    it = iter(it)
-    try:
-        acc = next(it)
-    except StopIteration:
-        raise ValueError
-
-    raise TypeError

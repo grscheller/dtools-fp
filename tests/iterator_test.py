@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from grscheller.fp.iterators import concat, merge, exhaust
+from grscheller.fp.iterators import accumulate
 
 class Test_fp_iterators:
     def test_identity(self) -> None:
@@ -118,3 +119,37 @@ class Test_fp_iterators:
         tup2: tuple[int|str, ...] = tuple(concat(i3, ih, i4))
         assert len(tup2) == 12
         assert tup2 == ('a3', 'b3', 'c3', 'h', 'e', 'l', 'l', 'o', 1, 2, 3, 4)
+
+    def test_accumulate(self) -> None:
+        def add(x: int, y: int) -> int:
+            return x+y
+
+        foo: list[int] = [5,4,3,2,1]
+        fooPlus = list(accumulate(foo, add))
+        fooMult = list(accumulate(foo, lambda a,b: a*b))
+        assert fooPlus == [5, 9, 12, 14, 15]
+        assert fooMult == [5, 20, 60, 120, 120]
+
+        bar: list[int] = []
+        barPlus = list(accumulate(bar, add))
+        barMult = list(accumulate(bar, lambda a,b: a*b))
+        assert barPlus == []
+        assert barMult == []
+
+        woo: list[int] = [5,4,3,2,1]
+        wooPlus = list(accumulate(woo, add, 1))
+        wooMult = list(accumulate(woo, lambda a,b: a*b, 10))
+        assert wooPlus == [1, 6, 10, 13, 15, 16]
+        assert wooMult == [10, 50, 200, 600, 1200, 1200]
+
+        baz: list[int] = []
+        bazPlus = list(accumulate(baz, add, 1))
+        bazMult = list(accumulate(baz, lambda a,b: a*b, 10))
+        assert bazPlus == [1]
+        assert bazMult == [10]
+
+        bat = (5,4,3,2,1)
+        empty: tuple[int, ...] = ()
+        batPlus = list(accumulate(bat, lambda t,i: (i,) + t, empty))
+        assert batPlus == [(), (5,), (4, 5), (3, 4, 5), (2, 3, 4, 5), (1, 2, 3, 4, 5)]
+
