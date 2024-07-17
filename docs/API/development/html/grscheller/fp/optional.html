@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>grscheller.fp API documentation</title>
-<meta name="description" content="Functional programming tools which endeavor to be Pythonic.">
+<title>grscheller.fp.optional API documentation</title>
+<meta name="description" content="Functional data types to use in lieu of exceptions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -22,33 +22,151 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>grscheller.fp</code></h1>
+<h1 class="title">Module <code>grscheller.fp.optional</code></h1>
 </header>
 <section id="section-intro">
-<p>Functional programming tools which endeavor to be Pythonic.</p>
+<p>Functional data types to use in lieu of exceptions.</p>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="grscheller.fp.iterators" href="iterators.html">grscheller.fp.iterators</a></code></dt>
+<dt id="grscheller.fp.optional.Opt"><code class="flex name class">
+<span>class <span class="ident">Opt</span></span>
+<span>(</span><span>value: Optional[_T] = None)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>Library of iterator related functions.</p></div>
+<div class="desc"><p>Class representing a value of type _T or None</p>
+<ul>
+<li>_T|None is an Optional/Maybe Monad built into Python</li>
+<li>None makes a lousy bottom type since it has almost no methods</li>
+<li>one must always manually check if a value is None or not</li>
+<li>aside: () would make a much better bottom, it is at least iterable</li>
+<li>Opt wraps an _T|None and supplies many useful mostly useless methods</li>
+<li>Opt is my partially successful attempt to give Python a bottom type</li>
+<li>Opt[NoneType] by design is unrepresentable</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Opt(Generic[_T]):
+    &#34;&#34;&#34;Class representing a value of type _T or None
+
+    * _T|None is an Optional/Maybe Monad built into Python
+    * None makes a lousy bottom type since it has almost no methods
+    * one must always manually check if a value is None or not
+    * aside: () would make a much better bottom, it is at least iterable
+    * Opt wraps an _T|None and supplies many useful mostly useless methods
+    * Opt is my partially successful attempt to give Python a bottom type
+    * Opt[NoneType] by design is unrepresentable
+
+    &#34;&#34;&#34;
+    __slots__ = &#39;_value&#39;,
+
+    def __init__(self, value: Optional[_T]=None):
+        self._value = value
+
+    def __iter__(self) -&gt; Iterator[Optional[_T]]:
+        yield self._value
+
+    def __bool__(self) -&gt; bool:
+        if self._value is None:
+            return False
+        else:
+            return True
+
+    def __repr__(self) -&gt; str:
+        if self._value is None:
+            return &#39;Opt()&#39;
+        else:
+            return &#39;Opt(&#39; + repr(self._value) + &#39;)&#39;
+
+    def __str__(self) -&gt; str:
+        if self._value is None:
+            return &#39;None&#39;
+        else:
+            return str(self._value)
+
+    def __len__(self) -&gt; int:
+        if self._value is None:
+            return 0
+        else:
+            return 1
+
+    def __eq__(self, other: object) -&gt; bool:
+        if not isinstance(other, type(self)):
+            return False
+        return self._value == other._value
+
+    def get(self) -&gt; Optional[_T]:
+        &#34;&#34;&#34;Get contents.&#34;&#34;&#34;
+        return self._value
+
+    def map(self, f: Callable[[_T], _S]) -&gt; Opt[_S]:
+        &#34;&#34;&#34;Map f over the value if not None.&#34;&#34;&#34;
+        if self._value is None:
+            return Opt()
+        return Opt(f(self._value))
+
+    def flatmap(self, f: Callable[[_T], Opt[_S]]) -&gt; Opt[_S]:
+        &#34;&#34;&#34;Map `f` and flatten.&#34;&#34;&#34;
+        if self._value is None:
+            return Opt()
+        else:
+            return f(self._value)
+
+    def __getitem__(self, index: int) -&gt; Any:
+        if self._value is None:
+            return None
+        else:
+            item: Any = None
+            try:
+                value = self._value
+                item = value[index]   # type: ignore
+            except IndexError:
+                item = None
+        return item
+
+    def __setitem__(self, index: int, item: Any) -&gt; None:
+        if self._value is None:
+            return
+        else:
+            self._value[index] = item   # type: ignore
+        return</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Generic</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="grscheller.fp.optional.Opt.flatmap"><code class="name flex">
+<span>def <span class="ident">flatmap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[_S]]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Map <code>f</code> and flatten.</p></div>
 </dd>
-<dt><code class="name"><a title="grscheller.fp.optional" href="optional.html">grscheller.fp.optional</a></code></dt>
+<dt id="grscheller.fp.optional.Opt.get"><code class="name flex">
+<span>def <span class="ident">get</span></span>(<span>self) ‑> Optional[~_T]</span>
+</code></dt>
 <dd>
-<div class="desc"><p>Functional data types to use in lieu of exceptions.</p></div>
+<div class="desc"><p>Get contents.</p></div>
 </dd>
-<dt><code class="name"><a title="grscheller.fp.wo_exception" href="wo_exception.html">grscheller.fp.wo_exception</a></code></dt>
+<dt id="grscheller.fp.optional.Opt.map"><code class="name flex">
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
+</code></dt>
 <dd>
-<div class="desc"><p>Functional data types to use in lieu of exceptions.</p></div>
+<div class="desc"><p>Map f over the value if not None.</p></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -56,11 +174,21 @@ hljs.highlightAll();
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="grscheller.fp.iterators" href="iterators.html">grscheller.fp.iterators</a></code></li>
-<li><code><a title="grscheller.fp.optional" href="optional.html">grscheller.fp.optional</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception" href="wo_exception.html">grscheller.fp.wo_exception</a></code></li>
+<li><code><a title="grscheller.fp" href="index.html">grscheller.fp</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a></code></h4>
+<ul class="">
+<li><code><a title="grscheller.fp.optional.Opt.flatmap" href="#grscheller.fp.optional.Opt.flatmap">flatmap</a></code></li>
+<li><code><a title="grscheller.fp.optional.Opt.get" href="#grscheller.fp.optional.Opt.get">get</a></code></li>
+<li><code><a title="grscheller.fp.optional.Opt.map" href="#grscheller.fp.optional.Opt.map">map</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

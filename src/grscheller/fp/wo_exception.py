@@ -31,12 +31,16 @@ _R = TypeVar('_R')
 class MB(Generic[_T]):
     """Class representing a potentially missing value.
 
-    * implements the Maybe Monad
     * where MB(value) contains a possible value of type _T
     * MB( ) semantically represent "Nothing"
+    * set out to implement the Maybe Monad
+    * this may be an example of a monad transformer
     * therefore None, as a value, cannot be put into a MB
     * immutable - a MB does not change after being created
     * immutable - map & flatMap produce new instances
+    * there is no general way to combine two arbitrary monads
+    * knowledge of internal details of one monad is needed
+
     """
     __slots__ = '_value',
 
@@ -55,11 +59,6 @@ class MB(Generic[_T]):
             return 'MB()'
 
     def __bool__(self) -> bool:
-        """Determine if the `MB` contains a value.
-
-        * return `True` if the `MB` contains a value
-        * return `False` otherwise
-        """
         return self._value is not None
 
     def __len__(self) -> int:
@@ -69,11 +68,6 @@ class MB(Generic[_T]):
             return 1
 
     def __eq__(self, other: object) -> bool:
-        """Return `True` only when
-
-        * both sides are "Nothings"
-        * both sides contain values which compare as equal
-        """
         if not isinstance(other, type(self)):
             return False
         return self._value == other._value
@@ -83,6 +77,7 @@ class MB(Generic[_T]):
 
         * otherwise return an alternate value of type `_T|NoneType`
         * alternate value defaults to `None`
+
         """
         if self._value is None:
             return alt
@@ -101,6 +96,10 @@ class MB(Generic[_T]):
             return MB()
         return f(self._value)
 
+    @classmethod
+    def pure(cls, t: _T) -> MB[_T]:
+        return MB(t)
+
 class XOR(Generic[_L, _R]):
     """Class that either contains a "left" value or "right" value, but not both.
 
@@ -112,6 +111,7 @@ class XOR(Generic[_L, _R]):
     * in a Boolean context, returns `True` if a "left", `False` if a "right"
     * immutable, an `XOR` does not change after being created
     * immutable semantics, `map` & `flatMap` never mutate `self`
+
     """
     __slots__ = '_left', '_right'
 
@@ -155,6 +155,7 @@ class XOR(Generic[_L, _R]):
         * if the XOR is a left, return its value
         * otherwise, return alt if it is not None
         * otherwise, return None
+
         """
         if self._left is None:
             return alt
@@ -167,6 +168,7 @@ class XOR(Generic[_L, _R]):
         * if XOR is a right, return its value
         * otherwise return an alternate value of type `_R|NoneType`
         * default alternate value is None
+
         """
         if self._left is None:
             return self._right
@@ -181,6 +183,7 @@ class XOR(Generic[_L, _R]):
         * otherwise, if right None, return a "right" with the default right value
         * if a "right" return a  "right" with non-None right
         * otherwise, if right None, propagate the "right"
+
         """
         if self._left is None:
             if right is None:
