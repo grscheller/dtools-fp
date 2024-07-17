@@ -76,9 +76,17 @@ class TestMB:
         o1 = MB(1)
         n1: MB[int] = MB()
         assert o1.get(42) == 1
-        assert n1.get(42) == 42
+        assert n1.get(21) == 21
         assert o1.get() == 1
-        assert n1.get() is None
+        try:
+            foo = 42
+            foo = n1.get()
+        except ValueError:
+            assert True
+        else:
+            assert False
+        finally:
+            assert foo == 42
         assert n1.get(13) == (10 + 3)
         assert n1.get(10//7) == 10//7
 
@@ -205,9 +213,17 @@ class TestXOR:
         assert s1.get() == 3
         assert s2.get() == 3
         assert s4.get(42) == 42
-        assert s1.getRight() == None
-        assert s2.getRight() == None
-        assert s3.getRight() == None
+        try:
+            bar = 'barbell'
+            bar = s1.getRight()
+        except ValueError:
+            assert True
+        else:
+            assert False
+        finally:
+            assert bar == 'barbell'
+        assert s2.getRight('everything OK') == 'everything OK'
+        assert s3.getRight('no rights here') == 'no rights here'
         assert s4.getRight() == 'more than 5'
         assert s1.get(0) == 3
         assert s3.get(0) == 42
@@ -227,7 +243,7 @@ class TestXOR:
             else:
                 return XOR(None, '>=5')
 
-        left1 = XOR(1, 'nono')
+        left1 = XOR(1, 'no')
         left4 = XOR(4, '')
         left7 = XOR(7, 'foobar')
         right: XOR[int, str] = XOR(None, 'Nobody home')

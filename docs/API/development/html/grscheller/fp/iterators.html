@@ -46,7 +46,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.concat"><code class="name flex">
-<span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[~_T]</span>
+<span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sequentially concatenate multiple iterators into one.</p>
@@ -55,13 +55,13 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.exhaust"><code class="name flex">
-<span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[~_T]</span>
+<span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Merge multiple iterator streams until all are exhausted.</p></div>
 </dd>
 <dt id="grscheller.fp.iterators.merge"><code class="name flex">
-<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partials: bool = False) ‑> Iterator[~_T]</span>
+<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partials: bool = False) ‑> Iterator[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Merge multiple iterable streams until one is exhausted.</p>

@@ -35,13 +35,13 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="grscheller.fp.wo_exception.mb_to_xor"><code class="name flex">
-<span>def <span class="ident">mb_to_xor</span></span>(<span>m: <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T], right: _R) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_T, ~_R]</span>
+<span>def <span class="ident">mb_to_xor</span></span>(<span>m: <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T], right: _R) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_T, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert a <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a></code> to an <code><a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a></code>.</p></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.xor_to_mb"><code class="name flex">
-<span>def <span class="ident">xor_to_mb</span></span>(<span>e: <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_T, _S]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[~_T]</span>
+<span>def <span class="ident">xor_to_mb</span></span>(<span>e: <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_T, _S]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert an <code><a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a></code> to a <code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a></code>.</p></div>
@@ -116,26 +116,29 @@ hljs.highlightAll();
             return False
         return self._value == other._value
 
-    def get(self, alt: Optional[_T]=None) -&gt; Optional[_T]:
+    def get(self, alt: Optional[_T]=None) -&gt; _T:
         &#34;&#34;&#34;Get contents if they exist
 
-        * otherwise return an alternate value of type `_T|NoneType`
-        * alternate value defaults to `None`
+        * otherwise return an alternate value of type _T|NoneType
+        * raises ValueError if alternate value needed but not provided
 
         &#34;&#34;&#34;
         if self._value is None:
-            return alt
+            if alt is None:
+                raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
+            else:
+                return alt
         else:
             return self._value
 
     def map(self, f: Callable[[_T], Optional[_S]]) -&gt; MB[_S]:
-        &#34;&#34;&#34;Map `f` over the 0 or 1 elements of the data structure.&#34;&#34;&#34;
+        &#34;&#34;&#34;Map MB function f over the 0 or 1 elements of this data structure.&#34;&#34;&#34;
         if self._value is None:
             return MB()
         return MB(f(self._value))
 
     def flatmap(self, f: Callable[[_T], MB[_S]]) -&gt; MB[_S]:
-        &#34;&#34;&#34;Map `f` and flatten.&#34;&#34;&#34;
+        &#34;&#34;&#34;Map MB with function f and flatten.&#34;&#34;&#34;
         if self._value is None:
             return MB()
         return f(self._value)
@@ -151,7 +154,7 @@ hljs.highlightAll();
 <h3>Static methods</h3>
 <dl>
 <dt id="grscheller.fp.wo_exception.MB.pure"><code class="name flex">
-<span>def <span class="ident">pure</span></span>(<span>t: _T) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[~_T]</span>
+<span>def <span class="ident">pure</span></span>(<span>t: _T) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -160,26 +163,26 @@ hljs.highlightAll();
 <h3>Methods</h3>
 <dl>
 <dt id="grscheller.fp.wo_exception.MB.flatmap"><code class="name flex">
-<span>def <span class="ident">flatmap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[~_S]</span>
+<span>def <span class="ident">flatmap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map <code>f</code> and flatten.</p></div>
+<div class="desc"><p>Map MB with function f and flatten.</p></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.MB.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_T] = None) ‑> Optional[~_T]</span>
+<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_T] = None) ‑> _T</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get contents if they exist</p>
 <ul>
-<li>otherwise return an alternate value of type <code>_T|NoneType</code></li>
-<li>alternate value defaults to <code>None</code></li>
+<li>otherwise return an alternate value of type _T|NoneType</li>
+<li>raises ValueError if alternate value needed but not provided</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.MB.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], Optional[_S]]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[~_S]</span>
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], Optional[_S]]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map <code>f</code> over the 0 or 1 elements of the data structure.</p></div>
+<div class="desc"><p>Map MB function f over the 0 or 1 elements of this data structure.</p></div>
 </dd>
 </dl>
 </dd>
@@ -252,31 +255,37 @@ hljs.highlightAll();
         else:
             return False
 
-    def get(self, alt: Optional[_L]=None) -&gt; Optional[_L]:
+    def get(self, alt: Optional[_L]=None) -&gt; _L:
         &#34;&#34;&#34;Get value if a Left.
 
         * if the XOR is a left, return its value
-        * otherwise, return alt if it is not None
-        * otherwise, return None
+        * otherwise, return alt if it is provided
+        * raises ValueError if alternate value needed but not provided
 
         &#34;&#34;&#34;
         if self._left is None:
-            return alt
+            if alt is None:
+                raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
+            else:
+                return alt
         else:
             return self._left
 
-    def getRight(self, alt: Optional[_R]=None) -&gt; Optional[_R]:
+    def getRight(self, alt: Optional[_R]=None) -&gt; _R:
         &#34;&#34;&#34;Get value if a Right.
 
         * if XOR is a right, return its value
-        * otherwise return an alternate value of type `_R|NoneType`
-        * default alternate value is None
+        * otherwise return an alternate value of type _R
+        * raises ValueError if alternate value needed but not provided
 
         &#34;&#34;&#34;
         if self._left is None:
             return self._right
         else:
-            return alt
+            if alt is None:
+                raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
+            else:
+                return alt
 
     def map(self, f: Callable[[_L], Optional[_S]], right: Optional[_R]=None) -&gt; XOR[_S, _R]:
         &#34;&#34;&#34;Map over an `XOR`.
@@ -319,35 +328,35 @@ hljs.highlightAll();
 <h3>Methods</h3>
 <dl>
 <dt id="grscheller.fp.wo_exception.XOR.flatMap"><code class="name flex">
-<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_L], <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_S, ~_R]</span>
+<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_L], <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map and flatten a <code>Left</code> value, propagate <code>Right</code> values.</p></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_L] = None) ‑> Optional[~_L]</span>
+<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_L] = None) ‑> _L</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get value if a Left.</p>
 <ul>
 <li>if the XOR is a left, return its value</li>
-<li>otherwise, return alt if it is not None</li>
-<li>otherwise, return None</li>
+<li>otherwise, return alt if it is provided</li>
+<li>raises ValueError if alternate value needed but not provided</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.getRight"><code class="name flex">
-<span>def <span class="ident">getRight</span></span>(<span>self, alt: Optional[_R] = None) ‑> Optional[~_R]</span>
+<span>def <span class="ident">getRight</span></span>(<span>self, alt: Optional[_R] = None) ‑> _R</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get value if a Right.</p>
 <ul>
 <li>if XOR is a right, return its value</li>
-<li>otherwise return an alternate value of type <code>_R|NoneType</code></li>
-<li>default alternate value is None</li>
+<li>otherwise return an alternate value of type _R</li>
+<li>raises ValueError if alternate value needed but not provided</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], Optional[_S]], right: Optional[_R] = None) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_S, ~_R]</span>
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], Optional[_S]], right: Optional[_R] = None) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map over an <code><a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a></code>.</p>
@@ -361,7 +370,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.wo_exception.XOR.mapRight"><code class="name flex">
-<span>def <span class="ident">mapRight</span></span>(<span>self, g: Callable[[_R], _R]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[~_L, ~_R]</span>
+<span>def <span class="ident">mapRight</span></span>(<span>self, g: Callable[[_R], _R]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_L, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map over a "right" value.</p></div>
