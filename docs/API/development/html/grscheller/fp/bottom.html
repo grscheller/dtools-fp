@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>grscheller.fp.optional API documentation</title>
-<meta name="description" content="Functional data types to use in lieu of exceptions.">
+<title>grscheller.fp.bottom API documentation</title>
+<meta name="description" content="A partially successful attempt to give Python a &#34;bottom&#34; type …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -22,10 +22,29 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>grscheller.fp.optional</code></h1>
+<h1 class="title">Module <code>grscheller.fp.bottom</code></h1>
 </header>
 <section id="section-intro">
-<p>Functional data types to use in lieu of exceptions.</p>
+<p>A partially successful attempt to give Python a "bottom" type.</p>
+<p>_T|None acts like a poor man's Optional/Maybe Monad but None is a lousy bottom</p>
+<ul>
+<li>semantically a singleton, it can still be instantiated</li>
+<li>it really is not a subtype of all types, has almost no methods</li>
+<li>() would make a much better bottom, it is at least iterable</li>
+<li>a value must manually be checked whether it is None or not</li>
+</ul>
+<p>Class Opt implements the Maybe monad with Opt() acting like a bottom, at least
+for Opt[_T].</p>
+<ul>
+<li>delegates most standard functions/methods to the contained object, if it exists</li>
+<li>get_, map_, flatMap_ and some inherited from object act on the Opt container</li>
+<li>use map_(lambda x: x.foobar()) to access specific methods of the underlying object</li>
+<li>Opt() not a singleton, so use == and != instead of "is" or "is not"</li>
+<li>Opt[NoneType] by design is unrepresentable</li>
+</ul>
+<p>The project maintainer realized with a little effort, he could make Opt() behave
+like a bottom type. It is really only a bottom type for Opt[_T], it can be
+instantiated, and then is not a singleton, but we can pretend.</p>
 </section>
 <section>
 </section>
@@ -36,21 +55,18 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="grscheller.fp.optional.Opt"><code class="flex name class">
+<dt id="grscheller.fp.bottom.Opt"><code class="flex name class">
 <span>class <span class="ident">Opt</span></span>
 <span>(</span><span>value: Optional[_T] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Class representing a value of type _T or None</p>
+<div class="desc"><p>Class representing a value of type _T|None</p>
 <ul>
-<li>_T|None is a poor man's Optional/Maybe Monad built into Python</li>
-<li>None makes a lousy bottom type since it has almost no methods</li>
-<li>one must always manually check if a value is None or not</li>
-<li>aside: () would make a much better bottom, it is at least iterable</li>
-<li>Opt is my partially successful attempt to give Python a bottom type</li>
-<li>Opt wraps a _T|None and supplies many useful mostly delegated methods</li>
-<li>methods get, map, flatMap not delegated</li>
-<li>use map_, flatmap_ if calling these methods on the contained _T</li>
+<li>delegates most standard functions/methods to the contained object, if it exists</li>
+<li>get_, map_, flatMap_ and some inherited from object act on the Opt container</li>
+<li>use map_(lambda x: x.foobar()) to access specific methods of contained object</li>
+<li>use map to access them on the underlying object</li>
+<li>Opt() not a singleton, so use == and != instead of "is" and "is not"</li>
 <li>Opt[NoneType] by design is unrepresentable</li>
 </ul></div>
 <details class="source">
@@ -58,16 +74,13 @@ hljs.highlightAll();
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Opt(Generic[_T]):
-    &#34;&#34;&#34;Class representing a value of type _T or None
+    &#34;&#34;&#34;Class representing a value of type _T|None
 
-    * _T|None is a poor man&#39;s Optional/Maybe Monad built into Python
-    * None makes a lousy bottom type since it has almost no methods
-    * one must always manually check if a value is None or not
-    * aside: () would make a much better bottom, it is at least iterable
-    * Opt is my partially successful attempt to give Python a bottom type
-    * Opt wraps a _T|None and supplies many useful mostly delegated methods
-    * methods get, map, flatMap not delegated
-    * use map_, flatmap_ if calling these methods on the contained _T
+    * delegates most standard functions/methods to the contained object, if it exists
+    * get_, map_, flatMap_ and some inherited from object act on the Opt container
+    * use map_(lambda x: x.foobar()) to access specific methods of contained object
+    * use map to access them on the underlying object
+    * Opt() not a singleton, so use == and != instead of &#34;is&#34; and &#34;is not&#34;
     * Opt[NoneType] by design is unrepresentable
 
     &#34;&#34;&#34;
@@ -104,40 +117,52 @@ hljs.highlightAll();
             if hasattr(self._value, &#39;__len__&#39;):
                 return len(self._value)
             else:
-                raise ValueError(&#39;Contained object does not len().&#39;)
+                msg = f&#39;contained object of type {type(self._value)} &#39;
+                msg += &#39;does not have a length.&#39;
+                raise TypeError(msg)
 
     def __eq__(self, other: object) -&gt; bool:
         if not isinstance(other, type(self)):
             return False
         return self._value == other._value
 
-    def get(self) -&gt; Optional[_T]:
-        &#34;&#34;&#34;Get contents.&#34;&#34;&#34;
+    def get_(self) -&gt; Optional[_T]:
+        &#34;&#34;&#34;Get contents of Opt container.&#34;&#34;&#34;
         return self._value
 
-    def map(self, f: Callable[[_T], _S]) -&gt; Opt[_S]:
-        &#34;&#34;&#34;Map f over the value if not None.&#34;&#34;&#34;
-        if self._value is None:
-            return Opt()
-        else:
-            return Opt(f(self._value))
-
-    def map_(self, f: Callable[[_V], _S]) -&gt; Opt[_S]:
+    def map(self, f: Callable[[_V], _S]) -&gt; Opt[_S]:
         &#34;&#34;&#34;Map f over the value if not None.
 
-        * raise ValueError if contained value is not map-able
+        * raise TypeError if contained value is not map-able
 
         &#34;&#34;&#34;
         if self._value is None:
             return Opt()
         else:
             if hasattr(self._value, &#39;map&#39;):
-                return Opt(f(self._value.map(f)))
+                return Opt(self._value.map(f))
             else:
-                raise ValueError(&#39;Contained object not map-able&#39;)
+                raise TypeError(&#39;Contained object not map-able&#39;)
 
-    def flatMap(self, f: Callable[[_T], Opt[_S]]) -&gt; Opt[_S]:
-        &#34;&#34;&#34;Map function f and flatten result.&#34;&#34;&#34;
+    def map_(self, f: Callable[[_T], _S]) -&gt; Opt[_S]:
+        &#34;&#34;&#34;Map f over the Opt container, not its value.&#34;&#34;&#34;
+        if self._value is None:
+            return Opt()
+        else:
+            return Opt(f(self._value))
+
+    def flatMap(self, f: Callable[[_U], _V]) -&gt; Opt[_V]:
+        &#34;&#34;&#34;flatMap f over the value if not None.&#34;&#34;&#34;
+        if self._value is None:
+            return Opt()
+        else:
+            if hasattr(self._value, &#39;flatMap&#39;):
+                return Opt(self._value.flatMap(f))
+            else:
+                raise TypeError(&#39;Contained value is not bind-able.&#39;)
+
+    def flatMap_(self, f: Callable[[_T], Opt[_S]]) -&gt; Opt[_S]:
+        &#34;&#34;&#34;flatMap function f over Opt container, not its value.&#34;&#34;&#34;
         if self._value is None:
             return Opt()
         else:
@@ -168,32 +193,38 @@ hljs.highlightAll();
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="grscheller.fp.optional.Opt.flatMap"><code class="name flex">
-<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[_S]]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
+<dt id="grscheller.fp.bottom.Opt.flatMap"><code class="name flex">
+<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_U], _V]) ‑> <a title="grscheller.fp.bottom.Opt" href="#grscheller.fp.bottom.Opt">Opt</a>[_V]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map function f and flatten result.</p></div>
+<div class="desc"><p>flatMap f over the value if not None.</p></div>
 </dd>
-<dt id="grscheller.fp.optional.Opt.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self) ‑> Optional[~_T]</span>
+<dt id="grscheller.fp.bottom.Opt.flatMap_"><code class="name flex">
+<span>def <span class="ident">flatMap_</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.bottom.Opt" href="#grscheller.fp.bottom.Opt">Opt</a>[_S]]) ‑> <a title="grscheller.fp.bottom.Opt" href="#grscheller.fp.bottom.Opt">Opt</a>[_S]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get contents.</p></div>
+<div class="desc"><p>flatMap function f over Opt container, not its value.</p></div>
 </dd>
-<dt id="grscheller.fp.optional.Opt.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
+<dt id="grscheller.fp.bottom.Opt.get_"><code class="name flex">
+<span>def <span class="ident">get_</span></span>(<span>self) ‑> Optional[_T]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map f over the value if not None.</p></div>
+<div class="desc"><p>Get contents of Opt container.</p></div>
 </dd>
-<dt id="grscheller.fp.optional.Opt.map_"><code class="name flex">
-<span>def <span class="ident">map_</span></span>(<span>self, f: Callable[[_V], _S]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
+<dt id="grscheller.fp.bottom.Opt.map"><code class="name flex">
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_V], _S]) ‑> <a title="grscheller.fp.bottom.Opt" href="#grscheller.fp.bottom.Opt">Opt</a>[_S]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map f over the value if not None.</p>
 <ul>
-<li>raise ValueError if contained value is not map-able</li>
+<li>raise TypeError if contained value is not map-able</li>
 </ul></div>
+</dd>
+<dt id="grscheller.fp.bottom.Opt.map_"><code class="name flex">
+<span>def <span class="ident">map_</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.bottom.Opt" href="#grscheller.fp.bottom.Opt">Opt</a>[_S]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Map f over the Opt container, not its value.</p></div>
 </dd>
 </dl>
 </dd>
@@ -213,12 +244,13 @@ hljs.highlightAll();
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a></code></h4>
+<h4><code><a title="grscheller.fp.bottom.Opt" href="#grscheller.fp.bottom.Opt">Opt</a></code></h4>
 <ul class="">
-<li><code><a title="grscheller.fp.optional.Opt.flatMap" href="#grscheller.fp.optional.Opt.flatMap">flatMap</a></code></li>
-<li><code><a title="grscheller.fp.optional.Opt.get" href="#grscheller.fp.optional.Opt.get">get</a></code></li>
-<li><code><a title="grscheller.fp.optional.Opt.map" href="#grscheller.fp.optional.Opt.map">map</a></code></li>
-<li><code><a title="grscheller.fp.optional.Opt.map_" href="#grscheller.fp.optional.Opt.map_">map_</a></code></li>
+<li><code><a title="grscheller.fp.bottom.Opt.flatMap" href="#grscheller.fp.bottom.Opt.flatMap">flatMap</a></code></li>
+<li><code><a title="grscheller.fp.bottom.Opt.flatMap_" href="#grscheller.fp.bottom.Opt.flatMap_">flatMap_</a></code></li>
+<li><code><a title="grscheller.fp.bottom.Opt.get_" href="#grscheller.fp.bottom.Opt.get_">get_</a></code></li>
+<li><code><a title="grscheller.fp.bottom.Opt.map" href="#grscheller.fp.bottom.Opt.map">map</a></code></li>
+<li><code><a title="grscheller.fp.bottom.Opt.map_" href="#grscheller.fp.bottom.Opt.map_">map_</a></code></li>
 </ul>
 </li>
 </ul>

@@ -12,7 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Functional data types to use in lieu of exceptions."""
+"""A partially successful attempt to give Python a "bottom" type.
+
+_T|None acts like a poor man's Optional/Maybe Monad but None is a lousy bottom
+
+* semantically a singleton, it can still be instantiated
+* it really is not a subtype of all types, has almost no methods
+* () would make a much better bottom, it is at least iterable
+* a value must manually be checked whether it is None or not
+
+Class Opt implements the Maybe monad with Opt() acting like a bottom, at least
+for Opt[_T].
+
+* delegates most standard functions/methods to the contained object, if it exists
+* get_, map_, flatMap_ and some inherited from object act on the Opt container
+* use map_(lambda x: x.foobar()) to access specific methods of the underlying object
+* Opt() not a singleton, so use == and != instead of "is" or "is not"
+* Opt[NoneType] by design is unrepresentable
+
+The project maintainer realized with a little effort, he could make Opt() behave
+like a bottom type. It is really only a bottom type for Opt[_T], it can be
+instantiated, and then is not a singleton, but we can pretend.
+
+"""
 
 from __future__ import annotations
 
@@ -26,18 +48,16 @@ from typing import Any, Callable, Generic, Iterator, Optional, TypeVar
 _T = TypeVar('_T')
 _S = TypeVar('_S')
 _V = TypeVar('_V')
+_U = TypeVar('_U')
 
 class Opt(Generic[_T]):
-    """Class representing a value of type _T or None
+    """Class representing a value of type _T|None
 
-    * _T|None is a poor man's Optional/Maybe Monad built into Python
-    * None makes a lousy bottom type since it has almost no methods
-    * one must always manually check if a value is None or not
-    * aside: () would make a much better bottom, it is at least iterable
-    * Opt is my partially successful attempt to give Python a bottom type
-    * Opt wraps a _T|None and supplies many useful mostly delegated methods
-    * methods get, map, flatMap not delegated
-    * use map_, flatmap_ if calling these methods on the contained _T
+    * delegates most standard functions/methods to the contained object, if it exists
+    * get_, map_, flatMap_ and some inherited from object act on the Opt container
+    * use map_(lambda x: x.foobar()) to access specific methods of contained object
+    * use map to access them on the underlying object
+    * Opt() not a singleton, so use == and != instead of "is" and "is not"
     * Opt[NoneType] by design is unrepresentable
 
     """
@@ -74,40 +94,52 @@ class Opt(Generic[_T]):
             if hasattr(self._value, '__len__'):
                 return len(self._value)
             else:
-                raise ValueError('Contained object does not len().')
+                msg = f'contained object of type {type(self._value)} '
+                msg += 'does not have a length.'
+                raise TypeError(msg)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return False
         return self._value == other._value
 
-    def get(self) -> Optional[_T]:
-        """Get contents."""
+    def get_(self) -> Optional[_T]:
+        """Get contents of Opt container."""
         return self._value
 
-    def map(self, f: Callable[[_T], _S]) -> Opt[_S]:
-        """Map f over the value if not None."""
-        if self._value is None:
-            return Opt()
-        else:
-            return Opt(f(self._value))
-
-    def map_(self, f: Callable[[_V], _S]) -> Opt[_S]:
+    def map(self, f: Callable[[_V], _S]) -> Opt[_S]:
         """Map f over the value if not None.
 
-        * raise ValueError if contained value is not map-able
+        * raise TypeError if contained value is not map-able
 
         """
         if self._value is None:
             return Opt()
         else:
             if hasattr(self._value, 'map'):
-                return Opt(f(self._value.map(f)))
+                return Opt(self._value.map(f))
             else:
-                raise ValueError('Contained object not map-able')
+                raise TypeError('Contained object not map-able')
 
-    def flatMap(self, f: Callable[[_T], Opt[_S]]) -> Opt[_S]:
-        """Map function f and flatten result."""
+    def map_(self, f: Callable[[_T], _S]) -> Opt[_S]:
+        """Map f over the Opt container, not its value."""
+        if self._value is None:
+            return Opt()
+        else:
+            return Opt(f(self._value))
+
+    def flatMap(self, f: Callable[[_U], _V]) -> Opt[_V]:
+        """flatMap f over the value if not None."""
+        if self._value is None:
+            return Opt()
+        else:
+            if hasattr(self._value, 'flatMap'):
+                return Opt(self._value.flatMap(f))
+            else:
+                raise TypeError('Contained value is not bind-able.')
+
+    def flatMap_(self, f: Callable[[_T], Opt[_S]]) -> Opt[_S]:
+        """flatMap function f over Opt container, not its value."""
         if self._value is None:
             return Opt()
         else:
