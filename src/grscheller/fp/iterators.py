@@ -1,11 +1,11 @@
 # Copyright 2023-2024 Geoffrey R. Scheller
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,9 @@ __license__ = "Apache License 2.0"
 def concat(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Sequentially concatenate multiple iterators into one.
 
-    * performant to the standard library's itertools.chain
+    * pure Python version of standard library's itertools.chain
+    * performant to chain
+
     """
     iterator: Iterator[_T]
     for iterator in map(lambda x: iter(x), iterables):
@@ -44,12 +46,15 @@ def concat(*iterables: Iterable[_T]) -> Iterator[_T]:
                 break
 
 def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
-    """Merge multiple iterator streams until all are exhausted."""
+    """Merge together multiple iterator streams until all are exhausted.
+
+    * breaks when last iterator is exhausted
+
+    """
     iterList = list(map(lambda x: iter(x), iterables))
     if (numIters := len(iterList)) > 0:
         ii = 0
         values = []
-        # Break when last iterator is exhausted
         while True:
             try:
                 while ii < numIters:
@@ -64,20 +69,20 @@ def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
                 if numIters < 1:
                     break
                 del iterList[ii]
-        # Yield any remaining values
         for value in values:
             yield value
 
 def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
     """Merge multiple iterable streams until one is exhausted.
 
+    * breaks when first iterator is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
     * this prevents data lose if any of the iterables are iterators with external references
+
     """
     iterList = list(map(lambda x: iter(x), iterables))
     if (numIters := len(iterList)) > 0:
         values = []
-        # Break when first iterator is exhausted
         while True:
             try:
                 for ii in range(numIters):
@@ -87,27 +92,19 @@ def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
                 values.clear()
             except StopIteration:
                 break
-        # Yield any remaining values
         if yield_partials:
             for value in values:
                 yield value
 
-## accumulate - itertools.accumulate is giving me mypy issues 
-
-#@overload
-#def accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]:
-#    ...
-#
-#@overload
-#def accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]:
-#    ...
+## accumulate - itertools.accumulate is giving me mypy issues
 
 def accumulate(it: Iterable[Any], f: Callable[[_S, _T], _S], s: Optional[_S]=None) -> Iterator[_S]:
     """Returns an iterator of accumulated value.
 
-    * accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -> Iterator[_T]
-    * accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -> Iterator[_S]
+    * pure Python version of standard library's itertools.chain
     * function f does not default to addition
+    * f not doing so results in more type annotation flexibility
+
     """
     it = iter(it)
     if s is None:

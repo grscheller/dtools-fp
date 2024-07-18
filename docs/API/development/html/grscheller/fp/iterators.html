@@ -35,37 +35,42 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="grscheller.fp.iterators.accumulate"><code class="name flex">
-<span>def <span class="ident">accumulate</span></span>(<span>it: Iterable[Any], f: Callable[[Any, Any], Any], s: Optional[Any] = None) ‑> Iterator[Any]</span>
+<span>def <span class="ident">accumulate</span></span>(<span>it: Iterable[Any], f: Callable[[_S, _T], _S], s: Optional[_S] = None) ‑> Iterator[~_S]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns an iterator of accumulated value.</p>
 <ul>
-<li>accumulate(it: Iterable[_T], f: Callable[[_T, _T], _T]) -&gt; Iterator[_T]</li>
-<li>accumulate(it: Iterable[_T], f: Callable[[_S, _T], _S], s: _S) -&gt; Iterator[_S]</li>
-<li>f does not default to addition</li>
+<li>pure Python version of standard library's itertools.chain</li>
+<li>function f does not default to addition</li>
+<li>f not doing so results in more type annotation flexibility</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.concat"><code class="name flex">
-<span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[_T]</span>
+<span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sequentially concatenate multiple iterators into one.</p>
 <ul>
-<li>performant to the standard library's itertools.chain</li>
+<li>pure Python version of standard library's itertools.chain</li>
+<li>performant to chain</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.exhaust"><code class="name flex">
-<span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[_T]</span>
+<span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[_T]) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Merge multiple iterator streams until all are exhausted.</p></div>
+<div class="desc"><p>Merge together multiple iterator streams until all are exhausted.</p>
+<ul>
+<li>breaks when last iterator is exhausted</li>
+</ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.merge"><code class="name flex">
-<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partials: bool = False) ‑> Iterator[_T]</span>
+<span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_T], yield_partials: bool = False) ‑> Iterator[~_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Merge multiple iterable streams until one is exhausted.</p>
 <ul>
+<li>breaks when first iterator is exhausted</li>
 <li>if yield_partials is true, yield any unmatched yielded values from the other iterables</li>
 <li>this prevents data lose if any of the iterables are iterators with external references</li>
 </ul></div>

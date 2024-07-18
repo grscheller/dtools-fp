@@ -111,9 +111,9 @@ class XOR(Generic[_L, _R]):
     * XOR(left: _L, right: _R) produces "left" value
     * XOR(None, right: _R) produces a "right" value
     * therefore None as a value, not implementation detail, can't be put into a "left"
-    * in a Boolean context, returns `True` if a "left", `False` if a "right"
-    * immutable, an `XOR` does not change after being created
-    * immutable semantics, `map` & `flatMap` never mutate `self`
+    * in a Boolean context, returns True if a "left", False if a "right"
+    * immutable, an XOR does not change after being created
+    * immutable semantics, map & flatMap never mutate self
 
     """
     __slots__ = '_left', '_right'
@@ -122,7 +122,7 @@ class XOR(Generic[_L, _R]):
         self._left, self._right = potential_left, default_right
 
     def __bool__(self) -> bool:
-        """Predicate to determine if the `XOR` contains a "left" or a "right".
+        """Predicate to determine if the XOR contains a "left" or a "right".
 
         * true if the XOR is a "left"
         * false if the XOR is a "right"
@@ -138,7 +138,7 @@ class XOR(Generic[_L, _R]):
         return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
 
     def __len__(self) -> int:
-        """Semantically, an `XOR` always contains just one value."""
+        """Semantically, an XOR always contains just one value."""
         return 1
 
     def __eq__(self, other: object) -> bool:
@@ -185,7 +185,7 @@ class XOR(Generic[_L, _R]):
                 return alt
 
     def map(self, f: Callable[[_L], Optional[_S]], right: Optional[_R]=None) -> XOR[_S, _R]:
-        """Map over an `XOR`.
+        """Map over an XOR.
 
         * if a "left" apply f and return a "left" if f successful
         * otherwise, if f unsuccessful, return a "right" with non-None right
@@ -212,7 +212,7 @@ class XOR(Generic[_L, _R]):
         return self
 
     def flatMap(self, f: Callable[[_L], XOR[_S, _R]]) -> XOR[_S, _R]:
-        """Map and flatten a `Left` value, propagate `Right` values."""
+        """Map and flatten a Left value, propagate Right values."""
         if self._left is None:
             return XOR(None, self._right)
         else:
@@ -221,18 +221,18 @@ class XOR(Generic[_L, _R]):
 # Conversion functions
 
 def mb_to_xor(m: MB[_T], right: _R) -> XOR[_T, _R]:
-    """Convert a `MB` to an `XOR`."""
+    """Convert a MB to an XOR."""
     if m:
         return XOR(m.get(), right)
     else:
         return XOR(None, right)
 
 def xor_to_mb(e: XOR[_T,_S]) -> MB[_T]:
-    """Convert an `XOR` to a `MB`."""
+    """Convert an XOR to a MB."""
     if e:
         return MB(e.get())
     else:
         return MB()
- 
+
 if __name__ == "__main__":
     pass

@@ -43,12 +43,14 @@ hljs.highlightAll();
 <dd>
 <div class="desc"><p>Class representing a value of type _T or None</p>
 <ul>
-<li>_T|None is an Optional/Maybe Monad built into Python</li>
+<li>_T|None is a poor man's Optional/Maybe Monad built into Python</li>
 <li>None makes a lousy bottom type since it has almost no methods</li>
 <li>one must always manually check if a value is None or not</li>
 <li>aside: () would make a much better bottom, it is at least iterable</li>
-<li>Opt wraps an _T|None and supplies many useful mostly useless methods</li>
 <li>Opt is my partially successful attempt to give Python a bottom type</li>
+<li>Opt wraps a _T|None and supplies many useful mostly delegated methods</li>
+<li>methods get, map, flatMap not delegated</li>
+<li>use map_, flatmap_ if calling these methods on the contained _T</li>
 <li>Opt[NoneType] by design is unrepresentable</li>
 </ul></div>
 <details class="source">
@@ -58,12 +60,14 @@ hljs.highlightAll();
 <pre><code class="python">class Opt(Generic[_T]):
     &#34;&#34;&#34;Class representing a value of type _T or None
 
-    * _T|None is an Optional/Maybe Monad built into Python
+    * _T|None is a poor man&#39;s Optional/Maybe Monad built into Python
     * None makes a lousy bottom type since it has almost no methods
     * one must always manually check if a value is None or not
     * aside: () would make a much better bottom, it is at least iterable
-    * Opt wraps an _T|None and supplies many useful mostly useless methods
     * Opt is my partially successful attempt to give Python a bottom type
+    * Opt wraps a _T|None and supplies many useful mostly delegated methods
+    * methods get, map, flatMap not delegated
+    * use map_, flatmap_ if calling these methods on the contained _T
     * Opt[NoneType] by design is unrepresentable
 
     &#34;&#34;&#34;
@@ -79,7 +83,7 @@ hljs.highlightAll();
         if self._value is None:
             return False
         else:
-            return True
+            return bool(self._value)
 
     def __repr__(self) -&gt; str:
         if self._value is None:
@@ -97,7 +101,10 @@ hljs.highlightAll();
         if self._value is None:
             return 0
         else:
-            return 1
+            if hasattr(self._value, &#39;__len__&#39;):
+                return len(self._value)
+            else:
+                raise ValueError(&#39;Contained object does not len().&#39;)
 
     def __eq__(self, other: object) -&gt; bool:
         if not isinstance(other, type(self)):
@@ -112,10 +119,25 @@ hljs.highlightAll();
         &#34;&#34;&#34;Map f over the value if not None.&#34;&#34;&#34;
         if self._value is None:
             return Opt()
-        return Opt(f(self._value))
+        else:
+            return Opt(f(self._value))
 
-    def flatmap(self, f: Callable[[_T], Opt[_S]]) -&gt; Opt[_S]:
-        &#34;&#34;&#34;Map `f` and flatten.&#34;&#34;&#34;
+    def map_(self, f: Callable[[_V], _S]) -&gt; Opt[_S]:
+        &#34;&#34;&#34;Map f over the value if not None.
+
+        * raise ValueError if contained value is not map-able
+
+        &#34;&#34;&#34;
+        if self._value is None:
+            return Opt()
+        else:
+            if hasattr(self._value, &#39;map&#39;):
+                return Opt(f(self._value.map(f)))
+            else:
+                raise ValueError(&#39;Contained object not map-able&#39;)
+
+    def flatMap(self, f: Callable[[_T], Opt[_S]]) -&gt; Opt[_S]:
+        &#34;&#34;&#34;Map function f and flatten result.&#34;&#34;&#34;
         if self._value is None:
             return Opt()
         else:
@@ -146,23 +168,32 @@ hljs.highlightAll();
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="grscheller.fp.optional.Opt.flatmap"><code class="name flex">
-<span>def <span class="ident">flatmap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[_S]]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[_S]</span>
+<dt id="grscheller.fp.optional.Opt.flatMap"><code class="name flex">
+<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[_S]]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map <code>f</code> and flatten.</p></div>
+<div class="desc"><p>Map function f and flatten result.</p></div>
 </dd>
 <dt id="grscheller.fp.optional.Opt.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self) ‑> Optional[_T]</span>
+<span>def <span class="ident">get</span></span>(<span>self) ‑> Optional[~_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get contents.</p></div>
 </dd>
 <dt id="grscheller.fp.optional.Opt.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[_S]</span>
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map f over the value if not None.</p></div>
+</dd>
+<dt id="grscheller.fp.optional.Opt.map_"><code class="name flex">
+<span>def <span class="ident">map_</span></span>(<span>self, f: Callable[[_V], _S]) ‑> <a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a>[~_S]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Map f over the value if not None.</p>
+<ul>
+<li>raise ValueError if contained value is not map-able</li>
+</ul></div>
 </dd>
 </dl>
 </dd>
@@ -184,9 +215,10 @@ hljs.highlightAll();
 <li>
 <h4><code><a title="grscheller.fp.optional.Opt" href="#grscheller.fp.optional.Opt">Opt</a></code></h4>
 <ul class="">
-<li><code><a title="grscheller.fp.optional.Opt.flatmap" href="#grscheller.fp.optional.Opt.flatmap">flatmap</a></code></li>
+<li><code><a title="grscheller.fp.optional.Opt.flatMap" href="#grscheller.fp.optional.Opt.flatMap">flatMap</a></code></li>
 <li><code><a title="grscheller.fp.optional.Opt.get" href="#grscheller.fp.optional.Opt.get">get</a></code></li>
 <li><code><a title="grscheller.fp.optional.Opt.map" href="#grscheller.fp.optional.Opt.map">map</a></code></li>
+<li><code><a title="grscheller.fp.optional.Opt.map_" href="#grscheller.fp.optional.Opt.map_">map_</a></code></li>
 </ul>
 </li>
 </ul>

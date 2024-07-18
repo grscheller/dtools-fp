@@ -25,16 +25,19 @@ from typing import Any, Callable, Generic, Iterator, Optional, TypeVar
 
 _T = TypeVar('_T')
 _S = TypeVar('_S')
+_V = TypeVar('_V')
 
 class Opt(Generic[_T]):
     """Class representing a value of type _T or None
 
-    * _T|None is an Optional/Maybe Monad built into Python
+    * _T|None is a poor man's Optional/Maybe Monad built into Python
     * None makes a lousy bottom type since it has almost no methods
     * one must always manually check if a value is None or not
     * aside: () would make a much better bottom, it is at least iterable
-    * Opt wraps an _T|None and supplies many useful mostly useless methods
     * Opt is my partially successful attempt to give Python a bottom type
+    * Opt wraps a _T|None and supplies many useful mostly delegated methods
+    * methods get, map, flatMap not delegated
+    * use map_, flatmap_ if calling these methods on the contained _T
     * Opt[NoneType] by design is unrepresentable
 
     """
@@ -50,7 +53,7 @@ class Opt(Generic[_T]):
         if self._value is None:
             return False
         else:
-            return True
+            return bool(self._value)
 
     def __repr__(self) -> str:
         if self._value is None:
@@ -68,7 +71,10 @@ class Opt(Generic[_T]):
         if self._value is None:
             return 0
         else:
-            return 1
+            if hasattr(self._value, '__len__'):
+                return len(self._value)
+            else:
+                raise ValueError('Contained object does not len().')
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
@@ -83,10 +89,25 @@ class Opt(Generic[_T]):
         """Map f over the value if not None."""
         if self._value is None:
             return Opt()
-        return Opt(f(self._value))
+        else:
+            return Opt(f(self._value))
 
-    def flatmap(self, f: Callable[[_T], Opt[_S]]) -> Opt[_S]:
-        """Map `f` and flatten."""
+    def map_(self, f: Callable[[_V], _S]) -> Opt[_S]:
+        """Map f over the value if not None.
+
+        * raise ValueError if contained value is not map-able
+
+        """
+        if self._value is None:
+            return Opt()
+        else:
+            if hasattr(self._value, 'map'):
+                return Opt(f(self._value.map(f)))
+            else:
+                raise ValueError('Contained object not map-able')
+
+    def flatMap(self, f: Callable[[_T], Opt[_S]]) -> Opt[_S]:
+        """Map function f and flatten result."""
         if self._value is None:
             return Opt()
         else:
