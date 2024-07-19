@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR
+from grscheller.fp.bottom import Opt
 
 def addLt42(x: int, y: int) -> int|None:
     sum = x + y
@@ -40,6 +41,22 @@ class Test_str:
         assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
         assert str(s1) == 'MB(1)'
 
+    def test_Opt(self) -> None:
+        n1: Opt[int] = Opt()
+        o1 = Opt(42)
+        assert str(n1) == 'None'
+        assert str(o1) == '42'
+        mb1 = Opt(addLt42(3, 7))
+        mb2 = Opt(addLt42(15, 30))
+        assert str(mb1) == '10'
+        assert str(mb2) == 'None'
+        nt1: Opt[int] = Opt()
+        nt2: Opt[int] = Opt(None)
+        nt3: Opt[int] = Opt()
+        s1 = Opt(1)
+        assert str(nt1) == str(nt2) == str(nt3) == str(mb2) == 'None'
+        assert str(s1) == '1'
+
     def test_XOR(self) -> None:
         assert str(XOR(10, '')) == "XOR(10, '')"
         assert str(XOR(addLt42(10, -4), 'foofoo')) == "XOR(6, 'foofoo')"
@@ -49,7 +66,7 @@ class Test_str:
         assert str(XOR('13', 0)) == "XOR('13', 0)"
 
 class Test_repr:
-    def test_maybe(self) -> None:
+    def test_mb(self) -> None:
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
         mb3: MB[object] = MB(None)
@@ -58,23 +75,23 @@ class Test_repr:
         mb4 = eval(repr(mb3))
         assert mb4 == mb3
 
-        def lt5OrNone(x: int) -> Optional[int]:
+        def lt5orNone(x: int) -> Optional[int]:
             if x < 5:
                 return x
             else:
                 return None
 
-        def lt5OrNoneMB(x: int) -> MB[int]:
+        def lt5orNoneMB(x: int) -> MB[int]:
             if x < 5:
                 return MB(x)
             else:
                 return MB()
 
-        mb5 = MB(lt5OrNone(2))
-        mb6 = lt5OrNoneMB(2)
-        mb7 = lt5OrNoneMB(3)
-        mb8 = MB(lt5OrNone(7))
-        mb9 = lt5OrNoneMB(8)
+        mb5 = MB(lt5orNone(2))
+        mb6 = lt5orNoneMB(2)
+        mb7 = lt5orNoneMB(3)
+        mb8 = MB(lt5orNone(7))
+        mb9 = lt5orNoneMB(8)
 
         assert mb5 == mb6
         assert mb6 != mb7
@@ -88,6 +105,46 @@ class Test_repr:
         foofoo2 = eval(repr(foofoo))
         assert foofoo2 == foofoo
         assert repr(foofoo) == "MB(MB('foo'))"
+
+    def test_opt(self) -> None:
+        opt1: Opt[object] = Opt()
+        opt2: Opt[object] = Opt()
+        opt3: Opt[object] = Opt(None)
+        assert opt1 == opt2 == opt3 == Opt()
+        assert repr(opt2) == 'Opt()'
+        opt4 = eval(repr(opt3))
+        assert opt4 == opt3
+
+        def lt5orNone(x: int) -> Optional[int]:
+            if x < 5:
+                return x
+            else:
+                return None
+
+        def lt5orNoneOpt(x: int) -> Opt[int]:
+            if x < 5:
+                return Opt(x)
+            else:
+                return Opt()
+
+        opt5 = Opt(lt5orNone(2))
+        opt6 = lt5orNoneOpt(2)
+        opt7 = lt5orNoneOpt(3)
+        opt8 = Opt(lt5orNone(7))
+        opt9 = lt5orNoneOpt(8)
+
+        assert opt5 == opt6
+        assert opt6 != opt7
+        assert opt8 == opt9
+
+        assert repr(opt5) == repr(opt6) ==  'Opt(2)'
+        assert repr(opt7) ==  'Opt(3)'
+        assert repr(opt8) == repr(opt9) ==  'Opt()'
+
+        foofoo = Opt(Opt('foo'))
+        foofoo2 = eval(repr(foofoo))
+        assert foofoo2 == foofoo
+        assert repr(foofoo) == "Opt(Opt('foo'))"
 
     def test_either(self) -> None:
         e1: XOR[int, str] = XOR(None, 'Nobody home!')

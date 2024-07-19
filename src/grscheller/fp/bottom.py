@@ -69,13 +69,8 @@ class Opt(Generic[_T]):
         self._value = value
 
     def __iter__(self) -> Iterator[Optional[_T]]:
-        yield self._value
-
-    def __bool__(self) -> bool:
-        if self._value is None:
-            return False
-        else:
-            return bool(self._value)
+        if self._value is not None:
+            yield self._value
 
     def __repr__(self) -> str:
         if self._value is None:
@@ -88,6 +83,12 @@ class Opt(Generic[_T]):
             return 'None'
         else:
             return str(self._value)
+
+    def __bool__(self) -> bool:
+        if self._value is None:
+            return False
+        else:
+            return bool(self._value)
 
     def __len__(self) -> int:
         if self._value is None:
@@ -105,9 +106,20 @@ class Opt(Generic[_T]):
             return False
         return self._value == other._value
 
-    def get_(self) -> Optional[_T]:
-        """Get contents of Opt container."""
-        return self._value
+    def get_(self, alt: Optional[_T]=None) -> _T:
+        """Get contents if they exist
+
+        * otherwise return an alternate value of type _T
+        * raises ValueError if alternate value needed but not provided
+
+        """
+        if self._value is None:
+            if alt is None:
+                raise ValueError('Alternate return type needed but not provided.')
+            else:
+                return alt
+        else:
+            return self._value
 
     def map(self, f: Callable[[_V], _S]) -> Opt[_S]:
         """Map f over the value if not None.

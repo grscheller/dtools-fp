@@ -48,7 +48,6 @@ class MB(Generic[_T]):
         self._value = value
 
     def __iter__(self) -> Iterator[_T]:
-        """Yields its value if not a "Nothing"."""
         if self._value is not None:
             yield self._value
 
@@ -75,7 +74,7 @@ class MB(Generic[_T]):
     def get(self, alt: Optional[_T]=None) -> _T:
         """Get contents if they exist
 
-        * otherwise return an alternate value of type _T|NoneType
+        * otherwise return an alternate value of type _T
         * raises ValueError if alternate value needed but not provided
 
         """
