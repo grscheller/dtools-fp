@@ -44,7 +44,7 @@ for Opt[_T].</p>
 </ul>
 <p>The project maintainer realized with a little effort, he could make Opt() behave
 like a bottom type. It is really only a bottom type for Opt[_T], it can be
-instantiated, and then is not a singleton, but we can pretend.</p>
+instantiated, and then not a singleton, but we can pretend.</p>
 </section>
 <section>
 </section>
@@ -60,12 +60,14 @@ instantiated, and then is not a singleton, but we can pretend.</p>
 <span>(</span><span>value: Optional[_T] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Class representing a value of type _T|None</p>
+<div class="desc"><p>Implements an Optional/Maybe Monad with a "bottom value" Opt().</p>
 <ul>
+<li>semantically represents a value of type _T|None</li>
 <li>delegates most standard functions/methods to the contained object, if it exists</li>
 <li>get_, map_, flatMap_ and some inherited from object act on the Opt container</li>
 <li>use map_(lambda x: x.foobar()) to access specific methods of contained object</li>
-<li>use map to access them on the underlying object</li>
+<li>use map to map over the underlying object</li>
+<li>Opt() is a better "bottom" value than either None or ()</li>
 <li>Opt() not a singleton, so use == and != instead of "is" and "is not"</li>
 <li>Opt[NoneType] by design is unrepresentable</li>
 </ul></div>
@@ -74,12 +76,14 @@ instantiated, and then is not a singleton, but we can pretend.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Opt(Generic[_T]):
-    &#34;&#34;&#34;Class representing a value of type _T|None
+    &#34;&#34;&#34;Implements an Optional/Maybe Monad with a &#34;bottom value&#34; Opt().
 
+    * semantically represents a value of type _T|None
     * delegates most standard functions/methods to the contained object, if it exists
     * get_, map_, flatMap_ and some inherited from object act on the Opt container
     * use map_(lambda x: x.foobar()) to access specific methods of contained object
-    * use map to access them on the underlying object
+    * use map to map over the underlying object
+    * Opt() is a better &#34;bottom&#34; value than either None or ()
     * Opt() not a singleton, so use == and != instead of &#34;is&#34; and &#34;is not&#34;
     * Opt[NoneType] by design is unrepresentable
 

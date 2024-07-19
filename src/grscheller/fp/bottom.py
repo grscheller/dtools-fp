@@ -32,7 +32,7 @@ for Opt[_T].
 
 The project maintainer realized with a little effort, he could make Opt() behave
 like a bottom type. It is really only a bottom type for Opt[_T], it can be
-instantiated, and then is not a singleton, but we can pretend.
+instantiated, and then not a singleton, but we can pretend.
 
 """
 
@@ -51,12 +51,14 @@ _V = TypeVar('_V')
 _U = TypeVar('_U')
 
 class Opt(Generic[_T]):
-    """Class representing a value of type _T|None
+    """Implements an Optional/Maybe Monad with a "bottom value" Opt().
 
+    * semantically represents a value of type _T|None
     * delegates most standard functions/methods to the contained object, if it exists
     * get_, map_, flatMap_ and some inherited from object act on the Opt container
     * use map_(lambda x: x.foobar()) to access specific methods of contained object
-    * use map to access them on the underlying object
+    * use map to map over the underlying object
+    * Opt() is a better "bottom" value than either None or ()
     * Opt() not a singleton, so use == and != instead of "is" and "is not"
     * Opt[NoneType] by design is unrepresentable
 

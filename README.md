@@ -16,20 +16,21 @@ Functional programming tools which endeavor to be Pythonic.
 
 ## Modules
 
-* [grscheller.fp.wo_exception](#grschellerfpwoexception)
+* [grscheller.fp.bottom](#grschellerfpbottom)
 * [grscheller.fp.iterators](#grschellerfpiterators)
+* [grscheller.fp.woException](#grschellerfpwoexception)
 
-### grscheller.fp.wo\_exception
-  * class `MB[T](t: Optional[T])`
-    * the maybe monad
-    * represents a potentially missing value
-      * result of a calculation that could fail
-      * user input which could be missing
-  * class `XOR[L, R](left: Optional[L], right: R)`
-    * the either monad
-    * one of two possible exclusive categories of values
-    * either one or the other, not both
-    * left biased
+### grscheller.fp.bottom
+  * class Opt[T](t: Optional[T])
+    * implements an Optional/Maybe Monad with a "bottom value" Opt()
+    * semantically represents a value of type _T|None
+    * delegates most standard functions/methods to the contained object, if it exists
+    * get_, map_, flatMap_ and some inherited from object act on the Opt container
+    * use map_(lambda x: x.foobar()) to access specific methods of contained object
+    * use map to perform a map on the underlying object
+    * Opt() is a better "bottom" type than either None or ()
+    * Opt() not a singleton, so use == and != instead of "is" and "is not"
+    * Opt[NoneType] by design is unrepresentable
 
 ---
 
@@ -43,6 +44,20 @@ Functional programming tools which endeavor to be Pythonic.
       * merge iterables until all are exhausted
     * function `merge(*t: [Iterable[T]]): Iterator[T]`
       * merge iterables until one is exhausted
+
+---
+
+### grscheller.fp.woException
+  * class `MB[T](t: Optional[T])`
+    * the maybe monad
+    * represents a potentially missing value
+      * result of a calculation that could fail
+      * user input which could be missing
+  * class `XOR[L, R](left: Optional[L], right: R)`
+    * the either monad
+    * one of two possible exclusive categories of values
+    * either one or the other, not both
+    * left biased
 
 ---
 
