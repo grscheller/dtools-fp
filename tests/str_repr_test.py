@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.wo_exception import MB, XOR
+from grscheller.fp.woException import MB, XOR
 
 def addLt42(x: int, y: int) -> int|None:
     sum = x + y

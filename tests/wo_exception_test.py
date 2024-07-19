@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.wo_exception import MB, XOR, mb_to_xor, xor_to_mb
+from grscheller.fp.woException import MB, XOR, mb_to_xor, xor_to_mb
 
 def add2(x: int) -> int:
     return x + 2

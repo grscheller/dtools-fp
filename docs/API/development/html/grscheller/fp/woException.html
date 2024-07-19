@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>grscheller.fp.wo_exception API documentation</title>
+<title>grscheller.fp.woException API documentation</title>
 <meta name="description" content="Functional data types to use in lieu of exceptions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -22,7 +22,7 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>grscheller.fp.wo_exception</code></h1>
+<h1 class="title">Module <code>grscheller.fp.woException</code></h1>
 </header>
 <section id="section-intro">
 <p>Functional data types to use in lieu of exceptions.</p>
@@ -34,14 +34,14 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="grscheller.fp.wo_exception.mb_to_xor"><code class="name flex">
-<span>def <span class="ident">mb_to_xor</span></span>(<span>m: <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T], right: _R) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_T, _R]</span>
+<dt id="grscheller.fp.woException.mb_to_xor"><code class="name flex">
+<span>def <span class="ident">mb_to_xor</span></span>(<span>m: <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_T], right: _R) ‑> <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_T, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert a MB to an XOR.</p></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.xor_to_mb"><code class="name flex">
-<span>def <span class="ident">xor_to_mb</span></span>(<span>e: <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_T, _S]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T]</span>
+<dt id="grscheller.fp.woException.xor_to_mb"><code class="name flex">
+<span>def <span class="ident">xor_to_mb</span></span>(<span>e: <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_T, _S]) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert an XOR to a MB.</p></div>
@@ -51,7 +51,7 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="grscheller.fp.wo_exception.MB"><code class="flex name class">
+<dt id="grscheller.fp.woException.MB"><code class="flex name class">
 <span>class <span class="ident">MB</span></span>
 <span>(</span><span>value: Optional[_T] = None)</span>
 </code></dt>
@@ -153,8 +153,8 @@ hljs.highlightAll();
 </ul>
 <h3>Static methods</h3>
 <dl>
-<dt id="grscheller.fp.wo_exception.MB.pure"><code class="name flex">
-<span>def <span class="ident">pure</span></span>(<span>t: _T) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_T]</span>
+<dt id="grscheller.fp.woException.MB.pure"><code class="name flex">
+<span>def <span class="ident">pure</span></span>(<span>t: _T) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_T]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -162,13 +162,13 @@ hljs.highlightAll();
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="grscheller.fp.wo_exception.MB.flatmap"><code class="name flex">
-<span>def <span class="ident">flatmap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]</span>
+<dt id="grscheller.fp.woException.MB.flatmap"><code class="name flex">
+<span>def <span class="ident">flatmap</span></span>(<span>self, f: Callable[[_T], <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_S]]) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_S]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map MB with function f and flatten.</p></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.MB.get"><code class="name flex">
+<dt id="grscheller.fp.woException.MB.get"><code class="name flex">
 <span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_T] = None) ‑> _T</span>
 </code></dt>
 <dd>
@@ -178,15 +178,15 @@ hljs.highlightAll();
 <li>raises ValueError if alternate value needed but not provided</li>
 </ul></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.MB.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], Optional[_S]]) ‑> <a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a>[_S]</span>
+<dt id="grscheller.fp.woException.MB.map"><code class="name flex">
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], Optional[_S]]) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_S]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map MB function f over the 0 or 1 elements of this data structure.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="grscheller.fp.wo_exception.XOR"><code class="flex name class">
+<dt id="grscheller.fp.woException.XOR"><code class="flex name class">
 <span>class <span class="ident">XOR</span></span>
 <span>(</span><span>potential_left: Optional[_L], default_right: _R)</span>
 </code></dt>
@@ -327,13 +327,13 @@ hljs.highlightAll();
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="grscheller.fp.wo_exception.XOR.flatMap"><code class="name flex">
-<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_L], <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]</span>
+<dt id="grscheller.fp.woException.XOR.flatMap"><code class="name flex">
+<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_L], <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_S, _R]]) ‑> <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_S, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map and flatten a Left value, propagate Right values.</p></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.XOR.get"><code class="name flex">
+<dt id="grscheller.fp.woException.XOR.get"><code class="name flex">
 <span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_L] = None) ‑> _L</span>
 </code></dt>
 <dd>
@@ -344,7 +344,7 @@ hljs.highlightAll();
 <li>raises ValueError if alternate value needed but not provided</li>
 </ul></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.XOR.getRight"><code class="name flex">
+<dt id="grscheller.fp.woException.XOR.getRight"><code class="name flex">
 <span>def <span class="ident">getRight</span></span>(<span>self, alt: Optional[_R] = None) ‑> _R</span>
 </code></dt>
 <dd>
@@ -355,8 +355,8 @@ hljs.highlightAll();
 <li>raises ValueError if alternate value needed but not provided</li>
 </ul></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.XOR.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], Optional[_S]], right: Optional[_R] = None) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_S, _R]</span>
+<dt id="grscheller.fp.woException.XOR.map"><code class="name flex">
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], Optional[_S]], right: Optional[_R] = None) ‑> <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_S, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map over an XOR.</p>
@@ -369,8 +369,8 @@ hljs.highlightAll();
 <li>otherwise, if right None, propagate the "right"</li>
 </ul></div>
 </dd>
-<dt id="grscheller.fp.wo_exception.XOR.mapRight"><code class="name flex">
-<span>def <span class="ident">mapRight</span></span>(<span>self, g: Callable[[_R], _R]) ‑> <a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a>[_L, _R]</span>
+<dt id="grscheller.fp.woException.XOR.mapRight"><code class="name flex">
+<span>def <span class="ident">mapRight</span></span>(<span>self, g: Callable[[_R], _R]) ‑> <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_L, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map over a "right" value.</p></div>
@@ -392,29 +392,29 @@ hljs.highlightAll();
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="grscheller.fp.wo_exception.mb_to_xor" href="#grscheller.fp.wo_exception.mb_to_xor">mb_to_xor</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.xor_to_mb" href="#grscheller.fp.wo_exception.xor_to_mb">xor_to_mb</a></code></li>
+<li><code><a title="grscheller.fp.woException.mb_to_xor" href="#grscheller.fp.woException.mb_to_xor">mb_to_xor</a></code></li>
+<li><code><a title="grscheller.fp.woException.xor_to_mb" href="#grscheller.fp.woException.xor_to_mb">xor_to_mb</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="grscheller.fp.wo_exception.MB" href="#grscheller.fp.wo_exception.MB">MB</a></code></h4>
+<h4><code><a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a></code></h4>
 <ul class="">
-<li><code><a title="grscheller.fp.wo_exception.MB.flatmap" href="#grscheller.fp.wo_exception.MB.flatmap">flatmap</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.MB.get" href="#grscheller.fp.wo_exception.MB.get">get</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.MB.map" href="#grscheller.fp.wo_exception.MB.map">map</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.MB.pure" href="#grscheller.fp.wo_exception.MB.pure">pure</a></code></li>
+<li><code><a title="grscheller.fp.woException.MB.flatmap" href="#grscheller.fp.woException.MB.flatmap">flatmap</a></code></li>
+<li><code><a title="grscheller.fp.woException.MB.get" href="#grscheller.fp.woException.MB.get">get</a></code></li>
+<li><code><a title="grscheller.fp.woException.MB.map" href="#grscheller.fp.woException.MB.map">map</a></code></li>
+<li><code><a title="grscheller.fp.woException.MB.pure" href="#grscheller.fp.woException.MB.pure">pure</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="grscheller.fp.wo_exception.XOR" href="#grscheller.fp.wo_exception.XOR">XOR</a></code></h4>
+<h4><code><a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a></code></h4>
 <ul class="">
-<li><code><a title="grscheller.fp.wo_exception.XOR.flatMap" href="#grscheller.fp.wo_exception.XOR.flatMap">flatMap</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.XOR.get" href="#grscheller.fp.wo_exception.XOR.get">get</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.XOR.getRight" href="#grscheller.fp.wo_exception.XOR.getRight">getRight</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.XOR.map" href="#grscheller.fp.wo_exception.XOR.map">map</a></code></li>
-<li><code><a title="grscheller.fp.wo_exception.XOR.mapRight" href="#grscheller.fp.wo_exception.XOR.mapRight">mapRight</a></code></li>
+<li><code><a title="grscheller.fp.woException.XOR.flatMap" href="#grscheller.fp.woException.XOR.flatMap">flatMap</a></code></li>
+<li><code><a title="grscheller.fp.woException.XOR.get" href="#grscheller.fp.woException.XOR.get">get</a></code></li>
+<li><code><a title="grscheller.fp.woException.XOR.getRight" href="#grscheller.fp.woException.XOR.getRight">getRight</a></code></li>
+<li><code><a title="grscheller.fp.woException.XOR.map" href="#grscheller.fp.woException.XOR.map">map</a></code></li>
+<li><code><a title="grscheller.fp.woException.XOR.mapRight" href="#grscheller.fp.woException.XOR.mapRight">mapRight</a></code></li>
 </ul>
 </li>
 </ul>
