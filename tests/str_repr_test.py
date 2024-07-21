@@ -16,13 +16,13 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR
-from grscheller.fp.bottom import Bottom
+from grscheller.fp.nothing import Nothing
 
-def addLt42(x: int, y: int) -> int|Bottom:
+def addLt42(x: int, y: int) -> int|Nothing:
     sum = x + y
     if sum < 42:
         return sum
-    return Bottom()
+    return Nothing()
 
 class Test_str:
     def test_MB(self) -> None:
@@ -35,55 +35,55 @@ class Test_str:
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
-        nt2: MB[int] = MB(Bottom())
+        nt2: MB[int] = MB(Nothing())
         nt3: MB[int] = MB()
         s1 = MB(1)
         assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
         assert str(s1) == 'MB(1)'
 
     def test_XOR(self) -> None:
-        bottom = Bottom()
+        nothing = Nothing()
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
         assert str(XOR(addLt42(10, 40), '')) == "< |  >"
-        assert str(XOR(bottom, 'Foofoo rules')) == "< | Foofoo rules >"
+        assert str(XOR(nothing, 'Foofoo rules')) == "< | Foofoo rules >"
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
 
-    def test_Bottom(self) -> None:
-        bot1 = Bottom()
-        bot2 = Bottom()
-        assert str(bot1) == 'bottom'
-        assert str(bot2) == 'bottom'
+    def test_Nothing(self) -> None:
+        bot1 = Nothing()
+        bot2 = Nothing()
+        assert str(bot1) == 'nothing'
+        assert str(bot2) == 'nothing'
 
 class Test_repr:
     def test_mb(self) -> None:
-        bottom = Bottom()
+        nothing = Nothing()
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
-        mb3: MB[object] = MB(bottom)
+        mb3: MB[object] = MB(nothing)
         assert mb1 == mb2 == mb3 == MB()
         assert repr(mb2) == 'MB()'
         mb4 = eval(repr(mb3))
         assert mb4 == mb3
 
-        def lt5orBottom(x: int) -> int|Bottom:
+        def lt5orNothing1(x: int) -> int|Nothing:
             if x < 5:
                 return x
             else:
-                return bottom
+                return nothing
 
-        def lt5orNothing(x: int) -> MB[int]:
+        def lt5orNothing2(x: int) -> MB[int]:
             if x < 5:
                 return MB(x)
             else:
                 return MB()
 
-        mb5 = MB(lt5orBottom(2))
-        mb6 = lt5orNothing(2)
-        mb7 = lt5orNothing(3)
-        mb8 = MB(lt5orBottom(7))
-        mb9 = lt5orNothing(8)
+        mb5 = MB(lt5orNothing1(2))
+        mb6 = lt5orNothing2(2)
+        mb7 = lt5orNothing2(3)
+        mb8 = MB(lt5orNothing1(7))
+        mb9 = lt5orNothing2(8)
 
         assert mb5 == mb6
         assert mb6 != mb7
@@ -99,7 +99,7 @@ class Test_repr:
         assert repr(foofoo) == "MB(MB('foo'))"
 
     def test_xor(self) -> None:
-        nothing = Bottom()
+        nothing = Nothing()
         e1: XOR[int, str] = XOR(nothing, 'Nobody home!')
         e2: XOR[int, str] = XOR(nothing, 'Somebody not home!')
         e3: XOR[int, str] = XOR(nothing, '')
@@ -112,11 +112,11 @@ class Test_repr:
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5OrNothing(x: int) -> int|Bottom:
+        def lt5OrNothing(x: int) -> int|Nothing:
             if x < 5:
                 return x
             else:
-                return Bottom()
+                return Nothing()
 
         def lt5OrNoneXOR(x: int) -> XOR[int, str]:
             if x < 5:
@@ -138,9 +138,9 @@ class Test_repr:
         assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
         assert repr(e2) ==  "XOR(2, 'None!')"
         assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(Bottom(), 'was to be 7')"
-        assert repr(e8) ==  "XOR(Bottom(), 'was to be 8')"
+        assert repr(e7) == "XOR(Nothing(), 'was to be 7')"
+        assert repr(e8) ==  "XOR(Nothing(), 'was to be 8')"
 
-    def test_Bottom(self) -> None:
-        bot1 = Bottom()
-        assert repr(bot1) == 'Bottom()'
+    def test_Nothing(self) -> None:
+        bot1 = Nothing()
+        assert repr(bot1) == 'Nothing()'

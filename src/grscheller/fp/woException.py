@@ -22,7 +22,7 @@ __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
 
 from typing import Callable, Generic, Iterator, Optional, TypeVar
-from .bottom import Bottom
+from .nothing import Nothing
 
 _T = TypeVar('_T')
 _S = TypeVar('_S')
@@ -41,7 +41,7 @@ class MB(Generic[_T]):
     """
     __slots__ = '_value',
 
-    def __init__(self, value: _T|Bottom=Bottom()) -> None:
+    def __init__(self, value: _T|Nothing=Nothing()) -> None:
         self._value = value
 
     def __iter__(self) -> Iterator[_T]:
@@ -55,7 +55,7 @@ class MB(Generic[_T]):
             return 'MB()'
 
     def __bool__(self) -> bool:
-        return self._value is not Bottom()
+        return self._value is not Nothing()
 
     def __len__(self) -> int:
         if self:
@@ -68,7 +68,7 @@ class MB(Generic[_T]):
             return False
         return self._value == other._value
 
-    def get(self, alt: _T|Bottom=Bottom()) -> _T:
+    def get(self, alt: _T|Nothing=Nothing()) -> _T:
         """Get contents if they exist
 
         * otherwise return an alternate value of type _T
@@ -78,12 +78,12 @@ class MB(Generic[_T]):
         if self:
             return self._value                                    # type: ignore
         else:
-            if alt is Bottom():
+            if alt is Nothing():
                 raise ValueError('Alternate return type needed but not provided.')
             else:
                 return alt                                        # type: ignore
 
-    def map(self, f: Callable[[_T], _S|Bottom]) -> MB[_S]:
+    def map(self, f: Callable[[_T], _S|Nothing]) -> MB[_S]:
         """Map MB function f over the 0 or 1 elements of this data structure."""
         if self:
             return MB(f(self._value))                             # type: ignore
@@ -96,10 +96,6 @@ class MB(Generic[_T]):
             return f(self._value)                                 # type: ignore
         else:
             return MB()
-
-    @classmethod
-    def pure(cls, t: _T) -> MB[_T]:
-        return MB(t)
 
 class XOR(Generic[_L, _R]):
     """Class that either contains a "left" value or "right" value, but not both.
@@ -116,7 +112,7 @@ class XOR(Generic[_L, _R]):
     """
     __slots__ = '_left', '_right'
 
-    def __init__(self, potential_left: _L|Bottom, default_right: _R):
+    def __init__(self, potential_left: _L|Nothing, default_right: _R):
         self._left, self._right = potential_left, default_right
 
     def __bool__(self) -> bool:
@@ -125,11 +121,11 @@ class XOR(Generic[_L, _R]):
         * true if the XOR is a "left"
         * false if the XOR is a "right"
         """
-        return self._left is not Bottom()
+        return self._left is not Nothing()
 
     def __iter__(self) -> Iterator[_L]:
         """Yields its value if the XOR is a "left"."""
-        if self._left is not Bottom():
+        if self._left is not Nothing():
             yield self._left                                      # type: ignore
 
     def __repr__(self) -> str:
@@ -157,7 +153,7 @@ class XOR(Generic[_L, _R]):
         else:
             return False
 
-    def get(self, alt: _L|Bottom=Bottom()) -> _L:
+    def get(self, alt: _L|Nothing=Nothing()) -> _L:
         """Get value if a Left.
 
         * if the XOR is a left, return its value
@@ -165,15 +161,15 @@ class XOR(Generic[_L, _R]):
         * raises ValueError if alternate value needed but not provided
 
         """
-        if self._left is Bottom():
-            if alt is Bottom():
+        if self._left is Nothing():
+            if alt is Nothing():
                 raise ValueError('Alternate return type needed but not provided.')
             else:
                 return alt                                        # type: ignore
         else:
             return self._left                                     # type: ignore
 
-    def getRight(self, alt: _R|Bottom=Bottom()) -> _R:
+    def getRight(self, alt: _R|Nothing=Nothing()) -> _R:
         """Get value if a Right.
 
         * if XOR is a right, return its value
@@ -181,10 +177,10 @@ class XOR(Generic[_L, _R]):
         * raises ValueError if alternate value needed but not provided
 
         """
-        if self._left is Bottom():
+        if self._left is Nothing():
             return self._right
         else:
-            if alt is Bottom():
+            if alt is Nothing():
                 raise ValueError('Alternate return type needed but not provided.')
             else:
                 return alt                                        # type: ignore
@@ -198,7 +194,7 @@ class XOR(Generic[_L, _R]):
         """
         return self._right
 
-    def map(self, f: Callable[[_L], _S|Bottom], right: _R|Bottom=Bottom()) -> XOR[_S, _R]:
+    def map(self, f: Callable[[_L], _S|Nothing], right: _R|Nothing=Nothing()) -> XOR[_S, _R]:
         """Map over an XOR.
 
         * if a "left" apply f and return a "left" if f successful
@@ -208,7 +204,7 @@ class XOR(Generic[_L, _R]):
         * otherwise, if right is bottom, propagate the "right"
 
         """
-        nothing = Bottom()
+        nothing = Nothing()
         if self._left is nothing:
             if right is nothing:
                 return XOR(nothing, self._right)
@@ -222,14 +218,14 @@ class XOR(Generic[_L, _R]):
 
     def mapRight(self, g: Callable[[_R], _R]) -> XOR[_L, _R]:
         """Map over a "right" value."""
-        if self._left is Bottom():
-            return XOR(Bottom(), g(self._right))
+        if self._left is Nothing():
+            return XOR(Nothing(), g(self._right))
         return self
 
     def flatMap(self, f: Callable[[_L], XOR[_S, _R]]) -> XOR[_S, _R]:
         """Map and flatten a Left value, propagate Right values."""
-        if self._left is Bottom():
-            return XOR(Bottom(), self._right)
+        if self._left is Nothing():
+            return XOR(Nothing(), self._right)
         else:
             return f(self._left)                                  # type: ignore
 
@@ -240,7 +236,7 @@ def mb_to_xor(m: MB[_T], right: _R) -> XOR[_T, _R]:
     if m:
         return XOR(m.get(), right)
     else:
-        return XOR(Bottom(), right)
+        return XOR(Nothing(), right)
 
 def xor_to_mb(e: XOR[_T,_S]) -> MB[_T]:
     """Convert an XOR to a MB."""
@@ -248,6 +244,3 @@ def xor_to_mb(e: XOR[_T,_S]) -> MB[_T]:
         return MB(e.get())
     else:
         return MB()
-
-if __name__ == "__main__":
-    pass

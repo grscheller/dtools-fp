@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An attempt to give Python a "bottom" type than either None or ().
+"""A nothing is an attempt to give Python a "bottom" type.
 
-* Bottom(): Bottom is a singleton representing the absence of a value
+* nothing: Nothing = Nothing(): is a singleton representing an absent value
 * unlike a true bottom, it can be instantiated
-* Bottom() can be used with most standard Python functions
-* Bottom() accepts most standard Python methods (still a work in progress)
-* _T|None and _T|() can act like a poor man's Optional/Maybe Monad
+* Nothing() can be used with most standard Python functions
+* Nothing() accepts most standard Python methods (still a work in progress)
+* types _T|None and _T|() both can act like a poor man's Optional/Maybe Monad
 * both None and () are lousy bottoms
 * both don't accept many methods, None has no length, at least () is iterable
-* both must constantly be checked for as return values
-* many developers use None and () as a sentinel values
-* used as sentinels developers like to be able to store them in data structures
+* both must constantly be checked for in return values
+* many developers use None and () as sentinel values
+* as sentinels Null & () should be capable of being stored as values
 
 """
 
 from __future__ import annotations
 
-__all__ = [ 'Bottom' ]
+__all__ = [ 'Nothing', 'nothing' ]
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
@@ -39,7 +39,7 @@ from typing import Any, Callable, ClassVar, Generic, Iterator, Optional, TypeVar
 _T = TypeVar('_T')
 _S = TypeVar('_S')
 
-class Bottom():
+class Nothing():
     """Attempt to give Python a "bottom" type.
 
     * semantically represents an empty container containing Any type
@@ -51,9 +51,9 @@ class Bottom():
     """
     __slots__ = '_bottom',
 
-    def __new__(cls) -> Bottom:
+    def __new__(cls) -> Nothing:
         if not hasattr(cls, 'instance'):
-            cls.instance = super(Bottom, cls).__new__(cls)
+            cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
     def __init__(self) -> None:
@@ -63,10 +63,10 @@ class Bottom():
         return iter(self._bottom)
 
     def __repr__(self) -> str:
-        return 'Bottom()'
+        return 'Nothing()'
 
     def __str__(self) -> str:
-        return 'bottom'
+        return 'nothing'
 
     def __bool__(self) -> bool:
         return False
@@ -85,16 +85,18 @@ class Bottom():
         else:
             return alt
 
-    def map(self, f: Callable[[_T], _S]) -> Bottom:
+    def map(self, f: Callable[[_T], _S]) -> Nothing:
         """Semantically map function f over an empty container."""
-        return Bottom()
+        return Nothing()
 
-    def flatMap(self, f: Callable[[_T], _S]) -> Bottom:
+    def flatMap(self, f: Callable[[_T], _S]) -> Nothing:
         """Semantically flatMap function f over an empty container."""
-        return Bottom()
+        return Nothing()
 
-    def __getitem__(self, index: int) -> Bottom:
-        return Bottom()
+    def __getitem__(self, index: int) -> Nothing:
+        return Nothing()
 
     def __setitem__(self, index: int, item: Any) -> None:
         return
+
+nothing = Nothing()

@@ -16,17 +16,17 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR, mb_to_xor, xor_to_mb
-from grscheller.fp.bottom import Bottom
+from grscheller.fp.nothing import Nothing
 
 def add2(x: int) -> int:
     return x + 2
 
-def gt42(x: int) -> bool|Bottom:
+def gt42(x: int) -> bool|Nothing:
     if x > 42:
         return True
     if x == 42:
         return False
-    return Bottom()
+    return Nothing()
 
 class TestMB:
     def test_identity(self) -> None:
@@ -102,9 +102,9 @@ class TestXOR:
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42, '')
         e2: XOR[int, str] = XOR(42, 'The secret is unknown')
-        e3: XOR[int, str] = XOR(Bottom(), 'not 42')
-        e4: XOR[int, str] = XOR(Bottom(), 'not 42')
-        e5: XOR[int, str] = XOR(Bottom(), 'also not 42')
+        e3: XOR[int, str] = XOR(Nothing(), 'not 42')
+        e4: XOR[int, str] = XOR(Nothing(), 'not 42')
+        e5: XOR[int, str] = XOR(Nothing(), 'also not 42')
         e6 = e3
         assert e1 is e1
         assert e1 is not e2
@@ -129,7 +129,7 @@ class TestXOR:
         assert e6 is e6
 
     def test_equality(self) -> None:
-        nothing = Bottom()
+        nothing = Nothing()
         e1: XOR[int, str] = XOR(42, '')
         e2: XOR[int, str] = XOR(42, '')
         e3: XOR[int, str] = XOR(nothing, 'not 42')
@@ -160,7 +160,7 @@ class TestXOR:
 
     def test_equal_self(self) -> None:
         xor42 = XOR(40+2, 'forty-two')
-        xorno42: XOR[int, str] = XOR(Bottom(), 'no forty-two')
+        xorno42: XOR[int, str] = XOR(Nothing(), 'no forty-two')
         xor_fortytwo = XOR('forty-two', 21*2)
         xor42tuple = XOR(42, (2, 3))
 
@@ -172,8 +172,8 @@ class TestXOR:
         assert xor42 != xor_fortytwo
         assert xor42 == xor42tuple
 
-        thing1: XOR[int, str] = xor42.map(lambda _: Bottom(), 'none').mapRight(lambda s: s + '?')
-        thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(Bottom(), 'none?'))
+        thing1: XOR[int, str] = xor42.map(lambda _: Nothing(), 'none').mapRight(lambda s: s + '?')
+        thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(Nothing(), 'none?'))
         assert thing1 == thing2
 
         xor_99 = XOR(99, 'orig 99')
@@ -196,17 +196,17 @@ class TestXOR:
 
         assert repr(hymie) == "XOR(True, 'orig 86')"
         assert repr(chief) == "XOR(True, 'orig 86')"
-        assert repr(ratton) == "XOR(Bottom(), 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(Bottom(), 'Seigfried says: orig 21')"
+        assert repr(ratton) == "XOR(Nothing(), 'Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(Nothing(), 'Seigfried says: orig 21')"
 
-        assert xor_12.map(gt42, 'not greater than 42') == XOR(Bottom(), 'not greater than 42')
+        assert xor_12.map(gt42, 'not greater than 42') == XOR(Nothing(), 'not greater than 42')
 
     def test_either_right(self) -> None:
-        def noMoreThan5(x: int) -> int|Bottom:
+        def noMoreThan5(x: int) -> int|Nothing:
             if x <= 5:
                 return x
             else:
-                return Bottom()
+                return Nothing()
 
         s1 = XOR(3, default_right = 'foofoo rules')
         s2 = s1.map(noMoreThan5, 'more than 5')
@@ -237,21 +237,21 @@ class TestXOR:
             if x < 2:
                 return XOR(x, 'fail!')
             else:
-                return XOR(Bottom(), '>=2')
+                return XOR(Nothing(), '>=2')
 
         def lessThan5(x: int) -> XOR[int, str]:
             if x < 5:
                 return XOR(x, '')
             else:
-                return XOR(Bottom(), '>=5')
+                return XOR(Nothing(), '>=5')
 
         left1 = XOR(1, 'no')
         left4 = XOR(4, '')
         left7 = XOR(7, 'foobar')
-        right: XOR[int, str] = XOR(Bottom(), 'Nobody home')
+        right: XOR[int, str] = XOR(Nothing(), 'Nobody home')
 
         nobody = right.flatMap(lessThan2)
-        assert nobody == XOR(Bottom(), 'Nobody home')
+        assert nobody == XOR(Nothing(), 'Nobody home')
 
         lt2 = left1.flatMap(lessThan2)
         lt5 = left1.flatMap(lessThan5)
@@ -260,16 +260,16 @@ class TestXOR:
 
         lt2 = left4.flatMap(lessThan2)
         lt5 = left4.flatMap(lessThan5)
-        assert lt2 == XOR(Bottom(), '>=2')
+        assert lt2 == XOR(Nothing(), '>=2')
         assert lt5 == XOR(4, '>=5')
 
         lt2 = left7.flatMap(lessThan2)
         lt5 = left7.flatMap(lessThan5)
-        assert lt2 == XOR(Bottom(), '>=2')
-        assert lt5 == XOR(Bottom(), '>=5')
+        assert lt2 == XOR(Nothing(), '>=2')
+        assert lt5 == XOR(Nothing(), '>=5')
 
         nobody = right.flatMap(lessThan5)
-        assert nobody == XOR(Bottom(), 'Nobody home')
+        assert nobody == XOR(Nothing(), 'Nobody home')
 
         lt2 = left1.flatMap(lessThan2)
         lt5 = left1.flatMap(lessThan5)
@@ -278,15 +278,15 @@ class TestXOR:
 
         lt2 = left4.flatMap(lessThan2)
         lt5 = left4.flatMap(lessThan5)
-        assert lt2 == XOR(Bottom(), '>=2')
+        assert lt2 == XOR(Nothing(), '>=2')
         assert lt2 != XOR(42, '>=42')
         assert lt5 == XOR(4, 'boo')
         assert lt5 != XOR(42, 'boohoo')
 
         lt2 = left7.flatMap(lessThan2).mapRight(lambda _: 'greater than or equal 2')
         lt5 = left7.flatMap(lessThan5).mapRight(lambda s: s + ', greater than or equal 5')
-        assert lt2 == XOR(Bottom(), 'greater than or equal 2')
-        assert lt5 == XOR(Bottom(), '>=5, greater than or equal 5')
+        assert lt2 == XOR(Nothing(), 'greater than or equal 2')
+        assert lt5 == XOR(Nothing(), '>=5, greater than or equal 5')
 
     def test_MB_XOR(self) -> None:
         mb42 = MB(42)
@@ -295,7 +295,7 @@ class TestXOR:
         left42 = mb_to_xor(mb42, 'fail!')
         right = mb_to_xor(mbNot, 'Nobody home')
         assert left42 == XOR(42, 'fail!')
-        assert right == XOR(Bottom(), 'Nobody home')
+        assert right == XOR(Nothing(), 'Nobody home')
 
         ph42 = xor_to_mb(left42)
         phNot = xor_to_mb(right)

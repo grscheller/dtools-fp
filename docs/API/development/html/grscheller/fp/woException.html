@@ -53,7 +53,7 @@ hljs.highlightAll();
 <dl>
 <dt id="grscheller.fp.woException.MB"><code class="flex name class">
 <span>class <span class="ident">MB</span></span>
-<span>(</span><span>value: _T | Bottom = Bottom())</span>
+<span>(</span><span>value: _T | Nothing = Nothing())</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Class representing a potentially missing value.</p>
@@ -80,7 +80,7 @@ hljs.highlightAll();
     &#34;&#34;&#34;
     __slots__ = &#39;_value&#39;,
 
-    def __init__(self, value: _T|Bottom=Bottom()) -&gt; None:
+    def __init__(self, value: _T|Nothing=Nothing()) -&gt; None:
         self._value = value
 
     def __iter__(self) -&gt; Iterator[_T]:
@@ -94,7 +94,7 @@ hljs.highlightAll();
             return &#39;MB()&#39;
 
     def __bool__(self) -&gt; bool:
-        return self._value is not Bottom()
+        return self._value is not Nothing()
 
     def __len__(self) -&gt; int:
         if self:
@@ -107,7 +107,7 @@ hljs.highlightAll();
             return False
         return self._value == other._value
 
-    def get(self, alt: _T|Bottom=Bottom()) -&gt; _T:
+    def get(self, alt: _T|Nothing=Nothing()) -&gt; _T:
         &#34;&#34;&#34;Get contents if they exist
 
         * otherwise return an alternate value of type _T
@@ -117,12 +117,12 @@ hljs.highlightAll();
         if self:
             return self._value                                    # type: ignore
         else:
-            if alt is Bottom():
+            if alt is Nothing():
                 raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
             else:
                 return alt                                        # type: ignore
 
-    def map(self, f: Callable[[_T], _S|Bottom]) -&gt; MB[_S]:
+    def map(self, f: Callable[[_T], _S|Nothing]) -&gt; MB[_S]:
         &#34;&#34;&#34;Map MB function f over the 0 or 1 elements of this data structure.&#34;&#34;&#34;
         if self:
             return MB(f(self._value))                             # type: ignore
@@ -134,25 +134,12 @@ hljs.highlightAll();
         if self:
             return f(self._value)                                 # type: ignore
         else:
-            return MB()
-
-    @classmethod
-    def pure(cls, t: _T) -&gt; MB[_T]:
-        return MB(t)</code></pre>
+            return MB()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>typing.Generic</li>
 </ul>
-<h3>Static methods</h3>
-<dl>
-<dt id="grscheller.fp.woException.MB.pure"><code class="name flex">
-<span>def <span class="ident">pure</span></span>(<span>t: _T) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_T]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="grscheller.fp.woException.MB.flatmap"><code class="name flex">
@@ -162,7 +149,7 @@ hljs.highlightAll();
 <div class="desc"><p>Map MB with function f and flatten.</p></div>
 </dd>
 <dt id="grscheller.fp.woException.MB.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self, alt: _T | Bottom = Bottom()) ‑> _T</span>
+<span>def <span class="ident">get</span></span>(<span>self, alt: _T | Nothing = Nothing()) ‑> _T</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get contents if they exist</p>
@@ -172,7 +159,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.woException.MB.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S | Bottom]) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_S]</span>
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S | Nothing]) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_S]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map MB function f over the 0 or 1 elements of this data structure.</p></div>
@@ -181,7 +168,7 @@ hljs.highlightAll();
 </dd>
 <dt id="grscheller.fp.woException.XOR"><code class="flex name class">
 <span>class <span class="ident">XOR</span></span>
-<span>(</span><span>potential_left: _L | Bottom, default_right: _R)</span>
+<span>(</span><span>potential_left: _L | Nothing, default_right: _R)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Class that either contains a "left" value or "right" value, but not both.</p>
@@ -214,7 +201,7 @@ hljs.highlightAll();
     &#34;&#34;&#34;
     __slots__ = &#39;_left&#39;, &#39;_right&#39;
 
-    def __init__(self, potential_left: _L|Bottom, default_right: _R):
+    def __init__(self, potential_left: _L|Nothing, default_right: _R):
         self._left, self._right = potential_left, default_right
 
     def __bool__(self) -&gt; bool:
@@ -223,11 +210,11 @@ hljs.highlightAll();
         * true if the XOR is a &#34;left&#34;
         * false if the XOR is a &#34;right&#34;
         &#34;&#34;&#34;
-        return self._left is not Bottom()
+        return self._left is not Nothing()
 
     def __iter__(self) -&gt; Iterator[_L]:
         &#34;&#34;&#34;Yields its value if the XOR is a &#34;left&#34;.&#34;&#34;&#34;
-        if self._left is not Bottom():
+        if self._left is not Nothing():
             yield self._left                                      # type: ignore
 
     def __repr__(self) -&gt; str:
@@ -255,7 +242,7 @@ hljs.highlightAll();
         else:
             return False
 
-    def get(self, alt: _L|Bottom=Bottom()) -&gt; _L:
+    def get(self, alt: _L|Nothing=Nothing()) -&gt; _L:
         &#34;&#34;&#34;Get value if a Left.
 
         * if the XOR is a left, return its value
@@ -263,15 +250,15 @@ hljs.highlightAll();
         * raises ValueError if alternate value needed but not provided
 
         &#34;&#34;&#34;
-        if self._left is Bottom():
-            if alt is Bottom():
+        if self._left is Nothing():
+            if alt is Nothing():
                 raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
             else:
                 return alt                                        # type: ignore
         else:
             return self._left                                     # type: ignore
 
-    def getRight(self, alt: _R|Bottom=Bottom()) -&gt; _R:
+    def getRight(self, alt: _R|Nothing=Nothing()) -&gt; _R:
         &#34;&#34;&#34;Get value if a Right.
 
         * if XOR is a right, return its value
@@ -279,10 +266,10 @@ hljs.highlightAll();
         * raises ValueError if alternate value needed but not provided
 
         &#34;&#34;&#34;
-        if self._left is Bottom():
+        if self._left is Nothing():
             return self._right
         else:
-            if alt is Bottom():
+            if alt is Nothing():
                 raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
             else:
                 return alt                                        # type: ignore
@@ -296,7 +283,7 @@ hljs.highlightAll();
         &#34;&#34;&#34;
         return self._right
 
-    def map(self, f: Callable[[_L], _S|Bottom], right: _R|Bottom=Bottom()) -&gt; XOR[_S, _R]:
+    def map(self, f: Callable[[_L], _S|Nothing], right: _R|Nothing=Nothing()) -&gt; XOR[_S, _R]:
         &#34;&#34;&#34;Map over an XOR.
 
         * if a &#34;left&#34; apply f and return a &#34;left&#34; if f successful
@@ -306,7 +293,7 @@ hljs.highlightAll();
         * otherwise, if right is bottom, propagate the &#34;right&#34;
 
         &#34;&#34;&#34;
-        nothing = Bottom()
+        nothing = Nothing()
         if self._left is nothing:
             if right is nothing:
                 return XOR(nothing, self._right)
@@ -320,14 +307,14 @@ hljs.highlightAll();
 
     def mapRight(self, g: Callable[[_R], _R]) -&gt; XOR[_L, _R]:
         &#34;&#34;&#34;Map over a &#34;right&#34; value.&#34;&#34;&#34;
-        if self._left is Bottom():
-            return XOR(Bottom(), g(self._right))
+        if self._left is Nothing():
+            return XOR(Nothing(), g(self._right))
         return self
 
     def flatMap(self, f: Callable[[_L], XOR[_S, _R]]) -&gt; XOR[_S, _R]:
         &#34;&#34;&#34;Map and flatten a Left value, propagate Right values.&#34;&#34;&#34;
-        if self._left is Bottom():
-            return XOR(Bottom(), self._right)
+        if self._left is Nothing():
+            return XOR(Nothing(), self._right)
         else:
             return f(self._left)                                  # type: ignore</code></pre>
 </details>
@@ -344,7 +331,7 @@ hljs.highlightAll();
 <div class="desc"><p>Map and flatten a Left value, propagate Right values.</p></div>
 </dd>
 <dt id="grscheller.fp.woException.XOR.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self, alt: _L | Bottom = Bottom()) ‑> _L</span>
+<span>def <span class="ident">get</span></span>(<span>self, alt: _L | Nothing = Nothing()) ‑> _L</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get value if a Left.</p>
@@ -365,7 +352,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.woException.XOR.getRight"><code class="name flex">
-<span>def <span class="ident">getRight</span></span>(<span>self, alt: _R | Bottom = Bottom()) ‑> _R</span>
+<span>def <span class="ident">getRight</span></span>(<span>self, alt: _R | Nothing = Nothing()) ‑> _R</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get value if a Right.</p>
@@ -376,7 +363,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.woException.XOR.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], _S | Bottom], right: _R | Bottom = Bottom()) ‑> <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_S, _R]</span>
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_L], _S | Nothing], right: _R | Nothing = Nothing()) ‑> <a title="grscheller.fp.woException.XOR" href="#grscheller.fp.woException.XOR">XOR</a>[_S, _R]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Map over an XOR.</p>
@@ -424,7 +411,6 @@ hljs.highlightAll();
 <li><code><a title="grscheller.fp.woException.MB.flatmap" href="#grscheller.fp.woException.MB.flatmap">flatmap</a></code></li>
 <li><code><a title="grscheller.fp.woException.MB.get" href="#grscheller.fp.woException.MB.get">get</a></code></li>
 <li><code><a title="grscheller.fp.woException.MB.map" href="#grscheller.fp.woException.MB.map">map</a></code></li>
-<li><code><a title="grscheller.fp.woException.MB.pure" href="#grscheller.fp.woException.MB.pure">pure</a></code></li>
 </ul>
 </li>
 <li>

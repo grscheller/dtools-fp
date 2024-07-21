@@ -17,7 +17,6 @@
 from __future__ import annotations
 from typing import Any, Callable, Iterator, Iterable, Iterator
 from typing import Never, overload, Optional, overload, TypeVar
-import itertools as IT
 
 _T = TypeVar('_T')
 _S = TypeVar('_S')

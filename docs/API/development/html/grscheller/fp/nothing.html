@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>grscheller.fp.bottom API documentation</title>
-<meta name="description" content="An attempt to give Python a &#34;bottom&#34; type than either None or () …">
+<title>grscheller.fp.nothing API documentation</title>
+<meta name="description" content="A nothing is an attempt to give Python a &#34;bottom&#34; type …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -22,21 +22,21 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>grscheller.fp.bottom</code></h1>
+<h1 class="title">Module <code>grscheller.fp.nothing</code></h1>
 </header>
 <section id="section-intro">
-<p>An attempt to give Python a "bottom" type than either None or ().</p>
+<p>A nothing is an attempt to give Python a "bottom" type.</p>
 <ul>
-<li>Bottom(): Bottom is a singleton representing the absence of a value</li>
+<li>nothing: Nothing = Nothing(): is a singleton representing an absent value</li>
 <li>unlike a true bottom, it can be instantiated</li>
-<li>Bottom() can be used with most standard Python functions</li>
-<li>Bottom() accepts most standard Python methods (still a work in progress)</li>
-<li>_T|None and _T|() can act like a poor man's Optional/Maybe Monad</li>
+<li>Nothing() can be used with most standard Python functions</li>
+<li>Nothing() accepts most standard Python methods (still a work in progress)</li>
+<li>types _T|None and _T|() both can act like a poor man's Optional/Maybe Monad</li>
 <li>both None and () are lousy bottoms</li>
 <li>both don't accept many methods, None has no length, at least () is iterable</li>
-<li>both must constantly be checked for as return values</li>
-<li>many developers use None and () as a sentinel values</li>
-<li>used as sentinels developers like to be able to store them in data structures</li>
+<li>both must constantly be checked for in return values</li>
+<li>many developers use None and () as sentinel values</li>
+<li>as sentinels Null &amp; () should be capable of being stored as values</li>
 </ul>
 </section>
 <section>
@@ -48,8 +48,8 @@ hljs.highlightAll();
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="grscheller.fp.bottom.Bottom"><code class="flex name class">
-<span>class <span class="ident">Bottom</span></span>
+<dt id="grscheller.fp.nothing.Nothing"><code class="flex name class">
+<span>class <span class="ident">Nothing</span></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Attempt to give Python a "bottom" type.</p>
@@ -64,7 +64,7 @@ hljs.highlightAll();
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Bottom():
+<pre><code class="python">class Nothing():
     &#34;&#34;&#34;Attempt to give Python a &#34;bottom&#34; type.
 
     * semantically represents an empty container containing Any type
@@ -76,9 +76,9 @@ hljs.highlightAll();
     &#34;&#34;&#34;
     __slots__ = &#39;_bottom&#39;,
 
-    def __new__(cls) -&gt; Bottom:
+    def __new__(cls) -&gt; Nothing:
         if not hasattr(cls, &#39;instance&#39;):
-            cls.instance = super(Bottom, cls).__new__(cls)
+            cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
     def __init__(self) -&gt; None:
@@ -88,10 +88,10 @@ hljs.highlightAll();
         return iter(self._bottom)
 
     def __repr__(self) -&gt; str:
-        return &#39;Bottom()&#39;
+        return &#39;Nothing()&#39;
 
     def __str__(self) -&gt; str:
-        return &#39;bottom&#39;
+        return &#39;nothing&#39;
 
     def __bool__(self) -&gt; bool:
         return False
@@ -110,36 +110,36 @@ hljs.highlightAll();
         else:
             return alt
 
-    def map(self, f: Callable[[_T], _S]) -&gt; Bottom:
+    def map(self, f: Callable[[_T], _S]) -&gt; Nothing:
         &#34;&#34;&#34;Semantically map function f over an empty container.&#34;&#34;&#34;
-        return Bottom()
+        return Nothing()
 
-    def flatMap(self, f: Callable[[_T], _S]) -&gt; Bottom:
+    def flatMap(self, f: Callable[[_T], _S]) -&gt; Nothing:
         &#34;&#34;&#34;Semantically flatMap function f over an empty container.&#34;&#34;&#34;
-        return Bottom()
+        return Nothing()
 
-    def __getitem__(self, index: int) -&gt; Bottom:
-        return Bottom()
+    def __getitem__(self, index: int) -&gt; Nothing:
+        return Nothing()
 
     def __setitem__(self, index: int, item: Any) -&gt; None:
         return</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
-<dt id="grscheller.fp.bottom.Bottom.instance"><code class="name">var <span class="ident">instance</span></code></dt>
+<dt id="grscheller.fp.nothing.Nothing.instance"><code class="name">var <span class="ident">instance</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="grscheller.fp.bottom.Bottom.flatMap"><code class="name flex">
-<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.bottom.Bottom" href="#grscheller.fp.bottom.Bottom">Bottom</a></span>
+<dt id="grscheller.fp.nothing.Nothing.flatMap"><code class="name flex">
+<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Semantically flatMap function f over an empty container.</p></div>
 </dd>
-<dt id="grscheller.fp.bottom.Bottom.get"><code class="name flex">
+<dt id="grscheller.fp.nothing.Nothing.get"><code class="name flex">
 <span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_T] = None) ‑> _T</span>
 </code></dt>
 <dd>
@@ -148,8 +148,8 @@ hljs.highlightAll();
 <li>raises ValueError if an alternate value is not provided</li>
 </ul></div>
 </dd>
-<dt id="grscheller.fp.bottom.Bottom.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.bottom.Bottom" href="#grscheller.fp.bottom.Bottom">Bottom</a></span>
+<dt id="grscheller.fp.nothing.Nothing.map"><code class="name flex">
+<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Semantically map function f over an empty container.</p></div>
@@ -172,12 +172,12 @@ hljs.highlightAll();
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="grscheller.fp.bottom.Bottom" href="#grscheller.fp.bottom.Bottom">Bottom</a></code></h4>
+<h4><code><a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></code></h4>
 <ul class="">
-<li><code><a title="grscheller.fp.bottom.Bottom.flatMap" href="#grscheller.fp.bottom.Bottom.flatMap">flatMap</a></code></li>
-<li><code><a title="grscheller.fp.bottom.Bottom.get" href="#grscheller.fp.bottom.Bottom.get">get</a></code></li>
-<li><code><a title="grscheller.fp.bottom.Bottom.instance" href="#grscheller.fp.bottom.Bottom.instance">instance</a></code></li>
-<li><code><a title="grscheller.fp.bottom.Bottom.map" href="#grscheller.fp.bottom.Bottom.map">map</a></code></li>
+<li><code><a title="grscheller.fp.nothing.Nothing.flatMap" href="#grscheller.fp.nothing.Nothing.flatMap">flatMap</a></code></li>
+<li><code><a title="grscheller.fp.nothing.Nothing.get" href="#grscheller.fp.nothing.Nothing.get">get</a></code></li>
+<li><code><a title="grscheller.fp.nothing.Nothing.instance" href="#grscheller.fp.nothing.Nothing.instance">instance</a></code></li>
+<li><code><a title="grscheller.fp.nothing.Nothing.map" href="#grscheller.fp.nothing.Nothing.map">map</a></code></li>
 </ul>
 </li>
 </ul>

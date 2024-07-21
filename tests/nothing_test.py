@@ -15,36 +15,51 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.bottom import Bottom
+from grscheller.fp.nothing import Nothing, nothing
 
 def add2(x: int) -> int:
     return x + 2
 
-def gt42(x: int) -> bool|Bottom:
+def gt42(x: int) -> bool|Nothing:
     if x > 42:
         return True
     if x >= 0:
         return False
-    return Bottom()
+    return Nothing()
 
 class Test_Bottom:
     def test_identity(self) -> None:
-        bot1 = Bottom()
-        bot2 = Bottom()
+        bot1 = Nothing()
+        bot2 = Nothing()
+        bot3 = nothing
         assert bot1 is bot1
         assert bot1 is bot2
+        assert bot3 is bot1
+        assert bot2 is nothing
+        if bot1 is not bot2:
+            assert False
+        else:
+            assert True
 
     def test_equality(self) -> None:
-        bot1 = Bottom()
-        bot2 = Bottom()
+        bot1 = Nothing()
+        bot2 = Nothing()
+        bot3 = nothing
         assert bot1 == bot1
         assert bot2 == bot2
+        assert bot3 == bot2
         assert bot1 == bot2
         assert bot2 == bot1
+        assert bot1 == nothing
+        if bot1 != bot2:
+            assert False
+        else:
+            assert True
 
     def test_iterate(self) -> None:
-        bot1 = Bottom()
-        bot2 = Bottom()
+        bot1 = Nothing()
+        bot2 = Nothing()
+        bot3 = nothing
         l1 = [42]
         for v in bot1:
             l1.append(v)
@@ -53,8 +68,8 @@ class Test_Bottom:
         assert len(l1) == 1
 
     def test_get(self) -> None:
-        bot1 = Bottom()
-        bot2 = Bottom()
+        bot1 = Nothing()
+        bot2 = Nothing()
         assert bot1.get(42) == 42
         assert bot2.get(21) == 21
         try:
@@ -70,13 +85,13 @@ class Test_Bottom:
         assert bot2.get(10//7) == 10//7
 
     def test_equal_self(self) -> None:
-        bot1 = Bottom()
+        bot1 = Nothing()
         bot1 == bot1
         bot1.get(42) == bot1.get(42)
         bot1.get(42) != bot1.get(21)
 
     def test_map(self) -> None:
-        bot1 = Bottom()
+        bot1 = Nothing()
         bot2 = bot1.map(add2)
-        assert bot1 == bot2 == Bottom()
-        assert bot1 is bot2 is Bottom()
+        assert bot1 == bot2 == Nothing()
+        assert bot1 is bot2 is Nothing()
