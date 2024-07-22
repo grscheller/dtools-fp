@@ -21,9 +21,9 @@
 * types _T|None and _T|() both can act like a poor man's Optional/Maybe Monad
 * both None and () are lousy bottoms
 * both don't accept many methods, None has no length, at least () is iterable
-* both must constantly be checked for in return values
+* both must constantly be checked for when return values
 * many developers use None and () as sentinel values
-* as sentinels Null & () should be capable of being stored as values
+* when used as sentinels, Null & () should be capable of being stored as values
 
 """
 
@@ -49,18 +49,15 @@ class Nothing():
     * Implemented with the Singleton Pattern
 
     """
-    __slots__ = '_bottom',
+    __slots__ = ()
 
     def __new__(cls) -> Nothing:
         if not hasattr(cls, 'instance'):
             cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self) -> None:
-        self._bottom = ()
-
     def __iter__(self) -> Iterator[Any]:
-        return iter(self._bottom)
+        return iter(())
 
     def __repr__(self) -> str:
         return 'Nothing()'

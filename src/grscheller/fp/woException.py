@@ -44,9 +44,12 @@ class MB(Generic[_T]):
     def __init__(self, value: _T|Nothing=Nothing()) -> None:
         self._value = value
 
+    def __bool__(self) -> bool:
+        return self._value is not Nothing()
+
     def __iter__(self) -> Iterator[_T]:
         if self:
-            yield self._value                                     # type: ignore
+            yield self._value          # type: ignore # will never yield nothing
 
     def __repr__(self) -> str:
         if self:
@@ -54,14 +57,8 @@ class MB(Generic[_T]):
         else:
             return 'MB()'
 
-    def __bool__(self) -> bool:
-        return self._value is not Nothing()
-
     def __len__(self) -> int:
-        if self:
-            return 1
-        else:
-            return 0
+        return (1 if self else 0)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
@@ -69,33 +66,28 @@ class MB(Generic[_T]):
         return self._value == other._value
 
     def get(self, alt: _T|Nothing=Nothing()) -> _T:
-        """Get contents if they exist
+        """Get non-existent contents
 
-        * otherwise return an alternate value of type _T
-        * raises ValueError if alternate value needed but not provided
+        * if given, return an alternate value of type _T
+        * otherwise, raises ValueError
+        * never returns nothing = Nothing()
 
         """
         if self:
-            return self._value                                    # type: ignore
+            return self._value        # type: ignore # will never return nothing
         else:
             if alt is Nothing():
-                raise ValueError('Alternate return type needed but not provided.')
+                raise ValueError('Alternate return type not provided.')
             else:
                 return alt                                        # type: ignore
 
     def map(self, f: Callable[[_T], _S|Nothing]) -> MB[_S]:
-        """Map MB function f over the 0 or 1 elements of this data structure."""
-        if self:
-            return MB(f(self._value))                             # type: ignore
-        else:
-            return MB()
+        """Map MB function f over the 0 elements of this data structure."""
+        return (MB(f(self._value)) if self else MB())             # type: ignore
 
     def flatmap(self, f: Callable[[_T], MB[_S]]) -> MB[_S]:
         """Map MB with function f and flatten."""
-        if self:
-            return f(self._value)                                 # type: ignore
-        else:
-            return MB()
+        return (f(self._value) if self else MB())                  # type: ignore
 
 class XOR(Generic[_L, _R]):
     """Class that either contains a "left" value or "right" value, but not both.
@@ -107,7 +99,7 @@ class XOR(Generic[_L, _R]):
     * therefore None as a value, not implementation detail, can't be put into a "left"
     * in a Boolean context, returns True if a "left", False if a "right"
     * immutable, an XOR does not change after being created
-    * immutable semantics, map & flatMap never mutate self
+    * immutable semantics, map & flatMap return new instances
 
     """
     __slots__ = '_left', '_right'
@@ -126,7 +118,7 @@ class XOR(Generic[_L, _R]):
     def __iter__(self) -> Iterator[_L]:
         """Yields its value if the XOR is a "left"."""
         if self._left is not Nothing():
-            yield self._left                                      # type: ignore
+            yield self._left           # type: ignore # will never yield nothing
 
     def __repr__(self) -> str:
         return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
@@ -165,9 +157,9 @@ class XOR(Generic[_L, _R]):
             if alt is Nothing():
                 raise ValueError('Alternate return type needed but not provided.')
             else:
-                return alt                                        # type: ignore
+                return alt            # type: ignore # will never return nothing
         else:
-            return self._left                                     # type: ignore
+            return self._left         # type: ignore # will never return nothing
 
     def getRight(self, alt: _R|Nothing=Nothing()) -> _R:
         """Get value if a Right.

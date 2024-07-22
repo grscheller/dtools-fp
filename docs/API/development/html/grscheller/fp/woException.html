@@ -83,9 +83,12 @@ hljs.highlightAll();
     def __init__(self, value: _T|Nothing=Nothing()) -&gt; None:
         self._value = value
 
+    def __bool__(self) -&gt; bool:
+        return self._value is not Nothing()
+
     def __iter__(self) -&gt; Iterator[_T]:
         if self:
-            yield self._value                                     # type: ignore
+            yield self._value          # type: ignore # will never yield nothing
 
     def __repr__(self) -&gt; str:
         if self:
@@ -93,14 +96,8 @@ hljs.highlightAll();
         else:
             return &#39;MB()&#39;
 
-    def __bool__(self) -&gt; bool:
-        return self._value is not Nothing()
-
     def __len__(self) -&gt; int:
-        if self:
-            return 1
-        else:
-            return 0
+        return (1 if self else 0)
 
     def __eq__(self, other: object) -&gt; bool:
         if not isinstance(other, type(self)):
@@ -108,33 +105,28 @@ hljs.highlightAll();
         return self._value == other._value
 
     def get(self, alt: _T|Nothing=Nothing()) -&gt; _T:
-        &#34;&#34;&#34;Get contents if they exist
+        &#34;&#34;&#34;Get non-existent contents
 
-        * otherwise return an alternate value of type _T
-        * raises ValueError if alternate value needed but not provided
+        * if given, return an alternate value of type _T
+        * otherwise, raises ValueError
+        * never returns nothing = Nothing()
 
         &#34;&#34;&#34;
         if self:
-            return self._value                                    # type: ignore
+            return self._value        # type: ignore # will never return nothing
         else:
             if alt is Nothing():
-                raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
+                raise ValueError(&#39;Alternate return type not provided.&#39;)
             else:
                 return alt                                        # type: ignore
 
     def map(self, f: Callable[[_T], _S|Nothing]) -&gt; MB[_S]:
-        &#34;&#34;&#34;Map MB function f over the 0 or 1 elements of this data structure.&#34;&#34;&#34;
-        if self:
-            return MB(f(self._value))                             # type: ignore
-        else:
-            return MB()
+        &#34;&#34;&#34;Map MB function f over the 0 elements of this data structure.&#34;&#34;&#34;
+        return (MB(f(self._value)) if self else MB())             # type: ignore
 
     def flatmap(self, f: Callable[[_T], MB[_S]]) -&gt; MB[_S]:
         &#34;&#34;&#34;Map MB with function f and flatten.&#34;&#34;&#34;
-        if self:
-            return f(self._value)                                 # type: ignore
-        else:
-            return MB()</code></pre>
+        return (f(self._value) if self else MB())                  # type: ignore</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -152,17 +144,18 @@ hljs.highlightAll();
 <span>def <span class="ident">get</span></span>(<span>self, alt: _T | Nothing = Nothing()) ‑> _T</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get contents if they exist</p>
+<div class="desc"><p>Get non-existent contents</p>
 <ul>
-<li>otherwise return an alternate value of type _T</li>
-<li>raises ValueError if alternate value needed but not provided</li>
+<li>if given, return an alternate value of type _T</li>
+<li>otherwise, raises ValueError</li>
+<li>never returns nothing = Nothing()</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.woException.MB.map"><code class="name flex">
 <span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S | Nothing]) ‑> <a title="grscheller.fp.woException.MB" href="#grscheller.fp.woException.MB">MB</a>[_S]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Map MB function f over the 0 or 1 elements of this data structure.</p></div>
+<div class="desc"><p>Map MB function f over the 0 elements of this data structure.</p></div>
 </dd>
 </dl>
 </dd>
@@ -180,7 +173,7 @@ hljs.highlightAll();
 <li>therefore None as a value, not implementation detail, can't be put into a "left"</li>
 <li>in a Boolean context, returns True if a "left", False if a "right"</li>
 <li>immutable, an XOR does not change after being created</li>
-<li>immutable semantics, map &amp; flatMap never mutate self</li>
+<li>immutable semantics, map &amp; flatMap return new instances</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -196,7 +189,7 @@ hljs.highlightAll();
     * therefore None as a value, not implementation detail, can&#39;t be put into a &#34;left&#34;
     * in a Boolean context, returns True if a &#34;left&#34;, False if a &#34;right&#34;
     * immutable, an XOR does not change after being created
-    * immutable semantics, map &amp; flatMap never mutate self
+    * immutable semantics, map &amp; flatMap return new instances
 
     &#34;&#34;&#34;
     __slots__ = &#39;_left&#39;, &#39;_right&#39;
@@ -215,7 +208,7 @@ hljs.highlightAll();
     def __iter__(self) -&gt; Iterator[_L]:
         &#34;&#34;&#34;Yields its value if the XOR is a &#34;left&#34;.&#34;&#34;&#34;
         if self._left is not Nothing():
-            yield self._left                                      # type: ignore
+            yield self._left           # type: ignore # will never yield nothing
 
     def __repr__(self) -&gt; str:
         return &#39;XOR(&#39; + repr(self._left) + &#39;, &#39; + repr(self._right) + &#39;)&#39;
@@ -254,9 +247,9 @@ hljs.highlightAll();
             if alt is Nothing():
                 raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
             else:
-                return alt                                        # type: ignore
+                return alt            # type: ignore # will never return nothing
         else:
-            return self._left                                     # type: ignore
+            return self._left         # type: ignore # will never return nothing
 
     def getRight(self, alt: _R|Nothing=Nothing()) -&gt; _R:
         &#34;&#34;&#34;Get value if a Right.

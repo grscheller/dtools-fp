@@ -34,9 +34,9 @@ hljs.highlightAll();
 <li>types _T|None and _T|() both can act like a poor man's Optional/Maybe Monad</li>
 <li>both None and () are lousy bottoms</li>
 <li>both don't accept many methods, None has no length, at least () is iterable</li>
-<li>both must constantly be checked for in return values</li>
+<li>both must constantly be checked for when return values</li>
 <li>many developers use None and () as sentinel values</li>
-<li>as sentinels Null &amp; () should be capable of being stored as values</li>
+<li>when used as sentinels, Null &amp; () should be capable of being stored as values</li>
 </ul>
 </section>
 <section>
@@ -74,18 +74,15 @@ hljs.highlightAll();
     * Implemented with the Singleton Pattern
 
     &#34;&#34;&#34;
-    __slots__ = &#39;_bottom&#39;,
+    __slots__ = ()
 
     def __new__(cls) -&gt; Nothing:
         if not hasattr(cls, &#39;instance&#39;):
             cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self) -&gt; None:
-        self._bottom = ()
-
     def __iter__(self) -&gt; Iterator[Any]:
-        return iter(self._bottom)
+        return iter(())
 
     def __repr__(self) -&gt; str:
         return &#39;Nothing()&#39;
