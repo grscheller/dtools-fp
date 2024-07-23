@@ -34,18 +34,16 @@ __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
 
-from typing import Any, Callable, ClassVar, Generic, Iterator, Optional, TypeVar
+from typing import Any, Callable, Iterator, Optional, TypeVar
 
-_T = TypeVar('_T')
-_S = TypeVar('_S')
+_U = TypeVar('_U')
+_V = TypeVar('_V')
 
 class Nothing():
     """Attempt to give Python a "bottom" type.
 
-    * semantically represents an empty container containing Any type
+    * semantically represents an empty typed container
     * delegates most standard functions/methods to the contained object, if it exists
-    * use map_(lambda x: x.foobar()) to access specific methods of contained object
-    * use map to map over the underlying object
     * Implemented with the Singleton Pattern
 
     """
@@ -56,7 +54,7 @@ class Nothing():
             cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self) -> Iterator[_U]:
         return iter(())
 
     def __repr__(self) -> str:
@@ -71,29 +69,45 @@ class Nothing():
     def __len__(self) -> int:
         return 0
 
-    def get(self, alt: Optional[_T]=None) -> _T:
-        """return a value of type _T
+    def __add__(self, right: Any) -> Any:
+        return Nothing()
 
-        * raises ValueError if an alternate value is not provided
+    def __radd__(self, left: Any) -> Any:
+        return Nothing()
 
-        """
+    def __mul__(self, right: Any) -> Any:
+        return Nothing()
+
+    def __rmul__(self, left: Any) -> Any:
+        return Nothing()
+
+    def __getattr__(self, name: str) -> Any:
+        def method(*args: Any, **kwargs: Any) -> Callable[[Any], Any]:
+            return Nothing()
+        return method
+
+    def __call__(*args: Any, **kwargs: Any) -> Any:
+        return Nothing()
+
+    def get(self, alt: Optional[_U]=None) -> _U|Nothing:
+        """Return an alternate value of type _T or a Nothing."""
         if alt is None:
-            raise ValueError('Alternate return type needed but not provided.')
+            return Nothing()
         else:
             return alt
 
-    def map(self, f: Callable[[_T], _S]) -> Nothing:
+    def map(self, f: Callable[[_U], _V]) -> Nothing:
         """Semantically map function f over an empty container."""
         return Nothing()
 
-    def flatMap(self, f: Callable[[_T], _S]) -> Nothing:
+    def flatMap(self, f: Callable[[_U], _V]) -> Nothing:
         """Semantically flatMap function f over an empty container."""
         return Nothing()
 
-    def __getitem__(self, index: int) -> Nothing:
+    def __getitem__(self, index: int|slice) -> Any:
         return Nothing()
 
-    def __setitem__(self, index: int, item: Any) -> None:
+    def __setitem__(self, index: int|slice, item: Any) -> None:
         return
 
 nothing = Nothing()
