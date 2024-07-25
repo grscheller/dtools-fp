@@ -44,6 +44,15 @@ hljs.highlightAll();
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="grscheller.fp.nothing.nothing"><code class="name flex">
+<span>def <span class="ident">nothing</span></span>(<span>*args: Any, **kwargs: Any) ‑> Callable[[Any], Any]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
@@ -52,26 +61,26 @@ hljs.highlightAll();
 <span>class <span class="ident">Nothing</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Attempt to give Python a "bottom" type.</p>
+<div class="desc"><p>Singleton semantically represents a missing value.</p>
 <ul>
-<li>semantically represents an empty container containing Any type</li>
-<li>delegates most standard functions/methods to the contained object, if it exists</li>
-<li>use map_(lambda x: x.foobar()) to access specific methods of contained object</li>
-<li>use map to map over the underlying object</li>
-<li>Implemented with the Singleton Pattern</li>
+<li>unlike a true "bottom type" this class is instantiate-able</li>
+<li>returns itself for arbitrary method calls</li>
+<li>returns itself if called as a Callable with arbitrary arguments</li>
+<li>interpreted as an empty container by standard Python functions</li>
+<li>better "bottom type" than either None or ()</li>
 </ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Nothing():
-    &#34;&#34;&#34;Attempt to give Python a &#34;bottom&#34; type.
+    &#34;&#34;&#34;Singleton semantically represents a missing value.
 
-    * semantically represents an empty container containing Any type
-    * delegates most standard functions/methods to the contained object, if it exists
-    * use map_(lambda x: x.foobar()) to access specific methods of contained object
-    * use map to map over the underlying object
-    * Implemented with the Singleton Pattern
+    * unlike a true &#34;bottom type&#34; this class is instantiate-able
+    * returns itself for arbitrary method calls
+    * returns itself if called as a Callable with arbitrary arguments
+    * interpreted as an empty container by standard Python functions
+    * better &#34;bottom type&#34; than either None or ()
 
     &#34;&#34;&#34;
     __slots__ = ()
@@ -81,7 +90,7 @@ hljs.highlightAll();
             cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
-    def __iter__(self) -&gt; Iterator[Any]:
+    def __iter__(self) -&gt; Iterator[_U]:
         return iter(())
 
     def __repr__(self) -&gt; str:
@@ -96,60 +105,52 @@ hljs.highlightAll();
     def __len__(self) -&gt; int:
         return 0
 
-    def get(self, alt: Optional[_T]=None) -&gt; _T:
-        &#34;&#34;&#34;return a value of type _T
+    def __add__(self, right: Any) -&gt; Any:
+        return Nothing()
 
-        * raises ValueError if an alternate value is not provided
+    def __radd__(self, left: Any) -&gt; Any:
+        return Nothing()
 
-        &#34;&#34;&#34;
+    def __mul__(self, right: Any) -&gt; Any:
+        return Nothing()
+
+    def __rmul__(self, left: Any) -&gt; Any:
+        return Nothing()
+
+    def __getitem__(self, index: int|slice) -&gt; Any:
+        return Nothing()
+
+    def __setitem__(self, index: int|slice, item: Any) -&gt; None:
+        return
+
+    def __getattr__(self, name: str) -&gt; Any:
+        def method(*args: Any, **kwargs: Any) -&gt; Callable[[Any], Any]:
+            return Nothing()
+        return method
+
+    def __call__(*args: Any, **kwargs: Any) -&gt; Any:
+        return Nothing()
+
+    def get(self, alt: Optional[_U]=None) -&gt; _U|Nothing:
+        &#34;&#34;&#34;Return an alternate value of type _T or a Nothing.&#34;&#34;&#34;
         if alt is None:
-            raise ValueError(&#39;Alternate return type needed but not provided.&#39;)
+            return Nothing()
         else:
-            return alt
-
-    def map(self, f: Callable[[_T], _S]) -&gt; Nothing:
-        &#34;&#34;&#34;Semantically map function f over an empty container.&#34;&#34;&#34;
-        return Nothing()
-
-    def flatMap(self, f: Callable[[_T], _S]) -&gt; Nothing:
-        &#34;&#34;&#34;Semantically flatMap function f over an empty container.&#34;&#34;&#34;
-        return Nothing()
-
-    def __getitem__(self, index: int) -&gt; Nothing:
-        return Nothing()
-
-    def __setitem__(self, index: int, item: Any) -&gt; None:
-        return</code></pre>
+            return alt</code></pre>
 </details>
-<h3>Class variables</h3>
-<dl>
-<dt id="grscheller.fp.nothing.Nothing.instance"><code class="name">var <span class="ident">instance</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 <h3>Methods</h3>
 <dl>
-<dt id="grscheller.fp.nothing.Nothing.flatMap"><code class="name flex">
-<span>def <span class="ident">flatMap</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>Semantically flatMap function f over an empty container.</p></div>
-</dd>
 <dt id="grscheller.fp.nothing.Nothing.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_T] = None) ‑> _T</span>
+<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_U] = None) ‑> Union[_U, <a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a>]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>return a value of type _T</p>
-<ul>
-<li>raises ValueError if an alternate value is not provided</li>
-</ul></div>
+<div class="desc"><p>Return an alternate value of type _T or a Nothing.</p></div>
 </dd>
-<dt id="grscheller.fp.nothing.Nothing.map"><code class="name flex">
-<span>def <span class="ident">map</span></span>(<span>self, f: Callable[[_T], _S]) ‑> <a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></span>
+<dt id="grscheller.fp.nothing.Nothing.instance"><code class="name flex">
+<span>def <span class="ident">instance</span></span>(<span>*args: Any, **kwargs: Any) ‑> Callable[[Any], Any]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Semantically map function f over an empty container.</p></div>
+<div class="desc"></div>
 </dd>
 </dl>
 </dd>
@@ -166,15 +167,18 @@ hljs.highlightAll();
 <li><code><a title="grscheller.fp" href="index.html">grscheller.fp</a></code></li>
 </ul>
 </li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="grscheller.fp.nothing.nothing" href="#grscheller.fp.nothing.nothing">nothing</a></code></li>
+</ul>
+</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
 <h4><code><a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></code></h4>
 <ul class="">
-<li><code><a title="grscheller.fp.nothing.Nothing.flatMap" href="#grscheller.fp.nothing.Nothing.flatMap">flatMap</a></code></li>
 <li><code><a title="grscheller.fp.nothing.Nothing.get" href="#grscheller.fp.nothing.Nothing.get">get</a></code></li>
 <li><code><a title="grscheller.fp.nothing.Nothing.instance" href="#grscheller.fp.nothing.Nothing.instance">instance</a></code></li>
-<li><code><a title="grscheller.fp.nothing.Nothing.map" href="#grscheller.fp.nothing.Nothing.map">map</a></code></li>
 </ul>
 </li>
 </ul>

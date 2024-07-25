@@ -59,10 +59,11 @@ hljs.highlightAll();
 <div class="desc"><p>Class representing a potentially missing value.</p>
 <ul>
 <li>where MB(value) contains a possible value of type _T</li>
-<li>MB( ) semantically represent a "Nothing" of type Bottom</li>
-<li>therefore bottom = Bottom(), as a value, cannot be put into a MB</li>
-<li>immutable - a MB does not change after being created</li>
-<li>immutable semantics - map &amp; flatMap produce new instances</li>
+<li>MB( ) semantically represent a "Nothing"</li>
+<li>implementation wise MB( ) contains a nothing: Nothing</li>
+<li>therefore nothing = Nothing(), as a value, cannot be put into a MB</li>
+<li>immutable, a MB does not change after being created</li>
+<li>immutable semantics, map and flatMap produce new instances</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -72,10 +73,11 @@ hljs.highlightAll();
     &#34;&#34;&#34;Class representing a potentially missing value.
 
     * where MB(value) contains a possible value of type _T
-    * MB( ) semantically represent a &#34;Nothing&#34; of type Bottom
-    * therefore bottom = Bottom(), as a value, cannot be put into a MB
-    * immutable - a MB does not change after being created
-    * immutable semantics - map &amp; flatMap produce new instances
+    * MB( ) semantically represent a &#34;Nothing&#34;
+    * implementation wise MB( ) contains a nothing: Nothing
+    * therefore nothing = Nothing(), as a value, cannot be put into a MB
+    * immutable, a MB does not change after being created
+    * immutable semantics, map and flatMap produce new instances
 
     &#34;&#34;&#34;
     __slots__ = &#39;_value&#39;,

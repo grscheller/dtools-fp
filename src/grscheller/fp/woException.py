@@ -33,10 +33,11 @@ class MB(Generic[_T]):
     """Class representing a potentially missing value.
 
     * where MB(value) contains a possible value of type _T
-    * MB( ) semantically represent a "Nothing" of type Bottom
-    * therefore bottom = Bottom(), as a value, cannot be put into a MB
-    * immutable - a MB does not change after being created
-    * immutable semantics - map & flatMap produce new instances
+    * MB( ) semantically represent a "Nothing"
+    * implementation wise MB( ) contains a nothing: Nothing
+    * therefore nothing = Nothing(), as a value, cannot be put into a MB
+    * immutable, a MB does not change after being created
+    * immutable semantics, map and flatMap produce new instances
 
     """
     __slots__ = '_value',

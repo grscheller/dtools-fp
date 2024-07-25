@@ -131,16 +131,26 @@ class Test_fp_iterators:
         assert fooMult == [5, 20, 60, 120, 120]
 
         bar: list[int] = []
-        barPlus = list(accumulate(bar, add))
-        barMult = list(accumulate(bar, lambda a,b: a*b))
-        assert barPlus == []
-        assert barMult == []
+        try:
+            barPlus = list(accumulate(bar, add))
+        except ValueError:
+            assert True
+        else:
+            assert False
+        barPlus = list(accumulate(bar, add, 0))
+        barMult = list(accumulate(bar, lambda a,b: a*b, 1))
+        assert barPlus == [0]
+        assert barMult == [1]
 
         woo: list[int] = [5,4,3,2,1]
-        wooPlus = list(accumulate(woo, add, 1))
-        wooMult = list(accumulate(woo, lambda a,b: a*b, 10))
-        assert wooPlus == [1, 6, 10, 13, 15, 16]
-        assert wooMult == [10, 50, 200, 600, 1200, 1200]
+        wooPlus1 = list(accumulate(woo, add, start=1))
+        wooMult1 = list(accumulate(woo, lambda a,b: a*b, start=10))
+        assert wooPlus1 == [1, 6, 10, 13, 15, 16]
+        assert wooMult1 == [10, 50, 200, 600, 1200, 1200]
+        nowooPlus1 = list(accumulate([], add, start=1))
+        nowooMult1 = list(accumulate([], lambda a,b: a*b, 10))
+        assert nowooPlus1 == [1]
+        assert nowooMult1 == [10]
 
         baz: list[int] = []
         bazPlus = list(accumulate(baz, add, 1))

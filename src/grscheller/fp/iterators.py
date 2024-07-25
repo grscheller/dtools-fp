@@ -15,7 +15,7 @@
 """Library of iterator related functions."""
 
 from __future__ import annotations
-from typing import Any, Callable, Iterator, Iterable, Iterator
+from typing import Callable, Iterator, Iterable, Iterator
 from typing import Never, overload, Optional, overload, TypeVar
 
 _T = TypeVar('_T')
@@ -97,24 +97,35 @@ def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
 
 ## accumulate - itertools.accumulate is giving me mypy issues
 
-def accumulate(it: Iterable[Any], f: Callable[[_S, _T], _S], s: Optional[_S]=None) -> Iterator[_S]:
-    """Returns an iterator of accumulated value.
+def accumulate(iterable: Iterable[_T], f: Callable[[_S, _T], _S], start: Optional[_S]=None) -> Iterator[_S]:
+    """Returns an iterator of accumulated values.
 
-    * pure Python version of standard library's itertools.chain
-    * function f does not default to addition
-    * f not doing so results in more type annotation flexibility
+    * pure Python version of standard library's itertools.accumulate
+    * function f does not default to addition (for typing flexibility)
+    * yields default value if iter(iterable) yields no results
+    * begins accumulation with an optional starting value
 
     """
-    it = iter(it)
-    if s is None:
-        try:
-            acc = next(it)
-        except StopIteration:
-            return
+    it = iter(iterable)
+    try:
+        it0 = next(it)
+    except StopIteration:
+        if start is None:
+            msg = 'accumulate called on empty iterable without a start value.'
+            raise ValueError(msg)
+        else:
+            yield start
     else:
-        acc = s
-
-    for ii in it:
-        yield acc
-        acc = f(acc, ii)
-    yield acc
+        if start is not None:
+            yield start
+            acc = f(start, it0)
+            for ii in it:
+                yield acc
+                acc = f(acc, ii)
+            yield acc
+        else:
+            acc = it0                      # type: ignore # in this case _S = _T
+            for ii in it:
+                yield acc
+                acc = f(acc, ii)
+            yield acc

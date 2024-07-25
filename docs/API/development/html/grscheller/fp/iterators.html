@@ -35,14 +35,15 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="grscheller.fp.iterators.accumulate"><code class="name flex">
-<span>def <span class="ident">accumulate</span></span>(<span>it: Iterable[Any], f: Callable[[_S, _T], _S], s: Optional[_S] = None) ‑> Iterator[_S]</span>
+<span>def <span class="ident">accumulate</span></span>(<span>iterable: Iterable[_T], f: Callable[[_S, _T], _S], start: Optional[_S] = None) ‑> Iterator[_S]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Returns an iterator of accumulated value.</p>
+<div class="desc"><p>Returns an iterator of accumulated values.</p>
 <ul>
-<li>pure Python version of standard library's itertools.chain</li>
-<li>function f does not default to addition</li>
-<li>f not doing so results in more type annotation flexibility</li>
+<li>pure Python version of standard library's itertools.accumulate</li>
+<li>function f does not default to addition (for typing flexibility)</li>
+<li>yields default value if iter(iterable) yields no results</li>
+<li>begins accumulation with an optional starting value</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.concat"><code class="name flex">

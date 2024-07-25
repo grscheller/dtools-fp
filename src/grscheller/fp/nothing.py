@@ -40,11 +40,13 @@ _U = TypeVar('_U')
 _V = TypeVar('_V')
 
 class Nothing():
-    """Attempt to give Python a "bottom" type.
+    """Singleton semantically represents a missing value.
 
-    * semantically represents an empty typed container
-    * delegates most standard functions/methods to the contained object, if it exists
-    * Implemented with the Singleton Pattern
+    * unlike a true "bottom type" this class is instantiate-able
+    * returns itself for arbitrary method calls
+    * returns itself if called as a Callable with arbitrary arguments
+    * interpreted as an empty container by standard Python functions
+    * better "bottom type" than either None or ()
 
     """
     __slots__ = ()
@@ -81,6 +83,12 @@ class Nothing():
     def __rmul__(self, left: Any) -> Any:
         return Nothing()
 
+    def __getitem__(self, index: int|slice) -> Any:
+        return Nothing()
+
+    def __setitem__(self, index: int|slice, item: Any) -> None:
+        return
+
     def __getattr__(self, name: str) -> Any:
         def method(*args: Any, **kwargs: Any) -> Callable[[Any], Any]:
             return Nothing()
@@ -95,19 +103,5 @@ class Nothing():
             return Nothing()
         else:
             return alt
-
-    def map(self, f: Callable[[_U], _V]) -> Nothing:
-        """Semantically map function f over an empty container."""
-        return Nothing()
-
-    def flatMap(self, f: Callable[[_U], _V]) -> Nothing:
-        """Semantically flatMap function f over an empty container."""
-        return Nothing()
-
-    def __getitem__(self, index: int|slice) -> Any:
-        return Nothing()
-
-    def __setitem__(self, index: int|slice, item: Any) -> None:
-        return
 
 nothing = Nothing()
