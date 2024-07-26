@@ -14,16 +14,13 @@
 
 """A nothing is an attempt to give Python a "bottom" type.
 
-* nothing: Nothing = Nothing(): is a singleton representing an absent value
-* unlike a true bottom, it can be instantiated
-* Nothing() can be used with most standard Python functions
-* Nothing() accepts most standard Python methods (still a work in progress)
-* types _T|None and _T|() both can act like a poor man's Optional/Maybe Monad
-* both None and () are lousy bottoms
+* unlike a true bottom, it can be instantiated as a singleton
+* types like _T|None and _T|() act like a poor man's Optional/Maybe Monads
+* both None and () make for lousy bottom types
 * both don't accept many methods, None has no length, at least () is iterable
-* both must constantly be checked for when return values
+* when returning or iterating values, both must constantly be checked for
 * many developers use None and () as sentinel values
-* when used as sentinels, Null & () should be capable of being stored as values
+* therefore Null & () should be store-able in data structures 
 
 """
 
@@ -36,17 +33,17 @@ __license__ = "Apache License 2.0"
 
 from typing import Any, Callable, Iterator, Optional, TypeVar
 
-_U = TypeVar('_U')
-_V = TypeVar('_V')
+_T = TypeVar('_T')
+_S = TypeVar('_S')
 
 class Nothing():
     """Singleton semantically represents a missing value.
 
-    * unlike a true "bottom type" this class is instantiate-able
+    * nothing: Nothing = Nothing() is a singleton representing an absent value
     * returns itself for arbitrary method calls
     * returns itself if called as a Callable with arbitrary arguments
     * interpreted as an empty container by standard Python functions
-    * better "bottom type" than either None or ()
+    * makes for a better "bottom type" than either None or ()
 
     """
     __slots__ = ()
@@ -56,7 +53,7 @@ class Nothing():
             cls.instance = super(Nothing, cls).__new__(cls)
         return cls.instance
 
-    def __iter__(self) -> Iterator[_U]:
+    def __iter__(self) -> Iterator[Any]:
         return iter(())
 
     def __repr__(self) -> str:
@@ -97,7 +94,7 @@ class Nothing():
     def __call__(*args: Any, **kwargs: Any) -> Any:
         return Nothing()
 
-    def get(self, alt: Optional[_U]=None) -> _U|Nothing:
+    def get(self, alt: Optional[_T]=None) -> _T|Nothing:
         """Return an alternate value of type _T or a Nothing."""
         if alt is None:
             return Nothing()

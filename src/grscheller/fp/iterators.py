@@ -47,7 +47,7 @@ def concat(*iterables: Iterable[_T]) -> Iterator[_T]:
 def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
     """Merge together multiple iterator streams until all are exhausted.
 
-    * breaks when last iterator is exhausted
+    * returns when last iterator is exhausted
 
     """
     iterList = list(map(lambda x: iter(x), iterables))
@@ -74,7 +74,7 @@ def exhaust(*iterables: Iterable[_T]) -> Iterator[_T]:
 def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
     """Merge multiple iterable streams until one is exhausted.
 
-    * breaks when first iterator is exhausted
+    * returns when first iterator is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
     * this prevents data lose if any of the iterables are iterators with external references
 
@@ -97,12 +97,12 @@ def merge(*iterables: Iterable[_T], yield_partials: bool=False) -> Iterator[_T]:
 
 ## accumulate - itertools.accumulate is giving me mypy issues
 
-def accumulate(iterable: Iterable[_T], f: Callable[[_S, _T], _S], start: Optional[_S]=None) -> Iterator[_S]:
+def accumulate(iterable: Iterable[_T], f: Callable[[_S, _T], _S],
+               initial: Optional[_S]=None) -> Iterator[_S]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's itertools.accumulate
     * function f does not default to addition (for typing flexibility)
-    * yields default value if iter(iterable) yields no results
     * begins accumulation with an optional starting value
 
     """
@@ -110,21 +110,20 @@ def accumulate(iterable: Iterable[_T], f: Callable[[_S, _T], _S], start: Optiona
     try:
         it0 = next(it)
     except StopIteration:
-        if start is None:
-            msg = 'accumulate called on empty iterable without a start value.'
-            raise ValueError(msg)
+        if initial is None:
+            return
         else:
-            yield start
+            yield initial
     else:
-        if start is not None:
-            yield start
-            acc = f(start, it0)
+        if initial is not None:
+            yield initial
+            acc = f(initial, it0)
             for ii in it:
                 yield acc
                 acc = f(acc, ii)
             yield acc
         else:
-            acc = it0                      # type: ignore # in this case _S = _T
+            acc = it0                     # type: ignore # for this case _S = _T
             for ii in it:
                 yield acc
                 acc = f(acc, ii)

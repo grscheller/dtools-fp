@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
-<title>grscheller.fp.nothing API documentation</title>
-<meta name="description" content="A nothing is an attempt to give Python a &#34;bottom&#34; type …">
+<title>grscheller.fp API documentation</title>
+<meta name="description" content="Functional programming tools which endeavor to be Pythonic.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -22,136 +22,33 @@ hljs.highlightAll();
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>grscheller.fp.nothing</code></h1>
+<h1 class="title">Package <code>grscheller.fp</code></h1>
 </header>
 <section id="section-intro">
-<p>A nothing is an attempt to give Python a "bottom" type.</p>
-<ul>
-<li>unlike a true bottom, it can be instantiated as a singleton</li>
-<li>types like _T|None and _T|() act like a poor man's Optional/Maybe Monads</li>
-<li>both None and () make for lousy bottom types</li>
-<li>both don't accept many methods, None has no length, at least () is iterable</li>
-<li>when returning or iterating values, both must constantly be checked for</li>
-<li>many developers use None and () as sentinel values</li>
-<li>therefore Null &amp; () should be store-able in data structures</li>
-</ul>
+<p>Functional programming tools which endeavor to be Pythonic.</p>
 </section>
 <section>
-</section>
-<section>
-</section>
-<section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt id="grscheller.fp.nothing.nothing"><code class="name flex">
-<span>def <span class="ident">nothing</span></span>(<span>*args: Any, **kwargs: Any) ‑> Callable[[Any], Any]</span>
-</code></dt>
+<dt><code class="name"><a title="grscheller.fp.iterators" href="iterators.html">grscheller.fp.iterators</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Library of iterator related functions.</p></div>
+</dd>
+<dt><code class="name"><a title="grscheller.fp.nothing" href="nothing.html">grscheller.fp.nothing</a></code></dt>
+<dd>
+<div class="desc"><p>A nothing is an attempt to give Python a "bottom" type …</p></div>
+</dd>
+<dt><code class="name"><a title="grscheller.fp.woException" href="woException.html">grscheller.fp.woException</a></code></dt>
+<dd>
+<div class="desc"><p>Functional data types to use in lieu of exceptions.</p></div>
 </dd>
 </dl>
 </section>
 <section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="grscheller.fp.nothing.Nothing"><code class="flex name class">
-<span>class <span class="ident">Nothing</span></span>
-</code></dt>
-<dd>
-<div class="desc"><p>Singleton semantically represents a missing value.</p>
-<ul>
-<li>nothing: Nothing = Nothing() is a singleton representing an absent value</li>
-<li>returns itself for arbitrary method calls</li>
-<li>returns itself if called as a Callable with arbitrary arguments</li>
-<li>interpreted as an empty container by standard Python functions</li>
-<li>makes for a better "bottom type" than either None or ()</li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class Nothing():
-    &#34;&#34;&#34;Singleton semantically represents a missing value.
-
-    * nothing: Nothing = Nothing() is a singleton representing an absent value
-    * returns itself for arbitrary method calls
-    * returns itself if called as a Callable with arbitrary arguments
-    * interpreted as an empty container by standard Python functions
-    * makes for a better &#34;bottom type&#34; than either None or ()
-
-    &#34;&#34;&#34;
-    __slots__ = ()
-
-    def __new__(cls) -&gt; Nothing:
-        if not hasattr(cls, &#39;instance&#39;):
-            cls.instance = super(Nothing, cls).__new__(cls)
-        return cls.instance
-
-    def __iter__(self) -&gt; Iterator[Any]:
-        return iter(())
-
-    def __repr__(self) -&gt; str:
-        return &#39;Nothing()&#39;
-
-    def __str__(self) -&gt; str:
-        return &#39;nothing&#39;
-
-    def __bool__(self) -&gt; bool:
-        return False
-
-    def __len__(self) -&gt; int:
-        return 0
-
-    def __add__(self, right: Any) -&gt; Any:
-        return Nothing()
-
-    def __radd__(self, left: Any) -&gt; Any:
-        return Nothing()
-
-    def __mul__(self, right: Any) -&gt; Any:
-        return Nothing()
-
-    def __rmul__(self, left: Any) -&gt; Any:
-        return Nothing()
-
-    def __getitem__(self, index: int|slice) -&gt; Any:
-        return Nothing()
-
-    def __setitem__(self, index: int|slice, item: Any) -&gt; None:
-        return
-
-    def __getattr__(self, name: str) -&gt; Any:
-        def method(*args: Any, **kwargs: Any) -&gt; Callable[[Any], Any]:
-            return Nothing()
-        return method
-
-    def __call__(*args: Any, **kwargs: Any) -&gt; Any:
-        return Nothing()
-
-    def get(self, alt: Optional[_T]=None) -&gt; _T|Nothing:
-        &#34;&#34;&#34;Return an alternate value of type _T or a Nothing.&#34;&#34;&#34;
-        if alt is None:
-            return Nothing()
-        else:
-            return alt</code></pre>
-</details>
-<h3>Methods</h3>
-<dl>
-<dt id="grscheller.fp.nothing.Nothing.get"><code class="name flex">
-<span>def <span class="ident">get</span></span>(<span>self, alt: Optional[_T] = None) ‑> Union[_T, <a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a>]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Return an alternate value of type _T or a Nothing.</p></div>
-</dd>
-<dt id="grscheller.fp.nothing.Nothing.instance"><code class="name flex">
-<span>def <span class="ident">instance</span></span>(<span>*args: Any, **kwargs: Any) ‑> Callable[[Any], Any]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
-</dd>
-</dl>
+</section>
+<section>
+</section>
+<section>
 </section>
 </article>
 <nav id="sidebar">
@@ -159,25 +56,11 @@ hljs.highlightAll();
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3>Super-module</h3>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="grscheller.fp" href="index.html">grscheller.fp</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="grscheller.fp.nothing.nothing" href="#grscheller.fp.nothing.nothing">nothing</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="grscheller.fp.nothing.Nothing" href="#grscheller.fp.nothing.Nothing">Nothing</a></code></h4>
-<ul class="">
-<li><code><a title="grscheller.fp.nothing.Nothing.get" href="#grscheller.fp.nothing.Nothing.get">get</a></code></li>
-<li><code><a title="grscheller.fp.nothing.Nothing.instance" href="#grscheller.fp.nothing.Nothing.instance">instance</a></code></li>
-</ul>
-</li>
+<li><code><a title="grscheller.fp.iterators" href="iterators.html">grscheller.fp.iterators</a></code></li>
+<li><code><a title="grscheller.fp.nothing" href="nothing.html">grscheller.fp.nothing</a></code></li>
+<li><code><a title="grscheller.fp.woException" href="woException.html">grscheller.fp.woException</a></code></li>
 </ul>
 </li>
 </ul>

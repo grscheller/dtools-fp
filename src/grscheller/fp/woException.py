@@ -96,8 +96,8 @@ class XOR(Generic[_L, _R]):
     * implements a left biased Either Monad
     * semantically containing 1 of 2 possible types of values
     * XOR(left: _L, right: _R) produces "left" value
-    * XOR(None, right: _R) produces a "right" value
-    * therefore None as a value, not implementation detail, can't be put into a "left"
+    * XOR(nothing, right: _R) produces a "right" value
+    * therefore nothing: Nothing as a value cannot be stored as a "left"
     * in a Boolean context, returns True if a "left", False if a "right"
     * immutable, an XOR does not change after being created
     * immutable semantics, map & flatMap return new instances
@@ -118,7 +118,7 @@ class XOR(Generic[_L, _R]):
 
     def __iter__(self) -> Iterator[_L]:
         """Yields its value if the XOR is a "left"."""
-        if self._left is not Nothing():
+        if self:
             yield self._left           # type: ignore # will never yield nothing
 
     def __repr__(self) -> str:
@@ -170,7 +170,7 @@ class XOR(Generic[_L, _R]):
         * raises ValueError if alternate value needed but not provided
 
         """
-        if self._left is Nothing():
+        if not self:
             return self._right
         else:
             if alt is Nothing():
@@ -190,11 +190,11 @@ class XOR(Generic[_L, _R]):
     def map(self, f: Callable[[_L], _S|Nothing], right: _R|Nothing=Nothing()) -> XOR[_S, _R]:
         """Map over an XOR.
 
-        * if a "left" apply f and return a "left" if f successful
-        * otherwise, if f unsuccessful, return right if not Bottom
-        * otherwise, if right Bottom, return the default right value
-        * if a "right" return a  "right" with non-bottom right
-        * otherwise, if right is bottom, propagate the "right"
+        * if a "Left" XOR map f and return a "Left" XOR if f successful
+        * otherwise, if f unsuccessful, return "Right" XOR with right not nothing: Nothing
+        * otherwise, if right is nothing, return the default "Right" XOR
+        * if a "Right" return a "Right" XOR with a non-nothing right
+        * otherwise, if right is nothing, propagate new "Right" XOR instance
 
         """
         nothing = Nothing()
