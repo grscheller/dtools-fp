@@ -148,7 +148,7 @@ def foldR(iterable: Iterable[_D], f: Callable[[_D, _R], _R],
 
     acc: _R
     if hasattr(iterable, '__reversed__') or hasattr(iterable, '__len__') and hasattr(iterable, '__getitem__'):
-        it = reversed(iterable)     # type: ignore # just checked if this was OK
+        it = reversed(iterable)   # type: ignore # just checked that this was OK
     else:
         msg = 'Iterable is not reversible.'
         raise TypeError(msg)
@@ -174,7 +174,7 @@ def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L],
     * if f returns the sentinel value, stop the fold at that point
     * f is never passed the sentinel value
     * note that _S can be the same type as _D
-    * if iterable empty & no initial value given, return default
+    * if iterable empty & no initial value given, return sentinel
     * note that when initial not given, then _L = _D
     * traditional FP type order given for function f
     * raises TypeError if the iterable is not iterable (for the benefit of untyped code)
