@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Library of iterator related functions."""
+"""Library of iterator related functions.
+
+* at all times iterator protocol is assumed to be followed, that is
+* all iterators produced are assumed to be iterable
+* for all iterators it, iter(it) is it
+* iterables are not necessarily iterators
+
+"""
 
 from __future__ import annotations
-from typing import Callable, Iterator, Iterable, Optional, TypeVar
+from typing import Callable, Iterator, Iterable, Optional, Reversible, TypeVar
 
 _D = TypeVar('_D')
 _L = TypeVar('_L')
@@ -112,7 +119,6 @@ def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
     * never returns if iterable generates an infinite iterator
 
     """
-
     acc: _L
     if hasattr(iterable, '__iter__'):
         it = iter(iterable)
@@ -133,7 +139,7 @@ def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
 
     return acc
 
-def foldR(iterable: Iterable[_D], f: Callable[[_D, _R], _R],
+def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
           default: _S, initial: Optional[_R]=None) -> _R|_S:
     """Folds a reversible iterable from the right with an optional initial value.
 
@@ -141,21 +147,19 @@ def foldR(iterable: Iterable[_D], f: Callable[[_D, _R], _R],
     * note that when an initial value not given then _R = _D
     * if iterable empty & no initial value given, return default
     * traditional FP type order given for function f
-    * raises TypeError if the iterable is not iterable (for the benefit of untyped code)
     * raises TypeError if iterable is not reversible
 
     """
-
     acc: _R
     if hasattr(iterable, '__reversed__') or hasattr(iterable, '__len__') and hasattr(iterable, '__getitem__'):
-        it = reversed(iterable)   # type: ignore # just checked that this was OK
+        it = reversed(iterable)
     else:
         msg = 'Iterable is not reversible.'
         raise TypeError(msg)
 
     if initial is None:
         try:
-            acc = next(it)
+            acc = next(it)                 # type: ignore # in this case _R = _D
         except StopIteration:
             return default
     else:
@@ -181,7 +185,6 @@ def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L],
     * never returns if iterable generates an infinite iterator & f never returns the sentinel value
 
     """
-
     acc: _L|_S
     if hasattr(iterable, '__iter__'):
         it = iter(iterable)
@@ -202,8 +205,8 @@ def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L],
     for v in it:
         if v == sentinel:
             break
-        facc = f(acc, v)         # type: ignore # if not _L = _S
-                                 #                then type(acc) is not _S
+        facc = f(acc, v)               # type: ignore # if not _L = _S
+                                                      # then type(acc) is not _S
         if facc == sentinel:
             break
         else:
