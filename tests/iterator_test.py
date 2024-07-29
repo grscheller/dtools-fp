@@ -61,7 +61,7 @@ class Test_fp_iterators:
         assert i2.__next__() == 'd2'
         assert i2.__next__() == 'e2'
 
-    def test_edge_cases(self) -> None:
+    def test_merges_concats(self) -> None:
         i3, i0, i4 = iter(('a3', 'b3', 'c3')), iter(()), iter(('a4', 'b4', 'c4', 'd4'))
         assert len(tup := tuple(concat(i3, i0, i4))) == 7
         assert tup == ('a3', 'b3', 'c3', 'a4', 'b4', 'c4', 'd4')
