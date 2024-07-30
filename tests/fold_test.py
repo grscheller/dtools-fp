@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from grscheller.fp.iterators import foldL, foldR, sc_foldL
+from grscheller.fp.iterators import foldL, foldR # , sc_foldL
 from grscheller.fp.nothing import nothing, Nothing
 
 class Test_fp_folds:
@@ -26,43 +26,68 @@ class Test_fp_folds:
         def funcR(ii: int, acc: int) -> int:
             return (ii - 1)*(acc + 1)
 
-        data1 = (1, 2, 3, 4, 5)
-        data2 = (2, 3, 4, 5)
-        data3: list[int] = []
+        data1 = tuple(range(1, 101))
+        data2 = tuple(range(2, 101))
+        data3: tuple[int, ...] = ()
         data4 = 42,
 
-        assert foldL(data1, add, None) == 15
-        assert foldR(data1, add, None) == 15
-        assert foldL(data2, add, None) == 14
-        assert foldR(data2, add, None) == 14
-        assert foldL(data3, add, None) == None
-        assert foldR(data3, add, None) == None
-        assert foldL(data4, add, None) == 42
-        assert foldR(data4, add, None) == 42
-        assert foldL(data3, add, nothing) == nothing
-        assert foldR(data3, add, nothing) == nothing
-        assert foldL(data4, add, nothing) == 42
-        assert foldR(data4, add, nothing) == 42
-        assert foldL(data4, add, nothing) == 42
-        assert foldR(data4, add, nothing) == 42
+        assert foldL(data1, add) == 5050
+        assert foldR(data1, add) == 5050
+        assert foldL(data1, add, 10) == 5060
+        assert foldR(data1, add, 10) == 5060
 
+        assert foldL(data2, add) == 5049
+        assert foldR(data2, add) == 5049
+        assert foldL(data2, add, 10) == 5059
+        assert foldR(data2, add, 10) == 5059
 
-        assert foldL(data1, funcL, None) == -156
-        assert foldR(data1, funcR, None) == 0
-        assert foldL(data2, funcL, None) == 84
-        assert foldR(data2, funcR, None) == 39
-        assert foldL(data3, funcL, None) == None
-        assert foldR(data3, funcR, None) == None
-        assert foldL(data4, funcL, None) == 42
-        assert foldR(data4, funcR, None) == 42
-        assert foldL(data1, funcL, nothing) == -156
-        assert foldR(data1, funcR, nothing) == 0
-        assert foldL(data2, funcL, nothing) == 84
-        assert foldR(data2, funcR, nothing) == 39
-        assert foldL(data3, funcL, nothing) == nothing
-        assert foldR(data3, funcR, nothing) == nothing
-        assert foldL(data4, funcL, nothing) == 42
-        assert foldR(data4, funcR, nothing) == 42
+        assert foldL(data3, add) == nothing
+        assert foldR(data3, add) == nothing
+        assert foldL(data3, add, 10) == 10
+        assert foldR(data3, add, 10) == 10
+
+        assert foldL(data4, add) == 42
+        assert foldR(data4, add) == 42
+        assert foldL(data4, add, 10) == 52
+        assert foldR(data4, add, 10) == 52
+
+        stuff1 = (1, 2, 3, 4, 5)
+        stuff2 = (2, 3, 4, 5)
+        stuff3: list[int] = []
+        stuff4 = 42,
+
+        assert foldL(stuff1, add, default=None) == 15
+        assert foldL(stuff1, add, None, default=None) == 15
+        assert foldL(stuff1, add, 10, default=None) == 25
+        assert foldR(stuff1, add, default=None) == 15
+        assert foldL(stuff2, add, default=None) == 14
+        assert foldR(stuff2, add, default=None) == 14
+        assert foldL(stuff3, add, default=None) == None
+        assert foldR(stuff3, add, default=None) == None
+        assert foldL(stuff4, add, default=None) == 42
+        assert foldR(stuff4, add, default=None) == 42
+        assert foldL(stuff3, add, default=nothing) == nothing
+        assert foldL(stuff3, add) == nothing
+        assert foldR(stuff3, add) == nothing
+        assert foldL(stuff4, add) == 42
+        assert foldR(stuff4, add) == 42
+
+        assert foldL(stuff1, funcL, default=None) == -156
+        assert foldR(stuff1, funcR, default=None) == 0
+        assert foldL(stuff2, funcL, default=None) == 84
+        assert foldR(stuff2, funcR, default=None) == 39
+        assert foldL(stuff3, funcL, default=None) == None
+        assert foldR(stuff3, funcR, default=None) == None
+        assert foldL(stuff4, funcL, default=None) == 42
+        assert foldR(stuff4, funcR, default=None) == 42
+        assert foldL(stuff1, funcL) == -156
+        assert foldR(stuff1, funcR) == 0
+        assert foldL(stuff2, funcL) == 84
+        assert foldR(stuff2, funcR) == 39
+        assert foldL(stuff3, funcL) == nothing
+        assert foldR(stuff3, funcR) == nothing
+        assert foldL(stuff4, funcL) == 42
+        assert foldR(stuff4, funcR) == 42
 
     def test_scfold(self) -> None:
         def add(ii: int|Nothing, jj: int|Nothing) -> int|Nothing:
@@ -80,29 +105,29 @@ class Test_fp_folds:
         data5 = 10,
         data6 = 15, 20, 25, 30
 
-        assert sc_foldL(data1, add, nothing) == 15
-    #   assert sc_foldR(data1, add, nothing) == 15
-        assert sc_foldL(data2, add, nothing) == 36
-    #   assert sc_foldR(data2, add, nothing) == 36
-        assert sc_foldL(data3, add, nothing) == 21
-    #   assert sc_foldR(data3, add, nothing) == 21
-        assert sc_foldL(data4, add, nothing) == nothing
-    #   assert sc_foldR(data4, add, nothing) == nothing
-        assert sc_foldL(data5, add, nothing) == 10
-    #   assert sc_foldR(data5, add, nothing) == 10
-        assert sc_foldL(data6, add, nothing) == 35
-    #   assert sc_foldR(data6, add, nothing) == 30
-        assert sc_foldL(data1, add, nothing, 10) == 25
-    #   assert sc_foldR(data1, add, nothing, 10) == 25
-        assert sc_foldL(data2, add, nothing, 10) == 38
-    #   assert sc_foldR(data2, add, nothing, 10) == 37
-        assert sc_foldL(data3, add, nothing, 20) == 41
-    #   assert sc_foldR(data3, add, nothing, 20) == 39
-        assert sc_foldL(data4, add, nothing, 10) == 10
-    #   assert sc_foldR(data4, add, nothing, 10) == 10
-        assert sc_foldL(data5, add, nothing, 10) == 20
-    #   assert sc_foldR(data5, add, nothing, 10) == 20
-        assert sc_foldL(data6, add, nothing, 10) == 25
-    #   assert sc_foldR(data6, add, nothing, 10) == 40
+    #    assert sc_foldL(data1, add, nothing) == 15
+    ##   assert sc_foldR(data1, add, nothing) == 15
+    #    assert sc_foldL(data2, add, nothing) == 36
+    ##   assert sc_foldR(data2, add, nothing) == 36
+    #    assert sc_foldL(data3, add, nothing) == 21
+    ##   assert sc_foldR(data3, add, nothing) == 21
+    #    assert sc_foldL(data4, add, nothing) == nothing
+    ##   assert sc_foldR(data4, add, nothing) == nothing
+    #    assert sc_foldL(data5, add, nothing) == 10
+    ##   assert sc_foldR(data5, add, nothing) == 10
+    #    assert sc_foldL(data6, add, nothing) == 35
+    ##   assert sc_foldR(data6, add, nothing) == 30
+    #    assert sc_foldL(data1, add, nothing, 10) == 25
+    ##   assert sc_foldR(data1, add, nothing, 10) == 25
+    #    assert sc_foldL(data2, add, nothing, 10) == 38
+    ##   assert sc_foldR(data2, add, nothing, 10) == 37
+    #    assert sc_foldL(data3, add, nothing, 20) == 41
+    ##   assert sc_foldR(data3, add, nothing, 20) == 39
+    #    assert sc_foldL(data4, add, nothing, 10) == 10
+    ##   assert sc_foldR(data4, add, nothing, 10) == 10
+    #    assert sc_foldL(data5, add, nothing, 10) == 20
+    ##   assert sc_foldR(data5, add, nothing, 10) == 20
+    #    assert sc_foldL(data6, add, nothing, 10) == 25
+    ##   assert sc_foldR(data6, add, nothing, 10) == 40
 
 

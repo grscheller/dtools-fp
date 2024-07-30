@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.1">
 <title>grscheller.fp.iterators API documentation</title>
-<meta name="description" content="Library of iterator related functions.">
+<meta name="description" content="Library of iterator related functions …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -26,6 +26,12 @@ hljs.highlightAll();
 </header>
 <section id="section-intro">
 <p>Library of iterator related functions.</p>
+<ul>
+<li>at all times iterator protocol is assumed to be followed, that is</li>
+<li>all iterators produced are assumed to be iterable</li>
+<li>for all iterators it, iter(it) is it</li>
+<li>iterables are not necessarily iterators</li>
+</ul>
 </section>
 <section>
 </section>
@@ -35,7 +41,7 @@ hljs.highlightAll();
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="grscheller.fp.iterators.accumulate"><code class="name flex">
-<span>def <span class="ident">accumulate</span></span>(<span>iterable: Iterable[_D], f: Callable[[_S, _D], _S], initial: Optional[_S] = None) ‑> Iterator[_S]</span>
+<span>def <span class="ident">accumulate</span></span>(<span>iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: Optional[_L] = None) ‑> Iterator[_L]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns an iterator of accumulated values.</p>
@@ -66,7 +72,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.foldL"><code class="name flex">
-<span>def <span class="ident">foldL</span></span>(<span>iterable: Iterable[_D], f: Callable[[_L, _D], _L], default: _S, initial: Optional[_L] = None) ‑> Union[_L, _S]</span>
+<span>def <span class="ident">foldL</span></span>(<span>iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: Optional[_L] = None, default: _S | Nothing = Nothing()) ‑> Union[_L, _S, <a title="grscheller.fp.nothing.Nothing" href="nothing.html#grscheller.fp.nothing.Nothing">Nothing</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Folds an iterable from the left with an optional initial value.</p>
@@ -80,7 +86,7 @@ hljs.highlightAll();
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterators.foldR"><code class="name flex">
-<span>def <span class="ident">foldR</span></span>(<span>iterable: Iterable[_D], f: Callable[[_D, _R], _R], default: _S, initial: Optional[_R] = None) ‑> Union[_R, _S]</span>
+<span>def <span class="ident">foldR</span></span>(<span>iterable: Reversible[_D], f: Callable[[_D, _R], _R], initial: Optional[_R] = None, default: _S | Nothing = Nothing()) ‑> Union[_R, _S, <a title="grscheller.fp.nothing.Nothing" href="nothing.html#grscheller.fp.nothing.Nothing">Nothing</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Folds a reversible iterable from the right with an optional initial value.</p>
@@ -89,7 +95,6 @@ hljs.highlightAll();
 <li>note that when an initial value not given then _R = _D</li>
 <li>if iterable empty &amp; no initial value given, return default</li>
 <li>traditional FP type order given for function f</li>
-<li>raises TypeError if the iterable is not iterable (for the benefit of untyped code)</li>
 <li>raises TypeError if iterable is not reversible</li>
 </ul></div>
 </dd>
@@ -102,23 +107,6 @@ hljs.highlightAll();
 <li>returns when first iterator is exhausted</li>
 <li>if yield_partials is true, yield any unmatched yielded values from the other iterables</li>
 <li>this prevents data lose if any of the iterables are iterators with external references</li>
-</ul></div>
-</dd>
-<dt id="grscheller.fp.iterators.sc_foldL"><code class="name flex">
-<span>def <span class="ident">sc_foldL</span></span>(<span>iterable: Iterable[_D | _S], f: Callable[[_L, _D | _S], _L], sentinel: _S, initial: Optional[_L | _S] = None) ‑> Union[_L, _S]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Folds an iterable from the left with an optional initial value.</p>
-<ul>
-<li>if the iterable returns the sentinel value, stop the fold at that point</li>
-<li>if f returns the sentinel value, stop the fold at that point</li>
-<li>f is never passed the sentinel value</li>
-<li>note that _S can be the same type as _D</li>
-<li>if iterable empty &amp; no initial value given, return default</li>
-<li>note that when initial not given, then _L = _D</li>
-<li>traditional FP type order given for function f</li>
-<li>raises TypeError if the iterable is not iterable (for the benefit of untyped code)</li>
-<li>never returns if iterable generates an infinite iterator &amp; f never returns the sentinel value</li>
 </ul></div>
 </dd>
 </dl>
@@ -144,7 +132,6 @@ hljs.highlightAll();
 <li><code><a title="grscheller.fp.iterators.foldL" href="#grscheller.fp.iterators.foldL">foldL</a></code></li>
 <li><code><a title="grscheller.fp.iterators.foldR" href="#grscheller.fp.iterators.foldR">foldR</a></code></li>
 <li><code><a title="grscheller.fp.iterators.merge" href="#grscheller.fp.iterators.merge">merge</a></code></li>
-<li><code><a title="grscheller.fp.iterators.sc_foldL" href="#grscheller.fp.iterators.sc_foldL">sc_foldL</a></code></li>
 </ul>
 </li>
 </ul>
