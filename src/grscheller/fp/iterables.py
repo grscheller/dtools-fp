@@ -32,8 +32,7 @@ _R = TypeVar('_R')
 _S = TypeVar('_S')
 
 __all__ = [ 'concat', 'merge', 'exhaust',
-            'foldL', 'foldR',
-            'accumulate' ]
+            'foldL', 'foldR', 'accumulate' ]
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
@@ -41,7 +40,7 @@ __license__ = "Apache License 2.0"
 ## Iterate over multiple Iterables
 
 def concat(*iterables: Iterable[_D]) -> Iterator[_D]:
-    """Sequentially concatenate multiple iterators into one.
+    """Sequentially concatenate multiple iterators from multiple iterables into one.
 
     * pure Python version of standard library's itertools.chain
     * performant to chain
@@ -57,7 +56,7 @@ def concat(*iterables: Iterable[_D]) -> Iterator[_D]:
                 break
 
 def exhaust(*iterables: Iterable[_D]) -> Iterator[_D]:
-    """Merge together multiple iterator streams until all are exhausted.
+    """Merge together the multiple iterator streams until all are exhausted.
 
     * returns when last iterator is exhausted
 
@@ -84,7 +83,7 @@ def exhaust(*iterables: Iterable[_D]) -> Iterator[_D]:
             yield value
 
 def merge(*iterables: Iterable[_D], yield_partials: bool=False) -> Iterator[_D]:
-    """Merge multiple iterable streams until one is exhausted.
+    """Merge multiple iterable streams until first is exhausted.
 
     * returns when first iterator is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables

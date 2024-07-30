@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from grscheller.fp.iterators import concat, merge, exhaust
-from grscheller.fp.iterators import accumulate
+from grscheller.fp.iterables import concat, merge, exhaust
+from grscheller.fp.iterables import accumulate
 
-class Test_fp_iterators:
+class Test_fp_iterables:
     def test_identity(self) -> None:
         ones = (1, 2, 3, 4, 5, 6, 7, 8, 9)
         tens = [10, 20, 30, 40, 50]
