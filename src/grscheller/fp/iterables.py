@@ -16,7 +16,7 @@
 
 * at all times iterator protocol is assumed to be followed, that is
 * all iterators produced are assumed to be iterable
-* for all iterators it, iter(it) is it
+* for all iterators "itor" we assume "iter(itor) is itor"
 * iterables are not necessarily iterators
 
 """
@@ -31,8 +31,7 @@ _L = TypeVar('_L')
 _R = TypeVar('_R')
 _S = TypeVar('_S')
 
-__all__ = [ 'concat', 'merge', 'exhaust',
-            'foldL', 'foldR', 'accumulate' ]
+__all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
@@ -40,9 +39,11 @@ __license__ = "Apache License 2.0"
 ## Iterate over multiple Iterables
 
 def concat(*iterables: Iterable[_D]) -> Iterator[_D]:
-    """Sequentially concatenate multiple iterators from multiple iterables into one.
+    """Sequentially concatenate multiple iterables into an iterator.
 
     * pure Python version of standard library's itertools.chain
+    * iterator yields Sequentially each iterable until all are exhausted
+    * an infinite iterable will prevent subsequent iterables from yielding any values
     * performant to chain
 
     """
@@ -56,9 +57,9 @@ def concat(*iterables: Iterable[_D]) -> Iterator[_D]:
                 break
 
 def exhaust(*iterables: Iterable[_D]) -> Iterator[_D]:
-    """Merge together the multiple iterator streams until all are exhausted.
+    """Shuffle together multiple iterables into an iterator until all are exhausted.
 
-    * returns when last iterator is exhausted
+    * iterator yields until all iterables are exhausted
 
     """
     iterList = list(map(lambda x: iter(x), iterables))
@@ -83,9 +84,9 @@ def exhaust(*iterables: Iterable[_D]) -> Iterator[_D]:
             yield value
 
 def merge(*iterables: Iterable[_D], yield_partials: bool=False) -> Iterator[_D]:
-    """Merge multiple iterable streams until first is exhausted.
+    """Shuffle together multiple iterables into an iterator yielding until one is exhausted.
 
-    * returns when first iterator is exhausted
+    * iterator yields until one of the iterables is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
     * this prevents data lose if any of the iterables are iterators with external references
 
@@ -116,6 +117,7 @@ def foldL(iterable: Iterable[_D], f: Callable[[_D, _D], _D]) -> _D|Nothing: ...
 def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: _L) -> _L: ...
 @overload
 def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: Optional[_L]) -> _L|Nothing: ...
+
 def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
           initial: Optional[_L]=None, default: _S|Nothing=nothing) -> _L|_S|Nothing:
     """Folds an iterable from the left with an optional initial value.
@@ -124,7 +126,7 @@ def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
     * note that when an initial value is not given then _L = _D
     * if iterable empty & no initial value given, return default
     * traditional FP type order given for function f
-    * raises TypeError if the iterable is not iterable (for the benefit of untyped code)
+    * raises TypeError if the "iterable" is not iterable
     * never returns if iterable generates an infinite iterator
 
     """

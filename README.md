@@ -12,7 +12,7 @@ Functional programming tools which endeavor to be Pythonic.
 ### Modules
 
 * grscheller.fp.nothing
-* grscheller.fp.iterators
+* grscheller.fp.iterables
 * grscheller.fp.woException
 
 ### Benefits of FP

@@ -29,7 +29,7 @@ hljs.highlightAll();
 <ul>
 <li>at all times iterator protocol is assumed to be followed, that is</li>
 <li>all iterators produced are assumed to be iterable</li>
-<li>for all iterators it, iter(it) is it</li>
+<li>for all iterators "itor" we assume "iter(itor) is itor"</li>
 <li>iterables are not necessarily iterators</li>
 </ul>
 </section>
@@ -56,9 +56,11 @@ hljs.highlightAll();
 <span>def <span class="ident">concat</span></span>(<span>*iterables: Iterable[_D]) ‑> Iterator[_D]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Sequentially concatenate multiple iterators from multiple iterables into one.</p>
+<div class="desc"><p>Sequentially concatenate multiple iterables into an iterator.</p>
 <ul>
 <li>pure Python version of standard library's itertools.chain</li>
+<li>iterator yields Sequentially each iterable until all are exhausted</li>
+<li>an infinite iterable will prevent subsequent iterables from yielding any values</li>
 <li>performant to chain</li>
 </ul></div>
 </dd>
@@ -66,9 +68,9 @@ hljs.highlightAll();
 <span>def <span class="ident">exhaust</span></span>(<span>*iterables: Iterable[_D]) ‑> Iterator[_D]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Merge together the multiple iterator streams until all are exhausted.</p>
+<div class="desc"><p>Shuffle together multiple iterables into an iterator until all are exhausted.</p>
 <ul>
-<li>returns when last iterator is exhausted</li>
+<li>iterator yields until all iterables are exhausted</li>
 </ul></div>
 </dd>
 <dt id="grscheller.fp.iterables.foldL"><code class="name flex">
@@ -81,7 +83,7 @@ hljs.highlightAll();
 <li>note that when an initial value is not given then _L = _D</li>
 <li>if iterable empty &amp; no initial value given, return default</li>
 <li>traditional FP type order given for function f</li>
-<li>raises TypeError if the iterable is not iterable (for the benefit of untyped code)</li>
+<li>raises TypeError if the "iterable" is not iterable</li>
 <li>never returns if iterable generates an infinite iterator</li>
 </ul></div>
 </dd>
@@ -102,9 +104,9 @@ hljs.highlightAll();
 <span>def <span class="ident">merge</span></span>(<span>*iterables: Iterable[_D], yield_partials: bool = False) ‑> Iterator[_D]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Merge multiple iterable streams until first is exhausted.</p>
+<div class="desc"><p>Shuffle together multiple iterables into an iterator yielding until one is exhausted.</p>
 <ul>
-<li>returns when first iterator is exhausted</li>
+<li>iterator yields until one of the iterables is exhausted</li>
 <li>if yield_partials is true, yield any unmatched yielded values from the other iterables</li>
 <li>this prevents data lose if any of the iterables are iterators with external references</li>
 </ul></div>
