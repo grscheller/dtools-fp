@@ -57,9 +57,6 @@ class Nothing():
         return iter(())
 
     def __repr__(self) -> str:
-        return 'Nothing()'
-
-    def __str__(self) -> str:
         return 'nothing'
 
     def __bool__(self) -> bool:
