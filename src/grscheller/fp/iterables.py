@@ -26,10 +26,10 @@ from typing import Callable, cast, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
 from .nothing import nothing, Nothing
 
-_D = TypeVar('_D')
-_L = TypeVar('_L')
-_R = TypeVar('_R')
-_S = TypeVar('_S')
+D = TypeVar('D')
+L = TypeVar('L')
+R = TypeVar('R')
+S = TypeVar('S')
 
 __all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]
 __author__ = "Geoffrey R. Scheller"
@@ -38,7 +38,7 @@ __license__ = "Apache License 2.0"
 
 ## Iterate over multiple Iterables
 
-def concat(*iterables: Iterable[_D]) -> Iterator[_D]:
+def concat(*iterables: Iterable[D]) -> Iterator[D]:
     """Sequentially concatenate multiple iterables into an iterator.
 
     * pure Python version of standard library's itertools.chain
@@ -47,16 +47,16 @@ def concat(*iterables: Iterable[_D]) -> Iterator[_D]:
     * performant to chain
 
     """
-    iterator: Iterator[_D]
+    iterator: Iterator[D]
     for iterator in map(lambda x: iter(x), iterables):
         while True:
             try:
-                value: _D = next(iterator)
+                value: D = next(iterator)
                 yield value
             except StopIteration:
                 break
 
-def exhaust(*iterables: Iterable[_D]) -> Iterator[_D]:
+def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
     """Shuffle together multiple iterables into an iterator until all are exhausted.
 
     * iterator yields until all iterables are exhausted
@@ -83,7 +83,7 @@ def exhaust(*iterables: Iterable[_D]) -> Iterator[_D]:
         for value in values:
             yield value
 
-def merge(*iterables: Iterable[_D], yield_partials: bool=False) -> Iterator[_D]:
+def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
     """Shuffle together multiple iterables into an iterator yielding until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
@@ -110,27 +110,31 @@ def merge(*iterables: Iterable[_D], yield_partials: bool=False) -> Iterator[_D]:
 ## reducing and accumulating
 
 @overload
-def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: Optional[_L], default: _S) -> _L|_S: ...
+def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Optional[L], default: S) -> L|S:
+    ...
 @overload
-def foldL(iterable: Iterable[_D], f: Callable[[_D, _D], _D]) -> _D|Nothing: ...
+def foldL(iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Nothing:
+    ...
 @overload
-def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: _L) -> _L: ...
+def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
+    ...
 @overload
-def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L], initial: Optional[_L]) -> _L|Nothing: ...
+def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Optional[L]) -> L|Nothing:
+    ...
 
-def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
-          initial: Optional[_L]=None, default: _S|Nothing=nothing) -> _L|_S|Nothing:
+def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
+          initial: Optional[L]=None, default: S|Nothing=nothing) -> L|S|Nothing:
     """Folds an iterable from the left with an optional initial value.
 
-    * note that _S can be the same type as _L
-    * note that when an initial value is not given then _L = _D
+    * note that ~S can be the same type as ~L
+    * note that when an initial value is not given then ~L = ~D
     * if iterable empty & no initial value given, return default
     * traditional FP type order given for function f
     * raises TypeError if the "iterable" is not iterable
     * never returns if iterable generates an infinite iterator
 
     """
-    acc: _L
+    acc: L
     if hasattr(iterable, '__iter__'):
         it = iter(iterable)
     else:
@@ -139,9 +143,9 @@ def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
 
     if initial is None:
         try:
-            acc = cast(_L, next(it))  # in this case _L = _D
+            acc = cast(L, next(it))  # in this case L = D
         except StopIteration:
-            return cast(_S, default)  # if default = nothing, then _S is Nothing
+            return cast(S, default)  # if default = nothing, then S is Nothing
     else:
         acc = initial
 
@@ -151,25 +155,26 @@ def foldL(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
     return acc
 
 @overload
-def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R], initial: Optional[_R], default: _S) -> _R|_S: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R], default: S) -> R|S: ...
 @overload
-def foldR(iterable: Reversible[_D], f: Callable[[_D, _D], _D]) -> _D|Nothing: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nothing: ...
 @overload
-def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R], initial: _R) -> _R: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: R) -> R: ...
 @overload
-def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R], initial: Optional[_R]=None) -> _R|Nothing: ...
-def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
-          initial: Optional[_R]=None, default: _S|Nothing=nothing) -> _R|_S|Nothing:
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R]=None) -> R|Nothing: ...
+
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
+          initial: Optional[R]=None, default: S|Nothing=nothing) -> R|S|Nothing:
     """Folds a reversible iterable from the right with an optional initial value.
 
-    * note that _S can be the same type as _R
-    * note that when an initial value not given then _R = _D
+    * note that ~S can be the same type as ~R
+    * note that when an initial value not given then ~R = ~D
     * if iterable empty & no initial value given, return default
     * traditional FP type order given for function f
     * raises TypeError if iterable is not reversible
 
     """
-    acc: _R
+    acc: R
     if hasattr(iterable, '__reversed__') or hasattr(iterable, '__len__') and hasattr(iterable, '__getitem__'):
         it = reversed(iterable)
     else:
@@ -178,9 +183,9 @@ def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
 
     if initial is None:
         try:
-            acc = cast(_R, next(it))  # in this case _R = _D
+            acc = cast(R, next(it))  # in this case R = D
         except StopIteration:
-            return cast(_S, default)  # if default = nothing, then _S is Nothing
+            return cast(S, default)  # if default = nothing, then S is Nothing
     else:
         acc = initial
 
@@ -190,16 +195,16 @@ def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
     return acc
 
 # @overload
-# def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_D, _D|_S], _D], sentinel: _S) -> _D|_S: ...
+# def foldLsc(iterable: Iterable[D|S], f: Callable[[D, D|S], D], sentinel: S) -> D|S: ...
 # @overload
-# def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L], sentinel: _S, initial: _L) -> _L: ...
+# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: L) -> L: ...
 # @overload
-# def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L], sentinel: _S, initial: Optional[_L]=None) -> _L|Nothing: ...
+# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: Optional[L]=None) -> L|Nothing: ...
 # @overload
-# def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L],
-#           initial: Optional[_L]=None, default: _S|Nothing=nothing) -> _L|_S: ...
-# def sc_foldL(iterable: Iterable[_D|_S], f: Callable[[_L, _D|_S], _L],
-#           sentinel: _S, initial: Optional[_L|_S]=None) -> _L|_S:
+# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],
+#           initial: Optional[L]=None, default: S|Nothing=nothing) -> L|S: ...
+# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],
+#           sentinel: S, initial: Optional[L|S]=None) -> L|S:
 #     """Folds an iterable from the left with an optional initial value.
 # 
 #     * if the iterable returns the sentinel value, stop the fold at that point
@@ -213,7 +218,7 @@ def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
 #     * never returns if iterable generates an infinite iterator & f never returns the sentinel value
 # 
 #     """
-#     acc: _L|_S
+#     acc: L|S
 #     if hasattr(iterable, '__iter__'):
 #         it = iter(iterable)
 #     else:
@@ -224,7 +229,7 @@ def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
 #         return sentinel
 #     elif initial is None:
 #         try:
-#             acc = cast(_L, next(it))
+#             acc = cast(L, next(it))
 #         except StopIteration:
 #             return sentinel
 #     else:
@@ -233,16 +238,16 @@ def foldR(iterable: Reversible[_D], f: Callable[[_D, _R], _R],
 #     for v in it:
 #         if v == sentinel:
 #             break
-#         facc = f(cast(_L, acc), v)                    # if not _L = _S
-#                                                       # then type(acc) is not _S
+#         facc = f(cast(L, acc), v)                    # if not L = S
+#                                                      # then type(acc) is not S
 #         if facc == sentinel:
 #             break
 #         else:
 #             acc = facc
 #     return acc
 
-def accumulate(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
-               initial: Optional[_L]=None) -> Iterator[_L]:
+def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
+               initial: Optional[L]=None) -> Iterator[L]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's itertools.accumulate
@@ -268,7 +273,7 @@ def accumulate(iterable: Iterable[_D], f: Callable[[_L, _D], _L],
                 acc = f(acc, ii)
             yield acc
         else:
-            acc = cast(_L, it0)  # in this case _L = _D
+            acc = cast(L, it0)  # in this case L = D
             for ii in it:
                 yield acc
                 acc = f(acc, ii)

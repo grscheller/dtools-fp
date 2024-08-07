@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR, mb_to_xor, xor_to_mb
-from grscheller.fp.nothing import Nothing
+from grscheller.fp.nothing import Nothing, nothing
 
 def add2(x: int) -> int:
     return x + 2
@@ -196,10 +196,10 @@ class TestXOR:
 
         assert repr(hymie) == "XOR(True, 'orig 86')"
         assert repr(chief) == "XOR(True, 'orig 86')"
-        assert repr(ratton) == "XOR(Nothing(), 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(Nothing(), 'Seigfried says: orig 21')"
+        assert repr(ratton) == "XOR(nothing, 'Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(nothing, 'Seigfried says: orig 21')"
 
-        assert xor_12.map(gt42, 'not greater than 42') == XOR(Nothing(), 'not greater than 42')
+        assert xor_12.map(gt42, 'not greater than 42') == XOR(nothing, 'not greater than 42')
 
     def test_either_right(self) -> None:
         def noMoreThan5(x: int) -> int|Nothing:
@@ -295,7 +295,7 @@ class TestXOR:
         left42 = mb_to_xor(mb42, 'fail!')
         right = mb_to_xor(mbNot, 'Nobody home')
         assert left42 == XOR(42, 'fail!')
-        assert right == XOR(Nothing(), 'Nobody home')
+        assert right == XOR(nothing, 'Nobody home')
 
         ph42 = xor_to_mb(left42)
         phNot = xor_to_mb(right)

@@ -1,21 +1,20 @@
 # CHANGELOG
 
-PyPI grscheller.fp project provides functional programming tools.
+PyPI grscheller.fp project.
 
 ## Semantic Versioning
 
-* first digit:
+* first digit
   * major event, epoch, or paradigm shift
-* second digit:
+* second digit
   * breaking API changes
   * major changes
-* third digit:
+* third digit
   * API additions
   * bug fixes
   * minor changes
   * significant documentation updates
-* forth digit:
-  * development only
+* forth digit (development environment only)
 
 ## Releases and Important Milestones
 

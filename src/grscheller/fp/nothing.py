@@ -15,7 +15,7 @@
 """A nothing is an attempt to give Python a "bottom" type.
 
 * unlike a true bottom, it can be instantiated as a singleton
-* types like _T|None and _T|() act like a poor man's Optional/Maybe Monads
+* types like ~T|None and ~T|() act like a poor man's Optional/Maybe Monads
 * both None and () make for lousy bottom types
 * both don't accept many methods, None has no length, at least () is iterable
 * when returning or iterating values, both must constantly be checked for
@@ -33,8 +33,8 @@ __license__ = "Apache License 2.0"
 
 from typing import Any, Callable, Iterator, Optional, TypeVar
 
-_T = TypeVar('_T')
-_S = TypeVar('_S')
+T = TypeVar('T')
+S = TypeVar('S')
 
 class Nothing():
     """Singleton semantically represents a missing value.
@@ -91,8 +91,8 @@ class Nothing():
     def __call__(*args: Any, **kwargs: Any) -> Any:
         return Nothing()
 
-    def get(self, alt: Optional[_T]=None) -> _T|Nothing:
-        """Return an alternate value of type _T or a Nothing."""
+    def get(self, alt: Optional[T]=None) -> T|Nothing:
+        """Return an alternate value of type ~T or a Nothing."""
         if alt is None:
             return Nothing()
         else:

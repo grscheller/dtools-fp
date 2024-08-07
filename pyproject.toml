@@ -33,7 +33,7 @@ Changelog = "https://github.com/grscheller/fp/blob/main/CHANGELOG.md"
 Documentation = "https://grscheller.github.io/fp/"
 
 [tool.flit.sdist]
-exclude = ["dist", "docs/*", ".gitignore", ".mypy_cache"]
+exclude = ["dist", "docs", ".gitignore", ".mypy_cache"]
 
 [tool.pylsp-mypy]
 live-mode = true
