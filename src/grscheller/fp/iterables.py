@@ -119,7 +119,7 @@ def foldL(iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Nothing:
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
     ...
 @overload
-def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Optional[L]) -> L|Nothing:
+def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Nothing) -> Nothing:
     ...
 
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
@@ -164,7 +164,7 @@ def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nothing:
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: R) -> R:
     ...
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R]=None) -> R|Nothing:
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Nothing) -> R|Nothing:
     ...
 
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
