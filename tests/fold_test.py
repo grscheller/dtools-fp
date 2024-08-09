@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from grscheller.fp.iterables import foldL, foldR # , sc_foldL
-from grscheller.fp.nothing import nothing, Nothing
+from grscheller.fp.iterables import foldL, foldR
+from grscheller.untyped.nothing import nothing, Nothing
 
 class Test_fp_folds:
     def test_fold(self) -> None:

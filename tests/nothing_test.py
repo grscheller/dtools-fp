@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.nothing import Nothing, nothing
+from grscheller.untyped.nothing import Nothing, nothing
 
 def add2(x: int) -> int:
     return x + 2

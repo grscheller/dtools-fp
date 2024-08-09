@@ -14,17 +14,17 @@
 
 """Library of iterator related functions.
 
-* at all times iterator protocol is assumed to be followed, that is
-* all iterators produced are assumed to be iterable
-* for all iterators "itor" we assume "iter(itor) is itor"
 * iterables are not necessarily iterators
+* at all times iterator protocol is assumed to be followed, that is
+  * for all iterators `foo` we assume `iter(foo) is foo`
+  * all iterators are assumed to be iterable
 
 """
 
 from __future__ import annotations
 from typing import Callable, cast, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
-from .nothing import nothing, Nothing
+from grscheller.untyped.nothing import nothing, Nothing
 
 D = TypeVar('D')
 L = TypeVar('L')
@@ -155,13 +155,17 @@ def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
     return acc
 
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R], default: S) -> R|S: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R], default: S) -> R|S:
+    ...
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nothing: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nothing:
+    ...
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: R) -> R: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: R) -> R:
+    ...
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R]=None) -> R|Nothing: ...
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R]=None) -> R|Nothing:
+    ...
 
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
           initial: Optional[R]=None, default: S|Nothing=nothing) -> R|S|Nothing:

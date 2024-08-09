@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR
-from grscheller.fp.nothing import Nothing
+from grscheller.untyped.nothing import Nothing
 
 def addLt42(x: int, y: int) -> int|Nothing:
     sum = x + y

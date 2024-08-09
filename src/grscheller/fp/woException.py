@@ -22,7 +22,7 @@ __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
 
 from typing import Callable, Generic, Iterator, Optional, TypeVar
-from .nothing import Nothing, nothing
+from grscheller.untyped.nothing import Nothing, nothing
 
 T = TypeVar('T')
 S = TypeVar('S')
