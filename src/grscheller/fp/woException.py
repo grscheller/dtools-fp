@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Functional data types to use in lieu of exceptions."""
+"""
+### Maybe and Either Monads
+
+Functional data types to use in lieu of exceptions.
+"""
 
 from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
-__author__ = "Geoffrey R. Scheller"
-__copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
-__license__ = "Apache License 2.0"
 
-from typing import Callable, Generic, Iterator, Optional, TypeVar
-from grscheller.untyped.nothing import Nothing, nothing
+from typing import Callable, cast, Final, Generic, Iterator, TypeVar
+from .core.nada import _nada, _Nada
 
 T = TypeVar('T')
 S = TypeVar('S')
@@ -30,27 +31,29 @@ L = TypeVar('L')
 R = TypeVar('R')
 
 class MB(Generic[T]):
-    """Class representing a potentially missing value.
+    """
+    #### Maybe Monad
 
-    * where MB(value) contains a possible value of type ~T
-    * MB( ) semantically represent a "Nothing"
-    * implementation wise MB( ) contains a nothing: Nothing
-    * therefore nothing = Nothing(), as a value, cannot be put into a MB
+    Class representing a potentially missing value.
+
+    * where `MB(value)` contains a possible value of type `~T`
+    * `MB( )` semantically represent a none existent value
+    * implementation wise `MB( )` contains an inaccessible sentinel value
     * immutable, a MB does not change after being created
     * immutable semantics, map and flatMap produce new instances
 
     """
     __slots__ = '_value',
 
-    def __init__(self, value: T|Nothing=nothing) -> None:
+    def __init__(self, value: T|_Nada=_nada) -> None:
         self._value = value
 
     def __bool__(self) -> bool:
-        return not self._value is nothing
+        return not self._value is _nada
 
     def __iter__(self) -> Iterator[T]:
         if self:
-            yield self._value
+            yield cast(T, self._value)
 
     def __repr__(self) -> str:
         if self:
@@ -66,48 +69,63 @@ class MB(Generic[T]):
             return False
         return self._value == other._value
 
-    def get(self, alt: T|Nothing=Nothing()) -> T:
-        """Get non-existent contents
+    def get(self, alt: T|_Nada=_nada) -> T:
+        """
+        ##### Get an alternate value for the non-existent value.
 
         * if given, return an alternate value of type ~T
         * otherwise, raises `ValueError`
-        * get will return nothing = Nothing()
-        * it will happily return `None` or `()`
-
+        * will happily return `None` or `()` as sentinel values
         """
         if self:
-            return self._value
+            return cast(T, self._value)
         else:
-            if alt is Nothing():
+            if alt is _nada:
                 raise ValueError('Alternate return type not provided.')
             else:
-                return alt
+                return cast(T, alt)
 
-    def map(self, f: Callable[[T], S|Nothing]) -> MB[S]:
-        """Map MB function f over the 0 elements of this data structure."""
-        return (MB(f(self._value)) if self else MB())
+    def map(self, f: Callable[[T], S]) -> MB[S]:
+        """
+        #### Map over the `MB`
+
+        Map MB function f over the 0 or 1 elements of this data structure.
+        """
+        return (MB(f(cast(T, self._value))) if self else MB())
 
     def flatmap(self, f: Callable[[T], MB[S]]) -> MB[S]:
         """Map MB with function f and flatten."""
-        return (f(self._value) if self else MB())
+        return (f(cast(T, self._value)) if self else MB())
 
 class XOR(Generic[L, R]):
-    """Class that either contains a "left" value or "right" value, but not both.
+    """
+    #### Either Monad
+
+    Class that can semantically contains either a "left" value or "right" value,
+    but not both.
 
     * implements a left biased Either Monad
-    * semantically containing 1 of 2 possible types of values
-    * XOR(left: ~L, right: ~R) produces "left" value
-    * XOR(nothing, right: ~R) produces a "right" value
-    * therefore nothing: Nothing as a value cannot be stored as a "left"
+    * `XOR(left, right)` produces a "left" and default potential "right" value
+    * `XOR(left)` produces a "left" value
+    * `XOR(right=right)` produces a "right" value
     * in a Boolean context, returns True if a "left", False if a "right"
     * immutable, an XOR does not change after being created
     * immutable semantics, map & flatMap return new instances
+    * raises ValueError if both "left" and "right" values are not given
+    * raises ValueError if both if a potential "right" value is not given
 
     """
     __slots__ = '_left', '_right'
 
-    def __init__(self, potential_left: L|Nothing, default_right: R):
-        self._left, self._right = potential_left, default_right
+    def __init__(self
+            , left: L|_Nada=_nada
+            , right: R|_Nada=_nada):
+
+        if left == _nada == right:
+            raise ValueError('XOR: neither a left nor right value provided')
+        if right is _nada:
+            raise ValueError('XOR: potential right value must be provided')
+        self._left, self._right = left, right
 
     def __bool__(self) -> bool:
         """Predicate to determine if the XOR contains a "left" or a "right".
@@ -115,12 +133,12 @@ class XOR(Generic[L, R]):
         * true if the XOR is a "left"
         * false if the XOR is a "right"
         """
-        return self._left is not Nothing()
+        return self._left is not _nada
 
     def __iter__(self) -> Iterator[L]:
         """Yields its value if the XOR is a "left"."""
         if self:
-            yield self._left
+            yield cast(L, self._left)
 
     def __repr__(self) -> str:
         return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
@@ -147,7 +165,7 @@ class XOR(Generic[L, R]):
         else:
             return False
 
-    def get(self, alt: L|Nothing=Nothing()) -> L:
+    def get(self, alt: L|_Nada=_nada) -> L:
         """Get value if a Left.
 
         * if the XOR is a left, return its value
@@ -155,16 +173,17 @@ class XOR(Generic[L, R]):
         * raises `ValueError` if alternate value needed but not provided
 
         """
-        if self._left is Nothing():
-            if alt is Nothing():
-                raise ValueError('Alternate return type needed but not provided.')
+        if self._left is _nada:
+            if alt is _nada:
+                raise ValueError('Alternate return value needed but not provided.')
             else:
-                return alt
+                return cast(L, alt)
         else:
-            return self._left
+            return cast(L, self._left)
 
-    def getRight(self, alt: R|Nothing=Nothing()) -> R:
-        """Get value if a Right.
+    def getRight(self, alt: R|_Nada=_nada) -> R:
+        """
+        ##### Get value if `XOR` is a Right.
 
         * if XOR is a right, return its value
         * otherwise return an alternate value of type ~R
@@ -172,47 +191,50 @@ class XOR(Generic[L, R]):
 
         """
         if not self:
-            return self._right
+            return cast(R, self._right)
         else:
-            if alt is Nothing():
+            if alt is _nada:
                 raise ValueError('Alternate return type needed but not provided.')
             else:
-                return alt
+                return cast(R, alt)
 
     def getDefaultRight(self) -> R:
-        """Get value if a "right" or the default "right" value.
+        """
+        ##### Get default right value
 
-        * if XOR is a right, return its value
-        * otherwise return the left's default right value
+        Get value if a "right" otherwise get the default "right" value.
+        """
+        return cast(R, self._right)
+
+    def map(self, f: Callable[[L], S], right: R|_Nada=_nada) -> XOR[S, R]:
+        """
+        ##### Map over an XOR.
+
+        TODO: catch any errors `f` may throw
+
+        * if `XOR` is a "left" then map `f`
+          * if `f` successful, return a "left" XOR[S, R]
+          * if `f` unsuccessful and `right` given, return `XOR(right=right)`
+          * if `f` unsuccessful and `right` not given, return `XOR(right=self.right)`
+        * if `XOR` is a "right"
+          * if `right` is given, return `XOR(right=right)`
+          * if `right` is not given, return `XOR(right=self.right)`
 
         """
-        return self._right
-
-    def map(self, f: Callable[[L], S|Nothing], right: R|Nothing=Nothing()) -> XOR[S, R]:
-        """Map over an XOR.
-
-        * if a "Left" XOR map f and return a "Left" XOR if f successful
-        * otherwise, if f unsuccessful, return "Right" XOR with right not nothing: Nothing
-        * otherwise, if right is nothing, return the default "Right" XOR
-        * if a "Right" return a "Right" XOR with a non-nothing right
-        * otherwise, if right is nothing, propagate new "Right" XOR instance
-
-        """
-        nothing = Nothing()
-        if self._left is nothing:
-            if right is nothing:
-                return XOR(nothing, self._right)
+        if self._left is _nada:
+            if right is _nada:
+                return XOR(right=self._right)
             else:
-                return XOR(nothing, right)
+                return XOR(right=right)
+
+        if right is _nada:
+            return XOR(f(cast(L, self._left)), self._right)
         else:
-            if right is nothing:
-                return XOR(f(self._left), self._right)
-            else:
-                return XOR(f(self._left), right)
+            return XOR(f(self._left), right)
 
     def mapRight(self, g: Callable[[R], R]) -> XOR[L, R]:
         """Map over a "right" value."""
-        if self._left is Nothing():
+        if self._left is _nada:
             return XOR(Nothing(), g(self._right))
         return self
 

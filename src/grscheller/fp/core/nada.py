@@ -1,4 +1,4 @@
-# Copyright 2023-2024 Geoffrey R. Scheller
+# Copyright 2024 Geoffrey R. Scheller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,34 @@
 # limitations under the License.
 
 """
-## Functional programming tools which endeavor to be Pythonic.
+### Module level sentinel value
+
+* sentinel value _nada: _Nada
+  * final variable with a singular value
+  * keep inaccessible to client code
+  * not to be exported
 
 """
-__version__ = "0.2.6.0"
-__author__ = "Geoffrey R. Scheller"
-__copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
-__license__ = "Apache License 2.0"
+
+from __future__ import annotations
+
+__all__ = ['_nada', '_Nada']
+
+from typing import Final
+
+_Nada = tuple[None, tuple[None, tuple[None, tuple[None, None]]]]
+_nada: Final[_Nada] = None, (None, (None, (None, None)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+

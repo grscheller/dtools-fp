@@ -2,7 +2,7 @@
 
 PyPI grscheller.fp project.
 
-## Semantic Versioning
+#### Semantic versioning
 
 * first digit
   * major event, epoch, or paradigm shift
@@ -15,6 +15,8 @@ PyPI grscheller.fp project.
   * minor changes
   * significant documentation updates
 * forth digit (development environment only)
+  * commit count of "non-trivial" changes/regressions
+  * third digit now plays the role of the second
 
 ## Releases and Important Milestones
 

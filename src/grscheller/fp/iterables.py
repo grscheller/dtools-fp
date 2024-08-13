@@ -22,19 +22,16 @@
 """
 
 from __future__ import annotations
-from typing import Callable, cast, Iterator, Iterable
+from typing import Callable, cast, Final, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
-from grscheller.untyped.nothing import nothing, Nothing
+from .core.nada import _nada, _Nada
+
+__all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]
 
 D = TypeVar('D')
 L = TypeVar('L')
 R = TypeVar('R')
 S = TypeVar('S')
-
-__all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]
-__author__ = "Geoffrey R. Scheller"
-__copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
-__license__ = "Apache License 2.0"
 
 ## Iterate over multiple Iterables
 
