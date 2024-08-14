@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from grscheller.fp.iterables import foldL, foldR
-from grscheller.untyped.nothing import nothing, Nothing
+from grscheller.untyped.nothing import Nothing, nothing
 
 class Test_fp_folds:
     def test_fold(self) -> None:

@@ -23,6 +23,7 @@ from __future__ import annotations
 __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
 
 from typing import Callable, cast, Final, Generic, Iterator, TypeVar
+from grscheller.untyped.nothing import Nothing, nothing
 from .core.nada import _nada, _Nada
 
 T = TypeVar('T')
@@ -37,10 +38,11 @@ class MB(Generic[T]):
     Class representing a potentially missing value.
 
     * where `MB(value)` contains a possible value of type `~T`
-    * `MB( )` semantically represent a none existent value
+    * `MB( )` semantically represent a non-existent or missing value
     * implementation wise `MB( )` contains an inaccessible sentinel value
     * immutable, a MB does not change after being created
     * immutable semantics, map and flatMap produce new instances
+    * two MB values only return equal if both ...
 
     """
     __slots__ = '_value',
@@ -67,7 +69,13 @@ class MB(Generic[T]):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return False
-        return self._value == other._value
+
+        if self._value is _nada:
+            return False
+        else:
+            if self._value is other._value:
+                return True
+            return self._value == other._value
 
     def get(self, alt: T|_Nada=_nada) -> T:
         """
@@ -230,20 +238,20 @@ class XOR(Generic[L, R]):
         if right is _nada:
             return XOR(f(cast(L, self._left)), self._right)
         else:
-            return XOR(f(self._left), right)
+            return XOR(f(cast(L, self._left)), right)
 
     def mapRight(self, g: Callable[[R], R]) -> XOR[L, R]:
         """Map over a "right" value."""
         if self._left is _nada:
-            return XOR(Nothing(), g(self._right))
+            return XOR(_nada, g(cast(R,self._right)))
         return self
 
     def flatMap(self, f: Callable[[L], XOR[S, R]]) -> XOR[S, R]:
         """Map and flatten a Left value, propagate Right values."""
-        if self._left is Nothing():
-            return XOR(Nothing(), self._right)
+        if self._left is _nada:
+            return XOR(_nada, self._right)
         else:
-            return f(self._left)
+            return f(cast(L, self._left))
 
 # Conversion functions
 
@@ -252,7 +260,7 @@ def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
     if m:
         return XOR(m.get(), right)
     else:
-        return XOR(Nothing(), right)
+        return XOR(_nada, right)
 
 def xor_to_mb(e: XOR[T,S]) -> MB[T]:
     """Convert an XOR to a MB."""

@@ -24,6 +24,7 @@
 from __future__ import annotations
 from typing import Callable, cast, Final, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
+from grscheller.untyped.nothing import Nothing, nothing
 from .core.nada import _nada, _Nada
 
 __all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]

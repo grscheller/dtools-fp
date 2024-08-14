@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR, mb_to_xor, xor_to_mb
-from grscheller.untyped.nothing import Nothing, nothing
+from grscheller.fp.woException import Nothing, nothing
 
 def add2(x: int) -> int:
     return x + 2
@@ -101,13 +101,14 @@ class TestMB:
 class TestXOR:
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42, '')
-        e2: XOR[int, str] = XOR(42, 'The secret is unknown')
-        e3: XOR[int, str] = XOR(Nothing(), 'not 42')
-        e4: XOR[int, str] = XOR(Nothing(), 'not 42')
-        e5: XOR[int, str] = XOR(Nothing(), 'also not 42')
+        e2: XOR[int, str] = XOR(42, '')
+        e3: XOR[int, str] = XOR(42, 'The secret is unknown')
+        e4: XOR[int, str] = XOR(_nada, 'not 42')
+        e5: XOR[int, str] = XOR(_nada, 'also not 42')
         e6 = e3
         assert e1 is e1
-        assert e1 is not e2
+        assert not (e1 is e2)
+        assert e1 is e2
         assert e1 is not e3
         assert e1 is not e4
         assert e1 is not e5
@@ -135,28 +136,28 @@ class TestXOR:
         e3: XOR[int, str] = XOR(nothing, 'not 42')
         e4: XOR[int, str] = XOR(nothing, 'not 42')
         e5: XOR[int, str] = XOR(nothing, 'also not 42')
-        e7 = e3
+        e6 = e3
         assert e1 == e1
         assert e1 == e2
         assert e1 != e3
         assert e1 != e4
         assert e1 != e5
-        assert e1 != e7
+        assert e1 != e6
         assert e2 == e2
         assert e2 != e3
         assert e2 != e4
         assert e2 != e5
-        assert e2 != e7
-        assert e3 == e3
-        assert e3 == e4
+        assert e2 != e6
+        assert e3 != e3
+        assert e3 != e4
         assert e3 != e5
-        assert e3 == e7
-        assert e4 == e4
+        assert e3 == e6
+        assert e4 != e4
         assert e4 != e5
-        assert e4 == e7
+        assert e4 == e6
         assert e5 == e5
-        assert e5 != e7
-        assert e7 == e7
+        assert e5 != e6
+        assert e6 == e6
 
     def test_equal_self(self) -> None:
         xor42 = XOR(40+2, 'forty-two')
