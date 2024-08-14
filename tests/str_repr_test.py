@@ -137,9 +137,9 @@ class Test_repr:
         assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
         assert repr(e2) ==  "XOR(2, 'None!')"
         assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(nothing, 'was to be 7')"
-        assert repr(e8) ==  "XOR(nothing, 'was to be 8')"
+        assert repr(e7) == "XOR(nada, 'was to be 7')"
+        assert repr(e8) ==  "XOR(nada, 'was to be 8')"
 
     def test_Nothing(self) -> None:
         bot1 = Nada()
-        assert repr(bot1) == 'nothing'
+        assert repr(bot1) == 'nada'

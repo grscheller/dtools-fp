@@ -41,8 +41,8 @@ class Test_fp_folds:
         assert foldL(data2, add, 10) == 5059
         assert foldR(data2, add, 10) == 5059
 
-        assert foldL(data3, add) == nada
-        assert foldR(data3, add) == nada
+        assert foldL(data3, add) is nada
+        assert foldR(data3, add) is nada
         assert foldL(data3, add, 10) == 10
         assert foldR(data3, add, 10) == 10
 
@@ -66,9 +66,10 @@ class Test_fp_folds:
         assert foldR(stuff3, add, default=None) == None
         assert foldL(stuff4, add, default=None) == 42
         assert foldR(stuff4, add, default=None) == 42
-        assert foldL(stuff3, add, default=nada) == nada
-        assert foldL(stuff3, add) == nada
-        assert foldR(stuff3, add) == nada
+        assert foldL(stuff3, add, default=nada) is nada
+        assert foldL(stuff3, add, default=nada) != nada
+        assert foldL(stuff3, add) is nada
+        assert foldR(stuff3, add) is nada
         assert foldL(stuff4, add) == 42
         assert foldR(stuff4, add) == 42
 
@@ -84,8 +85,8 @@ class Test_fp_folds:
         assert foldR(stuff1, funcR) == 0
         assert foldL(stuff2, funcL) == 84
         assert foldR(stuff2, funcR) == 39
-        assert foldL(stuff3, funcL) == nada
-        assert foldR(stuff3, funcR) == nada
+        assert foldL(stuff3, funcL) is nada
+        assert foldR(stuff3, funcR) is nada
         assert foldL(stuff4, funcL) == 42
         assert foldR(stuff4, funcR) == 42
 

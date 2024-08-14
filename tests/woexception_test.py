@@ -107,8 +107,7 @@ class TestXOR:
         e5: XOR[int, str] = XOR(nada, 'also not 42')
         e6 = e3
         assert e1 is e1
-        assert not (e1 is e2)
-        assert e1 is e2
+        assert e1 is not e2
         assert e1 is not e3
         assert e1 is not e4
         assert e1 is not e5
@@ -130,12 +129,12 @@ class TestXOR:
         assert e6 is e6
 
     def test_equality(self) -> None:
-        nothing = Nada()
+        nono = Nada()
         e1: XOR[int, str] = XOR(42, '')
         e2: XOR[int, str] = XOR(42, '')
-        e3: XOR[int, str] = XOR(nothing, 'not 42')
-        e4: XOR[int, str] = XOR(nothing, 'not 42')
-        e5: XOR[int, str] = XOR(nothing, 'also not 42')
+        e3: XOR[int, str] = XOR(nono, 'not 42')
+        e4: XOR[int, str] = XOR(nono, 'not 42')
+        e5: XOR[int, str] = XOR(nono, 'also not 42')
         e6 = e3
         assert e1 == e1
         assert e1 == e2
@@ -148,11 +147,11 @@ class TestXOR:
         assert e2 != e4
         assert e2 != e5
         assert e2 != e6
-        assert e3 != e3
-        assert e3 != e4
+        assert e3 == e3
+        assert e3 == e4
         assert e3 != e5
         assert e3 == e6
-        assert e4 != e4
+        assert e4 == e4
         assert e4 != e5
         assert e4 == e6
         assert e5 == e5
@@ -197,8 +196,8 @@ class TestXOR:
 
         assert repr(hymie) == "XOR(True, 'orig 86')"
         assert repr(chief) == "XOR(True, 'orig 86')"
-        assert repr(ratton) == "XOR(nothing, 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(nothing, 'Seigfried says: orig 21')"
+        assert repr(ratton) == "XOR(nada, 'Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(nada, 'Seigfried says: orig 21')"
 
         assert xor_12.map(gt42, 'not greater than 42') == XOR(nada, 'not greater than 42')
 
