@@ -24,8 +24,7 @@
 from __future__ import annotations
 from typing import Callable, cast, Final, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
-from grscheller.untyped.nothing import Nothing, nothing
-from .core.nada import _nada, _Nada
+from .nada import Nada, nada
 
 __all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]
 
@@ -111,17 +110,17 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Optional[L], default: S) -> L|S:
     ...
 @overload
-def foldL(iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Nothing:
+def foldL(iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Nada:
     ...
 @overload
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
     ...
 @overload
-def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Nothing) -> Nothing:
+def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Nada) -> Nada:
     ...
 
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
-          initial: Optional[L]=None, default: S|Nothing=nothing) -> L|S|Nothing:
+          initial: Optional[L]=None, default: S|Nada=nada) -> L|S|Nada:
     """Folds an iterable from the left with an optional initial value.
 
     * note that ~S can be the same type as ~L
@@ -162,11 +161,11 @@ def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nothing:
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: R) -> R:
     ...
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Nothing) -> R|Nothing:
+def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Nada) -> R|Nada:
     ...
 
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
-          initial: Optional[R]=None, default: S|Nothing=nothing) -> R|S|Nothing:
+          initial: Optional[R]=None, default: S|Nada=nada) -> R|S|Nada:
     """Folds a reversible iterable from the right with an optional initial value.
 
     * note that ~S can be the same type as ~R

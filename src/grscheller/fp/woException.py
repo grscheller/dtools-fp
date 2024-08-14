@@ -23,8 +23,7 @@ from __future__ import annotations
 __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
 
 from typing import Callable, cast, Final, Generic, Iterator, TypeVar
-from grscheller.untyped.nothing import Nothing, nothing
-from .core.nada import _nada, _Nada
+from .nada import Nada, nada
 
 T = TypeVar('T')
 S = TypeVar('S')
@@ -47,11 +46,11 @@ class MB(Generic[T]):
     """
     __slots__ = '_value',
 
-    def __init__(self, value: T|_Nada=_nada) -> None:
+    def __init__(self, value: T|Nada=nada) -> None:
         self._value = value
 
     def __bool__(self) -> bool:
-        return not self._value is _nada
+        return not self._value is nada
 
     def __iter__(self) -> Iterator[T]:
         if self:
@@ -70,14 +69,14 @@ class MB(Generic[T]):
         if not isinstance(other, type(self)):
             return False
 
-        if self._value is _nada:
+        if self._value is nada:
             return False
         else:
             if self._value is other._value:
                 return True
             return self._value == other._value
 
-    def get(self, alt: T|_Nada=_nada) -> T:
+    def get(self, alt: T|Nada=nada) -> T:
         """
         ##### Get an alternate value for the non-existent value.
 
@@ -88,7 +87,7 @@ class MB(Generic[T]):
         if self:
             return cast(T, self._value)
         else:
-            if alt is _nada:
+            if alt is nada:
                 raise ValueError('Alternate return type not provided.')
             else:
                 return cast(T, alt)
@@ -126,12 +125,12 @@ class XOR(Generic[L, R]):
     __slots__ = '_left', '_right'
 
     def __init__(self
-            , left: L|_Nada=_nada
-            , right: R|_Nada=_nada):
+            , left: L|Nada=nada
+            , right: R|Nada=nada):
 
-        if left == _nada == right:
+        if left == nada == right:
             raise ValueError('XOR: neither a left nor right value provided')
-        if right is _nada:
+        if right is nada:
             raise ValueError('XOR: potential right value must be provided')
         self._left, self._right = left, right
 
@@ -141,7 +140,7 @@ class XOR(Generic[L, R]):
         * true if the XOR is a "left"
         * false if the XOR is a "right"
         """
-        return self._left is not _nada
+        return self._left is not nada
 
     def __iter__(self) -> Iterator[L]:
         """Yields its value if the XOR is a "left"."""
@@ -173,7 +172,7 @@ class XOR(Generic[L, R]):
         else:
             return False
 
-    def get(self, alt: L|_Nada=_nada) -> L:
+    def get(self, alt: L|Nada=nada) -> L:
         """Get value if a Left.
 
         * if the XOR is a left, return its value
@@ -181,15 +180,15 @@ class XOR(Generic[L, R]):
         * raises `ValueError` if alternate value needed but not provided
 
         """
-        if self._left is _nada:
-            if alt is _nada:
+        if self._left is nada:
+            if alt is nada:
                 raise ValueError('Alternate return value needed but not provided.')
             else:
                 return cast(L, alt)
         else:
             return cast(L, self._left)
 
-    def getRight(self, alt: R|_Nada=_nada) -> R:
+    def getRight(self, alt: R|Nada=nada) -> R:
         """
         ##### Get value if `XOR` is a Right.
 
@@ -201,7 +200,7 @@ class XOR(Generic[L, R]):
         if not self:
             return cast(R, self._right)
         else:
-            if alt is _nada:
+            if alt is nada:
                 raise ValueError('Alternate return type needed but not provided.')
             else:
                 return cast(R, alt)
@@ -214,7 +213,7 @@ class XOR(Generic[L, R]):
         """
         return cast(R, self._right)
 
-    def map(self, f: Callable[[L], S], right: R|_Nada=_nada) -> XOR[S, R]:
+    def map(self, f: Callable[[L], S], right: R|Nada=nada) -> XOR[S, R]:
         """
         ##### Map over an XOR.
 
@@ -229,27 +228,27 @@ class XOR(Generic[L, R]):
           * if `right` is not given, return `XOR(right=self.right)`
 
         """
-        if self._left is _nada:
-            if right is _nada:
+        if self._left is nada:
+            if right is nada:
                 return XOR(right=self._right)
             else:
                 return XOR(right=right)
 
-        if right is _nada:
+        if right is nada:
             return XOR(f(cast(L, self._left)), self._right)
         else:
             return XOR(f(cast(L, self._left)), right)
 
     def mapRight(self, g: Callable[[R], R]) -> XOR[L, R]:
         """Map over a "right" value."""
-        if self._left is _nada:
-            return XOR(_nada, g(cast(R,self._right)))
+        if self._left is nada:
+            return XOR(nada, g(cast(R,self._right)))
         return self
 
     def flatMap(self, f: Callable[[L], XOR[S, R]]) -> XOR[S, R]:
         """Map and flatten a Left value, propagate Right values."""
-        if self._left is _nada:
-            return XOR(_nada, self._right)
+        if self._left is nada:
+            return XOR(nada, self._right)
         else:
             return f(cast(L, self._left))
 
@@ -260,7 +259,7 @@ def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
     if m:
         return XOR(m.get(), right)
     else:
-        return XOR(_nada, right)
+        return XOR(nada, right)
 
 def xor_to_mb(e: XOR[T,S]) -> MB[T]:
     """Convert an XOR to a MB."""

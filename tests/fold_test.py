@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from grscheller.fp.iterables import foldL, foldR
-from grscheller.untyped.nothing import Nothing, nothing
+from grscheller.fp.nada import Nada, nada
 
 class Test_fp_folds:
     def test_fold(self) -> None:
@@ -41,8 +41,8 @@ class Test_fp_folds:
         assert foldL(data2, add, 10) == 5059
         assert foldR(data2, add, 10) == 5059
 
-        assert foldL(data3, add) == nothing
-        assert foldR(data3, add) == nothing
+        assert foldL(data3, add) == nada
+        assert foldR(data3, add) == nada
         assert foldL(data3, add, 10) == 10
         assert foldR(data3, add, 10) == 10
 
@@ -66,9 +66,9 @@ class Test_fp_folds:
         assert foldR(stuff3, add, default=None) == None
         assert foldL(stuff4, add, default=None) == 42
         assert foldR(stuff4, add, default=None) == 42
-        assert foldL(stuff3, add, default=nothing) == nothing
-        assert foldL(stuff3, add) == nothing
-        assert foldR(stuff3, add) == nothing
+        assert foldL(stuff3, add, default=nada) == nada
+        assert foldL(stuff3, add) == nada
+        assert foldR(stuff3, add) == nada
         assert foldL(stuff4, add) == 42
         assert foldR(stuff4, add) == 42
 
@@ -84,21 +84,21 @@ class Test_fp_folds:
         assert foldR(stuff1, funcR) == 0
         assert foldL(stuff2, funcL) == 84
         assert foldR(stuff2, funcR) == 39
-        assert foldL(stuff3, funcL) == nothing
-        assert foldR(stuff3, funcR) == nothing
+        assert foldL(stuff3, funcL) == nada
+        assert foldR(stuff3, funcR) == nada
         assert foldL(stuff4, funcL) == 42
         assert foldR(stuff4, funcR) == 42
 
     def test_scfold(self) -> None:
-        def add(ii: int|Nothing, jj: int|Nothing) -> int|Nothing:
-            if ii is nothing or jj is nothing:
+        def add(ii: int|Nada, jj: int|Nada) -> int|Nada:
+            if ii is nada or jj is nada:
                 return -1
             if (kk := ii+jj) < 42:
                 return kk
             else:
-                return nothing
+                return nada
 
-        data1 = (1, 2, 3, 4, 5, nothing, 6, 7, 8, 9, 10)
+        data1 = (1, 2, 3, 4, 5, nada, 6, 7, 8, 9, 10)
         data2 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
         data3 = [1, 2, 3, 4, 5, 6]
         data4: tuple[int, ...] = ()

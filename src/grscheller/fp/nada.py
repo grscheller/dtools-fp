@@ -27,15 +27,12 @@
 """
 
 from __future__ import annotations
-from typing import Callable, cast, Generic, Final, Iterator, TypeVar
+from typing import Any, Callable, cast, Generic, Final, Iterator
 
 __all__ = ['nada', 'Nada']
 
 _Sentinel = tuple[None, tuple[None, tuple[None, tuple[()]]]]
-_s: Final[_Sentinel] = None, (None, (None, ()))
-
-U = TypeVar('U')
-V = TypeVar('V')
+_sentinel: Final[_Sentinel] = None, (None, (None, ()))
 
 class Nada():
     """
@@ -57,5 +54,78 @@ class Nada():
     def __new__(cls) -> Nada:
         if not hasattr(cls, 'instance'):
             cls.instance = super(Nada, cls).__new__(cls)
+            cls._hash = hash((_sentinel, (_sentinel,)))
         return cls.instance
 
+    def __iter__(self) -> Iterator[Any]:
+        return iter(())
+
+    def __hash__(self) -> int:
+        return self._hash
+
+    def __repr__(self) -> str:
+        return 'nada'
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __len__(self) -> int:
+        return 0
+
+    def __add__(self, right: Any) -> Nada:
+        return Nada()
+
+    def __radd__(self, left: Any) -> Nada:
+        return Nada()
+
+    def __mul__(self, right: Any) -> Nada:
+        return Nada()
+
+    def __rmul__(self, left: Any) -> Nada:
+        return Nada()
+
+    def __eq__(self, right: Any) -> bool:
+        """Never equals anything, even itself."""
+        return False
+
+    def __ne__(self, right: Any) -> bool:
+        """Always does not equal anything, even itself."""
+        return True
+
+    def __ge__(self, right: Any) -> bool:
+        return False
+
+    def __gt__(self, right: Any) -> bool:
+        return False
+
+    def __le__(self, right: Any) -> bool:
+        return False
+
+    def __lt__(self, right: Any) -> bool:
+        return False
+
+    def __getitem__(self, index: int|slice) -> Any:
+        return Nada()
+
+    def __setitem__(self, index: int|slice, item: Any) -> None:
+        return
+
+    def __call__(*args: Any, **kwargs: Any) -> Any:
+        return Nada()
+
+  # def __getattr__(self, name: str) -> Callable[[Any], Any]:
+  #     """Comment out for doc generation, pdoc gags on this method."""
+  #     def method(*args: Any, **kwargs: Any) -> Any:
+  #         return Nada()
+  #     return method
+
+    def get(self, alt: Any=_sentinel) -> Any:
+        """
+        ##### Get an alternate value, defaults to Nada().
+        """
+        if alt == _sentinel:
+            return Nada()
+        else:
+            return alt
+
+nada = Nada()

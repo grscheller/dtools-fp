@@ -16,13 +16,13 @@ from __future__ import annotations
 
 from typing import Optional
 from grscheller.fp.woException import MB, XOR
-from grscheller.untyped.nothing import Nothing, nothing
+from grscheller.fp.nada import Nada, nada
 
-def addLt42(x: int, y: int) -> int|Nothing:
+def addLt42(x: int, y: int) -> int|Nada:
     sum = x + y
     if sum < 42:
         return sum
-    return Nothing()
+    return Nada()
 
 class Test_str:
     def test_MB(self) -> None:
@@ -35,43 +35,42 @@ class Test_str:
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
-        nt2: MB[int] = MB(Nothing())
+        nt2: MB[int] = MB(Nada())
         nt3: MB[int] = MB()
         s1 = MB(1)
         assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
         assert str(s1) == 'MB(1)'
 
     def test_XOR(self) -> None:
-        nothing = Nothing()
+        nothing = Nada()
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
         assert str(XOR(addLt42(10, 40), '')) == "< |  >"
-        assert str(XOR(nothing, 'Foofoo rules')) == "< | Foofoo rules >"
+        assert str(XOR(nada, 'Foofoo rules')) == "< | Foofoo rules >"
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
 
     def test_Nothing(self) -> None:
-        bot1 = Nothing()
-        bot2 = Nothing()
-        assert str(bot1) == 'nothing'
-        assert str(bot2) == 'nothing'
+        bot1 = Nada()
+        bot2 = Nada()
+        assert str(bot1) == 'nada'
+        assert str(bot2) == 'nada'
 
 class Test_repr:
     def test_mb(self) -> None:
-        nothing = Nothing()
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
-        mb3: MB[object] = MB(nothing)
+        mb3: MB[object] = MB(nada)
         assert mb1 == mb2 == mb3 == MB()
         assert repr(mb2) == 'MB()'
         mb4 = eval(repr(mb3))
         assert mb4 == mb3
 
-        def lt5orNothing1(x: int) -> int|Nothing:
+        def lt5orNothing1(x: int) -> int|Nada:
             if x < 5:
                 return x
             else:
-                return nothing
+                return nada
 
         def lt5orNothing2(x: int) -> MB[int]:
             if x < 5:
@@ -99,7 +98,7 @@ class Test_repr:
         assert repr(foofoo) == "MB(MB('foo'))"
 
     def test_xor(self) -> None:
-        nothing = Nothing()
+        nothing = Nada()
         e1: XOR[int, str] = XOR(nothing, 'Nobody home!')
         e2: XOR[int, str] = XOR(nothing, 'Somebody not home!')
         e3: XOR[int, str] = XOR(nothing, '')
@@ -112,11 +111,11 @@ class Test_repr:
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5OrNothing(x: int) -> int|Nothing:
+        def lt5OrNothing(x: int) -> int|Nada:
             if x < 5:
                 return x
             else:
-                return Nothing()
+                return Nada()
 
         def lt5OrNoneXOR(x: int) -> XOR[int, str]:
             if x < 5:
@@ -142,5 +141,5 @@ class Test_repr:
         assert repr(e8) ==  "XOR(nothing, 'was to be 8')"
 
     def test_Nothing(self) -> None:
-        bot1 = Nothing()
+        bot1 = Nada()
         assert repr(bot1) == 'nothing'
