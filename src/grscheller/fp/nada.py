@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Attempt to give Python a "bottom" type
+"""#### Attempt to give Python a "bottom" type
 
 * `nada` is a singleton
   * while a true bottom type has no instances
@@ -27,12 +27,12 @@
 """
 
 from __future__ import annotations
-from typing import Any, Callable, cast, Generic, Final, Iterator
+from typing import Any, Callable, cast, Generic, Final, Iterator, NewType
 
 __all__ = ['nada', 'Nada']
 
-_Sentinel = tuple[None, tuple[None, tuple[None, tuple[()]]]]
-_sentinel: Final[_Sentinel] = None, (None, (None, ()))
+_S = NewType('_S', tuple[None, tuple[None, tuple[None, tuple[()]]]])
+_sentinel: Final[_S] = _S((None, (None, (None, ()))))
 
 class Nada():
     """

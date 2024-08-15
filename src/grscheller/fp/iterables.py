@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Library of iterator related functions.
+"""
+#### Library of iterator related functions.
 
 * iterables are not necessarily iterators
 * at all times iterator protocol is assumed to be followed, that is
@@ -36,7 +37,8 @@ S = TypeVar('S')
 ## Iterate over multiple Iterables
 
 def concat(*iterables: Iterable[D]) -> Iterator[D]:
-    """Sequentially concatenate multiple iterables into an iterator.
+    """
+    #### Sequentially concatenate multiple iterables together.
 
     * pure Python version of standard library's itertools.chain
     * iterator yields Sequentially each iterable until all are exhausted
@@ -54,7 +56,8 @@ def concat(*iterables: Iterable[D]) -> Iterator[D]:
                 break
 
 def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
-    """Shuffle together multiple iterables into an iterator until all are exhausted.
+    """
+    #### Shuffle together multiple iterables until all are exhausted.
 
     * iterator yields until all iterables are exhausted
 
@@ -81,7 +84,8 @@ def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
             yield value
 
 def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
-    """Shuffle together multiple iterables into an iterator yielding until one is exhausted.
+    """
+    #### Shuffle together multiple iterables until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
@@ -121,7 +125,8 @@ def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Nada) -> Nada:
 
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
           initial: Optional[L]=None, default: S|Nada=nada) -> L|S|Nada:
-    """Folds an iterable from the left with an optional initial value.
+    """
+    #### Folds iterable left with optional initial value.
 
     * note that ~S can be the same type as ~L
     * note that when an initial value is not given then ~L = ~D
@@ -166,7 +171,8 @@ def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Nada) -> R|N
 
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
           initial: Optional[R]=None, default: S|Nada=nada) -> R|S|Nada:
-    """Folds a reversible iterable from the right with an optional initial value.
+    """
+    #### Folds reversible iterable right with an optional initial value.
 
     * note that ~S can be the same type as ~R
     * note that when an initial value not given then ~R = ~D
@@ -249,7 +255,8 @@ def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
 
 def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
                initial: Optional[L]=None) -> Iterator[L]:
-    """Returns an iterator of accumulated values.
+    """
+    #### Returns an iterator of accumulated values.
 
     * pure Python version of standard library's itertools.accumulate
     * function f does not default to addition (for typing flexibility)

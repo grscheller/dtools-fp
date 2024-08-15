@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-## Functional programming tools which endeavor to be Pythonic.
+### Functional programming tools which endeavor to be Pythonic.
 
 """
 __version__ = "0.2.7.2"

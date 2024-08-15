@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-### Maybe and Either Monads
+#### Maybe and Either Monads
 
 Functional data types to use in lieu of exceptions.
 """
@@ -171,7 +171,8 @@ class XOR(Generic[L, R]):
             return False
 
     def get(self, alt: L|Nada=nada) -> L:
-        """Get value if a Left.
+        """
+        ##### Get value if a Left.
 
         * if the XOR is a left, return its value
         * otherwise, return alt if it is provided
@@ -258,14 +259,20 @@ class XOR(Generic[L, R]):
 # Conversion functions
 
 def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
-    """Convert a MB to an XOR."""
+    """
+    #### Convert a MB to an XOR.
+
+    """
     if m:
         return XOR(m.get(), right)
     else:
         return XOR(nada, right)
 
 def xor_to_mb(e: XOR[T,S]) -> MB[T]:
-    """Convert an XOR to a MB."""
+    """
+    ####Convert an XOR to a MB.
+
+    """
     if e:
         return MB(e.get())
     else:
