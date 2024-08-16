@@ -2,12 +2,10 @@
 
 Functional programming tools which endeavor to be Pythonic.
 
-## Overview
-
-* Repositories for grscheller.fp PyPI Package
+* **Repositories**
   * [grscheller.fp][1] project on *PyPI*
   * [Source code][2] on *GitHub*
-* Detailed documentation for grscheller.fp
+* Detailed documentation for grscheller.datastructures
   * [Detailed API documentation][3] on *GH-Pages*
 
 ### Modules
