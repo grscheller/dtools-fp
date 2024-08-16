@@ -12,22 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""#### Attempt to give Python a "bottom" type
+"""#### An attempt to give Python a "bottom" type
 
-* `nada` is a singleton
-  * while a true bottom type has no instances
-  * Python's evolving typing system seems to reject the concept
-* types like `None` and `()` make for lousy bottoms
-  * note that `~T|None` and `~T|()` are a poor man's Maybe Monads
-    * `None` has no length and is not indexable
-    *  `()` is at least iterable
-    * both take few methods (much less EVERY method)
-      * both must be constantly checked for
-        * preventing one from blissfully go down the "happy path"
-"""
+While a true bottom type has no instances, `nada` is a singleton. Python's
+evolving typing system seems to reject the concept of a true bottom type.
+
+   * types like `None` and `()` make for lousy bottoms
+     * they take few methods (much less EVERY method)
+     * `None` has no length and not indexable, `()` is at least iterable
+     * returned values must be constantly checked for
+       * preventing one from blissfully go down the "happy path"
+     * `None` and `()` are commonly used as sentinel values
+       * hindering both as being interpreted as "nothingness"
+
+The `nada` object makes for a better bottom like singleton
+object than either `None` and `()` do."""
 
 from __future__ import annotations
-from typing import Any, Callable, cast, Generic, Final, Iterator, NewType
+from typing import Any, Callable, Final, Iterator, NewType
 
 __all__ = ['nada', 'Nada']
 
@@ -39,15 +41,14 @@ class Nada():
     #### Singleton semantically represents a missing value.
 
     * singleton nada: Nada = Nada() represents a non-existent value
-    * makes for a better "bottom type" than either `None` or `()`
-        * returns itself for arbitrary method calls
-        * returns itself if called as a Callable with arbitrary arguments
-        * interpreted as an empty container by standard Python functions
-        * comparison ops compare true only when 2 non-missing values compare true
-          * when compared to itself behaves somewhat like IEEE Float NAN's
-            * `nada is nada` is true
-            * `nada == nada` is false
-            * `nada != nada` is true
+    * returns itself for arbitrary method calls
+    * returns itself if called as a Callable with arbitrary arguments
+    * interpreted as an empty container by standard Python functions
+    * comparison ops compare true only when 2 non-missing values compare true
+      * when compared to itself behaves somewhat like IEEE Float NAN's
+        * `nada is nada` is true
+        * `nada == nada` is false
+        * `nada != nada` is true
     """
     __slots__ = ()
 

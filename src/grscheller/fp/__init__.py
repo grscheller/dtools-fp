@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-### Functional programming tools which endeavor to be Pythonic.
+"""### Functional programming tools which endeavor to be Pythonic."""
 
-"""
-__version__ = "0.2.7.2"
+__version__ = "0.3.0"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
