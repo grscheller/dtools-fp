@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Functional programming tools which endeavor to be Pythonic."""
+"""### Pythonic Functional Programming Tools"""
 
 __version__ = "0.3.0"
 __author__ = "Geoffrey R. Scheller"

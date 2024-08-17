@@ -27,7 +27,7 @@ def gt42(x: int) -> bool|Nada:
         return False
     return Nada()
 
-class Test_Nothing:
+class Test_Nada:
     def test_identity(self) -> None:
         no1 = Nada()
         no2 = Nada()

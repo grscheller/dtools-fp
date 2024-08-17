@@ -20,6 +20,11 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.0 - PyPI Release: 2024-08-17
+
+* class Nothing re-added but renamed class Nada
+  * version grscheller.untyped.nothing for more strictly typed code
+
 ### Version 0.2.1 - PyPI Release: 2024-07-26
 
 PyPI grscheller.fp package release v0.2.1
