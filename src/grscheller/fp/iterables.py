@@ -23,11 +23,18 @@
 """
 
 from __future__ import annotations
+from enum import auto, Enum
 from typing import Callable, cast, Final, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
 from .nada import Nada, nada
 
-__all__ = [ 'concat', 'merge', 'exhaust', 'foldL', 'foldR', 'accumulate' ]
+__all__ = [ 'accumulate', 'foldL', 'foldR',
+            'concat', 'merge', 'exhaust', 'FM' ]
+
+class FM(Enum):
+    CONCAT = auto()
+    MERGE = auto()
+    EXHAUST = auto()
 
 D = TypeVar('D')
 L = TypeVar('L')
@@ -109,6 +116,40 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
                 yield value
 
 ## reducing and accumulating
+
+def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
+               initial: Optional[L]=None) -> Iterator[L]:
+    """
+    #### Returns an iterator of accumulated values.
+
+    * pure Python version of standard library's itertools.accumulate
+    * function f does not default to addition (for typing flexibility)
+    * begins accumulation with an optional starting value
+    * itertools.accumulate has mypy issues
+
+    """
+    it = iter(iterable)
+    try:
+        it0 = next(it)
+    except StopIteration:
+        if initial is None:
+            return
+        else:
+            yield initial
+    else:
+        if initial is not None:
+            yield initial
+            acc = f(initial, it0)
+            for ii in it:
+                yield acc
+                acc = f(acc, ii)
+            yield acc
+        else:
+            acc = cast(L, it0)  # in this case L = D
+            for ii in it:
+                yield acc
+                acc = f(acc, ii)
+            yield acc
 
 @overload
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Optional[L], default: S) -> L|S:
@@ -252,37 +293,3 @@ def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
 #         else:
 #             acc = facc
 #     return acc
-
-def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
-               initial: Optional[L]=None) -> Iterator[L]:
-    """
-    #### Returns an iterator of accumulated values.
-
-    * pure Python version of standard library's itertools.accumulate
-    * function f does not default to addition (for typing flexibility)
-    * begins accumulation with an optional starting value
-    * itertools.accumulate has mypy issues
-
-    """
-    it = iter(iterable)
-    try:
-        it0 = next(it)
-    except StopIteration:
-        if initial is None:
-            return
-        else:
-            yield initial
-    else:
-        if initial is not None:
-            yield initial
-            acc = f(initial, it0)
-            for ii in it:
-                yield acc
-                acc = f(acc, ii)
-            yield acc
-        else:
-            acc = cast(L, it0)  # in this case L = D
-            for ii in it:
-                yield acc
-                acc = f(acc, ii)
-            yield acc
