@@ -20,6 +20,13 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.1 - PyPI Release: 2024-08-20
+
+* fp.iterables no longer exports CONCAT, MERGE, EXHAUST
+  * for grscheller.datastructures
+    * grscheller.datastructures.ftuple
+    * grscheller.datastructures.split\_ends
+
 ### Version 0.3.0 - PyPI Release: 2024-08-17
 
 * class Nothing re-added but renamed class Nada
