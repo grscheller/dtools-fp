@@ -21,13 +21,6 @@ from grscheller.fp.nada import Nada, nada
 def add2(x: int) -> int:
     return x + 2
 
-def gt42(x: int) -> bool|Nada:
-    if x > 42:
-        return True
-    if x == 42:
-        return False
-    return nada
-
 class TestMB:
     def test_identity(self) -> None:
         n1: MB[int] = MB()
@@ -98,7 +91,58 @@ class TestMB:
         mb42 == mb42
         mbno == mbno
 
+def gt42(x: int) -> bool|Nada:
+    if x > 42:
+        return True
+    if x == 42:
+        return False
+    return nada
+
 class TestXOR:
+    def test_equal_self(self) -> None:
+        xor42 = XOR(40+2, 'forty-two')
+        xorno42: XOR[int, str] = XOR(right='no forty-two')
+        xor_fortytwo = XOR('forty-two', 21*2)
+        xor42tuple = XOR(42, (2, 3))
+
+        assert xor42 == xor42
+        assert xorno42 == xorno42
+        assert xor_fortytwo == xor_fortytwo
+        assert xor42tuple == xor42tuple
+
+        assert xor42 != xor_fortytwo
+        assert xor42 == xor42tuple
+
+        xor42 = xor42.mapRight(lambda _: 'none')
+        thing1: XOR[int, str] = xor42.mapRight(lambda s: s + '?').makeRight()
+        thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(right='none?'))
+        assert thing1 == thing2
+
+        xor_99 = XOR(99, 'orig 99')
+        xor_86 = XOR(86, 'orig 86')
+        xor_42 = XOR(42, 'orig 42')
+        xor_21 = XOR(21, 'orig 21')
+        xor_12 = XOR(12, 'orig 12')
+
+        assert xor_99.map(gt42) == xor_86.map(gt42)
+        assert xor_21.map(gt42) != xor_12.map(gt42)
+        assert xor_21.map(gt42).swapRight('lt 42') == xor_12.map(gt42).swapRight('lt 42')
+
+        hymie = xor_86.map(gt42).mapRight(lambda s: f'Hymie says: {s}')
+        chief = xor_86.map(gt42).mapRight(lambda s: f'Chief says: {s}')
+        ratton = xor_21.map(gt42).mapRight(lambda s: f'Dr. Ratton says: {s}')
+        seigfried = xor_21.map(gt42).mapRight(lambda s: f'Seigfried says: {s}')
+
+        assert hymie == chief
+        assert ratton != seigfried
+
+        assert repr(hymie) == "XOR(True, 'Hymie says: orig 86')"
+        assert repr(chief) == "XOR(True, 'Chief says: orig 86')"
+        assert repr(ratton) == "XOR(nada, 'Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(nada, 'Seigfried says: orig 21')"
+
+        assert xor_12.map(gt42).swapRight('not greater than 42') == XOR(right='not greater than 42')
+
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42, '')
         e2: XOR[int, str] = XOR(42, '')
@@ -158,49 +202,6 @@ class TestXOR:
         assert e5 != e6
         assert e6 == e6
 
-    def test_equal_self(self) -> None:
-        xor42 = XOR(40+2, 'forty-two')
-        xorno42: XOR[int, str] = XOR(Nada(), 'no forty-two')
-        xor_fortytwo = XOR('forty-two', 21*2)
-        xor42tuple = XOR(42, (2, 3))
-
-        assert xor42 == xor42
-        assert xorno42 == xorno42
-        assert xor_fortytwo == xor_fortytwo
-        assert xor42tuple == xor42tuple
-
-        assert xor42 != xor_fortytwo
-        assert xor42 == xor42tuple
-
-        thing1: XOR[int, str] = xor42.map(lambda _: nada, 'none').mapRight(lambda s: s + '?')
-        thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(Nada(), 'none?'))
-        assert thing1 == thing2
-
-        xor_99 = XOR(99, 'orig 99')
-        xor_86 = XOR(86, 'orig 86')
-        xor_42 = XOR(42, 'orig 42')
-        xor_21 = XOR(21, 'orig 21')
-        xor_12 = XOR(12, 'orig 12')
-
-        assert xor_99.map(gt42) == xor_86.map(gt42)
-        assert xor_21.map(gt42, 'lt 42') == xor_12.map(gt42, 'lt 42')
-        assert xor_21.map(gt42) != xor_12.map(gt42)
-
-        hymie = xor_86.map(gt42).mapRight(lambda s: f'Hymie says: {s}')
-        chief = xor_86.map(gt42).mapRight(lambda s: f'Chief says: {s}')
-        ratton = xor_21.map(gt42).mapRight(lambda s: f'Dr. Ratton says: {s}')
-        seigfried = xor_21.map(gt42).mapRight(lambda s: f'Seigfried says: {s}')
-
-        assert hymie == chief
-        assert ratton != seigfried
-
-        assert repr(hymie) == "XOR(True, 'orig 86')"
-        assert repr(chief) == "XOR(True, 'orig 86')"
-        assert repr(ratton) == "XOR(nada, 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(nada, 'Seigfried says: orig 21')"
-
-        assert xor_12.map(gt42, 'not greater than 42') == XOR(nada, 'not greater than 42')
-
     def test_either_right(self) -> None:
         def noMoreThan5(x: int) -> int|Nada:
             if x <= 5:
@@ -209,21 +210,15 @@ class TestXOR:
                 return Nada()
 
         s1 = XOR(3, right = 'foofoo rules')
-        s2 = s1.map(noMoreThan5, 'more than 5')
+        s2 = s1.map(noMoreThan5).mapRight(lambda _: 'more than 5')
         s3 = XOR(42, 'foofoo rules')
-        s4 = s3.map(noMoreThan5, 'more than 5')
+        s4 = s3.map(noMoreThan5).mapRight(lambda _: 'more than 5')
         assert s1.get() == 3
         assert s2.get() == 3
         assert s4.get(42) == 42
-        try:
-            bar = 'barbell'
-            bar = s1.getRight()
-        except ValueError:
-            assert True
-        else:
-            assert False
-        finally:
-            assert bar == 'barbell'
+        bar = 'barbell'
+        bar = s1.getRight()
+        assert bar == 'foofoo rules'
         assert s2.getRight('everything OK') == 'everything OK'
         assert s3.getRight('no rights here') == 'no rights here'
         assert s4.getRight() == 'more than 5'
