@@ -20,6 +20,14 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.3 - PyPI Release: 2024-08-25
+
+* removed method
+  * getDefaultRight(self) -> R:
+* added methods
+  * makeRight(self, right: R|Nada=nada) -> XOR[L, R]:
+  * swapRight(self, right: R) -> XOR[L, R]:
+
 ### Version 0.3.1 - PyPI Release: 2024-08-20
 
 * fp.iterables no longer exports CONCAT, MERGE, EXHAUST
