@@ -257,139 +257,133 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="nd">@overload</span>
 </span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="k">def</span> <span class="nf">foldL</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">L</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="p">:</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>    <span class="o">...</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="nd">@overload</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="k">def</span> <span class="nf">foldL</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">Nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Nada</span><span class="p">:</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="o">...</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="k">def</span> <span class="nf">foldL</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">    #### Folds iterable left with optional initial value.</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">    * note that ~S can be the same type as ~L</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="sd">    * note that when an initial value is not given then ~L = ~D</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">    * traditional FP type order given for function f</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="sd">    * raises TypeError if the &quot;iterable&quot; is not iterable</span>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">    * never returns if iterable generates an infinite iterator</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">L</span>
-</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
-</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
-</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;Iterable&quot; is not iterable.&#39;</span>
-</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>
-</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case L = D</span>
-</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nothing, then S is Nothing</span>
-</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="k">def</span> <span class="nf">foldL</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    #### Folds iterable left with optional initial value.</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">    * note that ~S can be the same type as ~L</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">    * note that when an initial value is not given then ~L = ~D</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">    * traditional FP type order given for function f</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="sd">    * raises TypeError if the &quot;iterable&quot; is not iterable</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    * never returns if iterable generates an infinite iterator</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">L</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;Iterable&quot; is not iterable.&#39;</span>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case L = D</span>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nada, then S is Nada</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 </span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>
-</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
-</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>
-</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a>    <span class="k">return</span> <span class="n">acc</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>    <span class="k">return</span> <span class="n">acc</span>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a><span class="nd">@overload</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>    <span class="o">...</span>
 </span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="nd">@overload</span>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">],</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>    <span class="o">...</span>
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="nd">@overload</span>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">D</span><span class="o">|</span><span class="n">Nothing</span><span class="p">:</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">R</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>    <span class="o">...</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="nd">@overload</span>
-</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">R</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="p">:</span>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>    <span class="o">...</span>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="nd">@overload</span>
-</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span> <span class="n">initial</span><span class="p">:</span> <span class="n">Nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
-</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>    <span class="o">...</span>
-</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>
-</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a><span class="sd">    #### Folds reversible iterable right with an optional initial value.</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="sd">    #### Folds reversible iterable right with an optional initial value.</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a><span class="sd">    * note that ~S can be the same type as ~R</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="sd">    * note that when an initial value not given then ~R = ~D</span>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="sd">    * traditional FP type order given for function f</span>
+</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a><span class="sd">    * raises TypeError if iterable is not reversible</span>
 </span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>
-</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a><span class="sd">    * note that ~S can be the same type as ~R</span>
-</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a><span class="sd">    * note that when an initial value not given then ~R = ~D</span>
-</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
-</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="sd">    * traditional FP type order given for function f</span>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="sd">    * raises TypeError if iterable is not reversible</span>
-</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>
-</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">R</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__reversed__&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__getitem__&#39;</span><span class="p">):</span>
-</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
-</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Iterable is not reversible.&#39;</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case R = D</span>
-</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nothing, then S is Nothing</span>
-</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
-</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>
-</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>
-</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>    <span class="k">return</span> <span class="n">acc</span>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>
+</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">R</span>
+</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__reversed__&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__getitem__&#39;</span><span class="p">):</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Iterable is not reversible.&#39;</span>
+</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case R = D</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nada, then S is nada</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>
+</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>    <span class="k">return</span> <span class="n">acc</span>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="c1"># @overload</span>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[D, D|S], D], sentinel: S) -&gt; D|S: ...</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="c1"># @overload</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: L) -&gt; L: ...</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="c1"># @overload</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: Optional[L]=None) -&gt; L|Nothing: ...</span>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="c1"># @overload</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[D, D|S], D], sentinel: S) -&gt; D|S: ...</span>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="c1"># @overload</span>
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: L) -&gt; L: ...</span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="c1"># @overload</span>
-</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: Optional[L]=None) -&gt; L|Nothing: ...</span>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="c1"># @overload</span>
-</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],</span>
-</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a><span class="c1">#           initial: Optional[L]=None, default: S|Nothing=nothing) -&gt; L|S: ...</span>
-</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],</span>
-</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="c1">#           sentinel: S, initial: Optional[L|S]=None) -&gt; L|S:</span>
-</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="c1">#     &quot;&quot;&quot;Folds an iterable from the left with an optional initial value.</span>
-</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a><span class="c1"># </span>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="c1">#     * if the iterable returns the sentinel value, stop the fold at that point</span>
-</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="c1">#     * if f returns the sentinel value, stop the fold at that point</span>
-</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="c1">#     * f is never passed the sentinel value</span>
-</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="c1">#     * note that _S can be the same type as _D</span>
-</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="c1">#     * if iterable empty &amp; no initial value given, return sentinel</span>
-</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="c1">#     * note that when initial not given, then _L = _D</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="c1">#     * traditional FP type order given for function f</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="c1">#     * raises TypeError if the iterable is not iterable (for the benefit of untyped code)</span>
-</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="c1">#     * never returns if iterable generates an infinite iterator &amp; f never returns the sentinel value</span>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="c1"># </span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="c1">#     &quot;&quot;&quot;</span>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="c1">#     acc: L|S</span>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="c1">#     if hasattr(iterable, &#39;__iter__&#39;):</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="c1">#         it = iter(iterable)</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="c1">#     else:</span>
-</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="c1">#         msg = &#39;&quot;Iterable&quot; is not iterable.&#39;</span>
-</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="c1">#         raise TypeError(msg)</span>
-</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="c1"># </span>
-</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="c1">#     if initial == sentinel:</span>
-</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="c1">#         return sentinel</span>
-</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="c1">#     elif initial is None:</span>
-</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="c1">#         try:</span>
-</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="c1">#             acc = cast(L, next(it))</span>
-</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="c1">#         except StopIteration:</span>
-</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="c1">#             return sentinel</span>
-</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="c1">#     else:</span>
-</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="c1">#         acc = initial</span>
-</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="c1"># </span>
-</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="c1">#     for v in it:</span>
-</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="c1">#         if v == sentinel:</span>
-</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="c1">#             break</span>
-</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="c1">#         facc = f(cast(L, acc), v)                    # if not L = S</span>
-</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a><span class="c1">#                                                      # then type(acc) is not S</span>
-</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a><span class="c1">#         if facc == sentinel:</span>
-</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a><span class="c1">#             break</span>
-</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a><span class="c1">#         else:</span>
-</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a><span class="c1">#             acc = facc</span>
-</span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a><span class="c1">#     return acc</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="c1">#           initial: Optional[L]=None, default: S|Nothing=nothing) -&gt; L|S: ...</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="c1"># def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="c1">#           sentinel: S, initial: Optional[L|S]=None) -&gt; L|S:</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="c1">#     &quot;&quot;&quot;Folds an iterable from the left with an optional initial value.</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="c1"># </span>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="c1">#     * if the iterable returns the sentinel value, stop the fold at that point</span>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a><span class="c1">#     * if f returns the sentinel value, stop the fold at that point</span>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="c1">#     * f is never passed the sentinel value</span>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="c1">#     * note that _S can be the same type as _D</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="c1">#     * if iterable empty &amp; no initial value given, return sentinel</span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a><span class="c1">#     * note that when initial not given, then _L = _D</span>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="c1">#     * traditional FP type order given for function f</span>
+</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="c1">#     * raises TypeError if the iterable is not iterable (for the benefit of untyped code)</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="c1">#     * never returns if iterable generates an infinite iterator &amp; f never returns the sentinel value</span>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="c1"># </span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="c1">#     acc: L|S</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="c1">#     if hasattr(iterable, &#39;__iter__&#39;):</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="c1">#         it = iter(iterable)</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="c1">#     else:</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="c1">#         msg = &#39;&quot;Iterable&quot; is not iterable.&#39;</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="c1">#         raise TypeError(msg)</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="c1"># </span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="c1">#     if initial == sentinel:</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="c1">#         return sentinel</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="c1">#     elif initial is None:</span>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="c1">#         try:</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="c1">#             acc = cast(L, next(it))</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="c1">#         except StopIteration:</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="c1">#             return sentinel</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="c1">#     else:</span>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="c1">#         acc = initial</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="c1"># </span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="c1">#     for v in it:</span>
+</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="c1">#         if v == sentinel:</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="c1">#             break</span>
+</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="c1">#         facc = f(cast(L, acc), v)                    # if not L = S</span>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="c1">#                                                      # then type(acc) is not S</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="c1">#         if facc == sentinel:</span>
+</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="c1">#             break</span>
+</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="c1">#         else:</span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="c1">#             acc = facc</span>
+</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="c1">#     return acc</span>
 </span></pre></div>
 
 
@@ -464,38 +458,38 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 
     </div>
     <a class="headerlink" href="#foldL"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="foldL-168"><a href="#foldL-168"><span class="linenos">168</span></a><span class="k">def</span> <span class="nf">foldL</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span>
-</span><span id="foldL-169"><a href="#foldL-169"><span class="linenos">169</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
-</span><span id="foldL-170"><a href="#foldL-170"><span class="linenos">170</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="foldL-171"><a href="#foldL-171"><span class="linenos">171</span></a><span class="sd">    #### Folds iterable left with optional initial value.</span>
-</span><span id="foldL-172"><a href="#foldL-172"><span class="linenos">172</span></a>
-</span><span id="foldL-173"><a href="#foldL-173"><span class="linenos">173</span></a><span class="sd">    * note that ~S can be the same type as ~L</span>
-</span><span id="foldL-174"><a href="#foldL-174"><span class="linenos">174</span></a><span class="sd">    * note that when an initial value is not given then ~L = ~D</span>
-</span><span id="foldL-175"><a href="#foldL-175"><span class="linenos">175</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
-</span><span id="foldL-176"><a href="#foldL-176"><span class="linenos">176</span></a><span class="sd">    * traditional FP type order given for function f</span>
-</span><span id="foldL-177"><a href="#foldL-177"><span class="linenos">177</span></a><span class="sd">    * raises TypeError if the &quot;iterable&quot; is not iterable</span>
-</span><span id="foldL-178"><a href="#foldL-178"><span class="linenos">178</span></a><span class="sd">    * never returns if iterable generates an infinite iterator</span>
-</span><span id="foldL-179"><a href="#foldL-179"><span class="linenos">179</span></a>
-</span><span id="foldL-180"><a href="#foldL-180"><span class="linenos">180</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="foldL-181"><a href="#foldL-181"><span class="linenos">181</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">L</span>
-</span><span id="foldL-182"><a href="#foldL-182"><span class="linenos">182</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
-</span><span id="foldL-183"><a href="#foldL-183"><span class="linenos">183</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
-</span><span id="foldL-184"><a href="#foldL-184"><span class="linenos">184</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="foldL-185"><a href="#foldL-185"><span class="linenos">185</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;Iterable&quot; is not iterable.&#39;</span>
-</span><span id="foldL-186"><a href="#foldL-186"><span class="linenos">186</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span><span id="foldL-187"><a href="#foldL-187"><span class="linenos">187</span></a>
-</span><span id="foldL-188"><a href="#foldL-188"><span class="linenos">188</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="foldL-189"><a href="#foldL-189"><span class="linenos">189</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="foldL-190"><a href="#foldL-190"><span class="linenos">190</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case L = D</span>
-</span><span id="foldL-191"><a href="#foldL-191"><span class="linenos">191</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-</span><span id="foldL-192"><a href="#foldL-192"><span class="linenos">192</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nothing, then S is Nothing</span>
-</span><span id="foldL-193"><a href="#foldL-193"><span class="linenos">193</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="foldL-194"><a href="#foldL-194"><span class="linenos">194</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="foldL-165"><a href="#foldL-165"><span class="linenos">165</span></a><span class="k">def</span> <span class="nf">foldL</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span>
+</span><span id="foldL-166"><a href="#foldL-166"><span class="linenos">166</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
+</span><span id="foldL-167"><a href="#foldL-167"><span class="linenos">167</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="foldL-168"><a href="#foldL-168"><span class="linenos">168</span></a><span class="sd">    #### Folds iterable left with optional initial value.</span>
+</span><span id="foldL-169"><a href="#foldL-169"><span class="linenos">169</span></a>
+</span><span id="foldL-170"><a href="#foldL-170"><span class="linenos">170</span></a><span class="sd">    * note that ~S can be the same type as ~L</span>
+</span><span id="foldL-171"><a href="#foldL-171"><span class="linenos">171</span></a><span class="sd">    * note that when an initial value is not given then ~L = ~D</span>
+</span><span id="foldL-172"><a href="#foldL-172"><span class="linenos">172</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
+</span><span id="foldL-173"><a href="#foldL-173"><span class="linenos">173</span></a><span class="sd">    * traditional FP type order given for function f</span>
+</span><span id="foldL-174"><a href="#foldL-174"><span class="linenos">174</span></a><span class="sd">    * raises TypeError if the &quot;iterable&quot; is not iterable</span>
+</span><span id="foldL-175"><a href="#foldL-175"><span class="linenos">175</span></a><span class="sd">    * never returns if iterable generates an infinite iterator</span>
+</span><span id="foldL-176"><a href="#foldL-176"><span class="linenos">176</span></a>
+</span><span id="foldL-177"><a href="#foldL-177"><span class="linenos">177</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="foldL-178"><a href="#foldL-178"><span class="linenos">178</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">L</span>
+</span><span id="foldL-179"><a href="#foldL-179"><span class="linenos">179</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+</span><span id="foldL-180"><a href="#foldL-180"><span class="linenos">180</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+</span><span id="foldL-181"><a href="#foldL-181"><span class="linenos">181</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="foldL-182"><a href="#foldL-182"><span class="linenos">182</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;Iterable&quot; is not iterable.&#39;</span>
+</span><span id="foldL-183"><a href="#foldL-183"><span class="linenos">183</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="foldL-184"><a href="#foldL-184"><span class="linenos">184</span></a>
+</span><span id="foldL-185"><a href="#foldL-185"><span class="linenos">185</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="foldL-186"><a href="#foldL-186"><span class="linenos">186</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="foldL-187"><a href="#foldL-187"><span class="linenos">187</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case L = D</span>
+</span><span id="foldL-188"><a href="#foldL-188"><span class="linenos">188</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span><span id="foldL-189"><a href="#foldL-189"><span class="linenos">189</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nada, then S is Nada</span>
+</span><span id="foldL-190"><a href="#foldL-190"><span class="linenos">190</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="foldL-191"><a href="#foldL-191"><span class="linenos">191</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
+</span><span id="foldL-192"><a href="#foldL-192"><span class="linenos">192</span></a>
+</span><span id="foldL-193"><a href="#foldL-193"><span class="linenos">193</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+</span><span id="foldL-194"><a href="#foldL-194"><span class="linenos">194</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 </span><span id="foldL-195"><a href="#foldL-195"><span class="linenos">195</span></a>
-</span><span id="foldL-196"><a href="#foldL-196"><span class="linenos">196</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
-</span><span id="foldL-197"><a href="#foldL-197"><span class="linenos">197</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-</span><span id="foldL-198"><a href="#foldL-198"><span class="linenos">198</span></a>
-</span><span id="foldL-199"><a href="#foldL-199"><span class="linenos">199</span></a>    <span class="k">return</span> <span class="n">acc</span>
+</span><span id="foldL-196"><a href="#foldL-196"><span class="linenos">196</span></a>    <span class="k">return</span> <span class="n">acc</span>
 </span></pre></div>
 
 
@@ -524,37 +518,37 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 
     </div>
     <a class="headerlink" href="#foldR"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="foldR-214"><a href="#foldR-214"><span class="linenos">214</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span>
-</span><span id="foldR-215"><a href="#foldR-215"><span class="linenos">215</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
-</span><span id="foldR-216"><a href="#foldR-216"><span class="linenos">216</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="foldR-217"><a href="#foldR-217"><span class="linenos">217</span></a><span class="sd">    #### Folds reversible iterable right with an optional initial value.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="foldR-208"><a href="#foldR-208"><span class="linenos">208</span></a><span class="k">def</span> <span class="nf">foldR</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Reversible</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">R</span><span class="p">],</span> <span class="n">R</span><span class="p">],</span>
+</span><span id="foldR-209"><a href="#foldR-209"><span class="linenos">209</span></a>          <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="o">=</span><span class="n">nada</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="o">|</span><span class="n">Nada</span><span class="p">:</span>
+</span><span id="foldR-210"><a href="#foldR-210"><span class="linenos">210</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="foldR-211"><a href="#foldR-211"><span class="linenos">211</span></a><span class="sd">    #### Folds reversible iterable right with an optional initial value.</span>
+</span><span id="foldR-212"><a href="#foldR-212"><span class="linenos">212</span></a>
+</span><span id="foldR-213"><a href="#foldR-213"><span class="linenos">213</span></a><span class="sd">    * note that ~S can be the same type as ~R</span>
+</span><span id="foldR-214"><a href="#foldR-214"><span class="linenos">214</span></a><span class="sd">    * note that when an initial value not given then ~R = ~D</span>
+</span><span id="foldR-215"><a href="#foldR-215"><span class="linenos">215</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
+</span><span id="foldR-216"><a href="#foldR-216"><span class="linenos">216</span></a><span class="sd">    * traditional FP type order given for function f</span>
+</span><span id="foldR-217"><a href="#foldR-217"><span class="linenos">217</span></a><span class="sd">    * raises TypeError if iterable is not reversible</span>
 </span><span id="foldR-218"><a href="#foldR-218"><span class="linenos">218</span></a>
-</span><span id="foldR-219"><a href="#foldR-219"><span class="linenos">219</span></a><span class="sd">    * note that ~S can be the same type as ~R</span>
-</span><span id="foldR-220"><a href="#foldR-220"><span class="linenos">220</span></a><span class="sd">    * note that when an initial value not given then ~R = ~D</span>
-</span><span id="foldR-221"><a href="#foldR-221"><span class="linenos">221</span></a><span class="sd">    * if iterable empty &amp; no initial value given, return default</span>
-</span><span id="foldR-222"><a href="#foldR-222"><span class="linenos">222</span></a><span class="sd">    * traditional FP type order given for function f</span>
-</span><span id="foldR-223"><a href="#foldR-223"><span class="linenos">223</span></a><span class="sd">    * raises TypeError if iterable is not reversible</span>
-</span><span id="foldR-224"><a href="#foldR-224"><span class="linenos">224</span></a>
-</span><span id="foldR-225"><a href="#foldR-225"><span class="linenos">225</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="foldR-226"><a href="#foldR-226"><span class="linenos">226</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">R</span>
-</span><span id="foldR-227"><a href="#foldR-227"><span class="linenos">227</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__reversed__&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__getitem__&#39;</span><span class="p">):</span>
-</span><span id="foldR-228"><a href="#foldR-228"><span class="linenos">228</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
-</span><span id="foldR-229"><a href="#foldR-229"><span class="linenos">229</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="foldR-230"><a href="#foldR-230"><span class="linenos">230</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Iterable is not reversible.&#39;</span>
-</span><span id="foldR-231"><a href="#foldR-231"><span class="linenos">231</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-</span><span id="foldR-232"><a href="#foldR-232"><span class="linenos">232</span></a>
-</span><span id="foldR-233"><a href="#foldR-233"><span class="linenos">233</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="foldR-234"><a href="#foldR-234"><span class="linenos">234</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="foldR-235"><a href="#foldR-235"><span class="linenos">235</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case R = D</span>
-</span><span id="foldR-236"><a href="#foldR-236"><span class="linenos">236</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-</span><span id="foldR-237"><a href="#foldR-237"><span class="linenos">237</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nothing, then S is Nothing</span>
-</span><span id="foldR-238"><a href="#foldR-238"><span class="linenos">238</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="foldR-239"><a href="#foldR-239"><span class="linenos">239</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
-</span><span id="foldR-240"><a href="#foldR-240"><span class="linenos">240</span></a>
-</span><span id="foldR-241"><a href="#foldR-241"><span class="linenos">241</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
-</span><span id="foldR-242"><a href="#foldR-242"><span class="linenos">242</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
-</span><span id="foldR-243"><a href="#foldR-243"><span class="linenos">243</span></a>
-</span><span id="foldR-244"><a href="#foldR-244"><span class="linenos">244</span></a>    <span class="k">return</span> <span class="n">acc</span>
+</span><span id="foldR-219"><a href="#foldR-219"><span class="linenos">219</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="foldR-220"><a href="#foldR-220"><span class="linenos">220</span></a>    <span class="n">acc</span><span class="p">:</span> <span class="n">R</span>
+</span><span id="foldR-221"><a href="#foldR-221"><span class="linenos">221</span></a>    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__reversed__&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="s1">&#39;__getitem__&#39;</span><span class="p">):</span>
+</span><span id="foldR-222"><a href="#foldR-222"><span class="linenos">222</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+</span><span id="foldR-223"><a href="#foldR-223"><span class="linenos">223</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="foldR-224"><a href="#foldR-224"><span class="linenos">224</span></a>        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Iterable is not reversible.&#39;</span>
+</span><span id="foldR-225"><a href="#foldR-225"><span class="linenos">225</span></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</span><span id="foldR-226"><a href="#foldR-226"><span class="linenos">226</span></a>
+</span><span id="foldR-227"><a href="#foldR-227"><span class="linenos">227</span></a>    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="foldR-228"><a href="#foldR-228"><span class="linenos">228</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="foldR-229"><a href="#foldR-229"><span class="linenos">229</span></a>            <span class="n">acc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>  <span class="c1"># in this case R = D</span>
+</span><span id="foldR-230"><a href="#foldR-230"><span class="linenos">230</span></a>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+</span><span id="foldR-231"><a href="#foldR-231"><span class="linenos">231</span></a>            <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>  <span class="c1"># if default = nada, then S is nada</span>
+</span><span id="foldR-232"><a href="#foldR-232"><span class="linenos">232</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="foldR-233"><a href="#foldR-233"><span class="linenos">233</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">initial</span>
+</span><span id="foldR-234"><a href="#foldR-234"><span class="linenos">234</span></a>
+</span><span id="foldR-235"><a href="#foldR-235"><span class="linenos">235</span></a>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+</span><span id="foldR-236"><a href="#foldR-236"><span class="linenos">236</span></a>        <span class="n">acc</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">acc</span><span class="p">)</span>
+</span><span id="foldR-237"><a href="#foldR-237"><span class="linenos">237</span></a>
+</span><span id="foldR-238"><a href="#foldR-238"><span class="linenos">238</span></a>    <span class="k">return</span> <span class="n">acc</span>
 </span></pre></div>
 
 

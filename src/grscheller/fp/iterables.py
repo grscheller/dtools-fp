@@ -160,9 +160,6 @@ def foldL(iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Nada:
 @overload
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
     ...
-@overload
-def foldL(iterable: Iterable[D], f: Callable[[L, D], L], initial: Nada) -> Nada:
-    ...
 
 def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
           initial: Optional[L]=None, default: S|Nada=nada) -> L|S|Nada:
@@ -188,7 +185,7 @@ def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
         try:
             acc = cast(L, next(it))  # in this case L = D
         except StopIteration:
-            return cast(S, default)  # if default = nothing, then S is Nothing
+            return cast(S, default)  # if default = nada, then S is Nada
     else:
         acc = initial
 
@@ -201,13 +198,10 @@ def foldL(iterable: Iterable[D], f: Callable[[L, D], L],
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Optional[R], default: S) -> R|S:
     ...
 @overload
-def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nothing:
+def foldR(iterable: Reversible[D], f: Callable[[D, D], D]) -> D|Nada:
     ...
 @overload
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: R) -> R:
-    ...
-@overload
-def foldR(iterable: Reversible[D], f: Callable[[D, R], R], initial: Nada) -> R|Nada:
     ...
 
 def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
@@ -233,7 +227,7 @@ def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
         try:
             acc = cast(R, next(it))  # in this case R = D
         except StopIteration:
-            return cast(S, default)  # if default = nothing, then S is Nothing
+            return cast(S, default)  # if default = nada, then S is nada
     else:
         acc = initial
 
