@@ -20,6 +20,11 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.3.2 - Commit Date: 2024-09-21
+
+* added fp.interables function foldL_sc
+  * shortcut version of foldL
+
 ### Version 0.3.3 - PyPI Release: 2024-08-25
 
 * removed method

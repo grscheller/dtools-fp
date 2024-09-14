@@ -28,18 +28,18 @@ from typing import Callable, cast, Final, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
 from .nada import Nada, nada
 
-__all__ = [ 'accumulate', 'foldL', 'foldR',
-            'concat', 'merge', 'exhaust', 'FM' ]
+__all__ = [ 'concat', 'merge', 'exhaust', 'FM',
+            'accumulate', 'foldL', 'foldR', 'foldL_sc' ]
 
 class FM(Enum):
     CONCAT = auto()
     MERGE = auto()
     EXHAUST = auto()
 
-D = TypeVar('D')
-L = TypeVar('L')
-R = TypeVar('R')
-S = TypeVar('S')
+D = TypeVar('D')      # D for data
+L = TypeVar('L')      # L for left
+R = TypeVar('R')      # R for right
+S = TypeVar('S')      # S for sentinel (also used for default values)
 
 ## Iterate over multiple Iterables
 
@@ -125,7 +125,8 @@ def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
     * pure Python version of standard library's itertools.accumulate
     * function f does not default to addition (for typing flexibility)
     * begins accumulation with an optional starting value
-    * itertools.accumulate has mypy issues
+    * itertools.accumulate had mypy issues
+    * assumes iterable follows iterable protocol
 
     """
     it = iter(iterable)
@@ -236,54 +237,56 @@ def foldR(iterable: Reversible[D], f: Callable[[D, R], R],
 
     return acc
 
-# @overload
-# def foldLsc(iterable: Iterable[D|S], f: Callable[[D, D|S], D], sentinel: S) -> D|S: ...
-# @overload
-# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: L) -> L: ...
-# @overload
-# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L], sentinel: S, initial: Optional[L]=None) -> L|Nothing: ...
-# @overload
-# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],
-#           initial: Optional[L]=None, default: S|Nothing=nothing) -> L|S: ...
-# def foldLsc(iterable: Iterable[D|S], f: Callable[[L, D|S], L],
-#           sentinel: S, initial: Optional[L|S]=None) -> L|S:
-#     """Folds an iterable from the left with an optional initial value.
-# 
-#     * if the iterable returns the sentinel value, stop the fold at that point
-#     * if f returns the sentinel value, stop the fold at that point
-#     * f is never passed the sentinel value
-#     * note that _S can be the same type as _D
-#     * if iterable empty & no initial value given, return sentinel
-#     * note that when initial not given, then _L = _D
-#     * traditional FP type order given for function f
-#     * raises TypeError if the iterable is not iterable (for the benefit of untyped code)
-#     * never returns if iterable generates an infinite iterator & f never returns the sentinel value
-# 
-#     """
-#     acc: L|S
-#     if hasattr(iterable, '__iter__'):
-#         it = iter(iterable)
-#     else:
-#         msg = '"Iterable" is not iterable.'
-#         raise TypeError(msg)
-# 
-#     if initial == sentinel:
-#         return sentinel
-#     elif initial is None:
-#         try:
-#             acc = cast(L, next(it))
-#         except StopIteration:
-#             return sentinel
-#     else:
-#         acc = initial
-# 
-#     for v in it:
-#         if v == sentinel:
-#             break
-#         facc = f(cast(L, acc), v)                    # if not L = S
-#                                                      # then type(acc) is not S
-#         if facc == sentinel:
-#             break
-#         else:
-#             acc = facc
-#     return acc
+@overload
+def foldL_sc(iterable: Iterable[D], f: Callable[[L, D], L], initial: Optional[L], sentinel: S) -> L|S:
+    ...
+@overload
+def foldL_sc(iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Nada:
+    ...
+@overload
+def foldL_sc(iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
+    ...
+def foldL_sc(iterable: Iterable[D], f: Callable[[L, D], L|S|Nada],
+             initial: Optional[L]=None, sentinel: S|Nada=nada) -> L|S|Nada:
+    """
+    #### Shortcut version of FoldL.
+
+    * if the iterable returns the sentinel value, stop the fold at that point
+    * if f returns the sentinel value, stop the fold at that point
+    * f is never passed the sentinel value
+    * note that ~S can be the same type as ~L
+    * note that when an initial value is not given then ~L = ~D
+    * if iterable empty & no initial value given, return default
+    * traditional FP type order given for function f
+    * never returns if iterable infinite & sentinel value not encountered
+    * raises TypeError if the "iterable" is not iterable
+    """
+    acc: L
+    if hasattr(iterable, '__iter__'):
+        it = iter(iterable)
+    else:
+        msg = '"Iterable" is not iterable.'
+        raise TypeError(msg)
+
+    if initial is None:
+        try:
+            acc = cast(L, next(it))  # in this case L = D
+        except StopIteration:
+            return cast(S, sentinel)  # if sentinel = nada, then S is Nada
+    else:
+        acc = initial
+
+    for v in it:
+        if v is sentinel or v == sentinel:
+            break
+        # TODO: Catch exception if f throws one?
+        f_ret = f(acc, v)
+        if f_ret is sentinel or f_ret == sentinel:
+            break
+        else:
+            acc = cast(L, f_ret)  # not the sentinel value
+
+    return acc
+
+# TODO: Shortcut version of foldR
+#       - does not have to be reversible
