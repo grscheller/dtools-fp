@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-#### Library of iterator related functions.
+### Library of iterator related functions.
 
 * iterables are not necessarily iterators
 * at all times iterator protocol is assumed to be followed, that is
@@ -47,10 +47,10 @@ T = TypeVar('T')      # T for sTate
 
 def concat(*iterables: Iterable[D]) -> Iterator[D]:
     """
-    #### Sequentially concatenate multiple iterables together.
+    ##### Sequentially concatenate multiple iterables together.
 
     * pure Python version of standard library's itertools.chain
-    * iterator yields Sequentially each iterable until all are exhausted
+    * iterator sequentially yields each iterable until all are exhausted
     * an infinite iterable will prevent subsequent iterables from yielding any values
     * performant to chain
 
@@ -66,7 +66,7 @@ def concat(*iterables: Iterable[D]) -> Iterator[D]:
 
 def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
     """
-    #### Shuffle together multiple iterables until all are exhausted.
+    ##### Shuffle together multiple iterables until all are exhausted.
 
     * iterator yields until all iterables are exhausted
 
@@ -94,7 +94,7 @@ def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
 
 def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
     """
-    #### Shuffle together multiple iterables until one is exhausted.
+    ##### Shuffle together multiple iterables until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
@@ -122,13 +122,12 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
 def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
                initial: Optional[L]=None) -> Iterator[L]:
     """
-    #### Returns an iterator of accumulated values.
+    ##### Returns an iterator of accumulated values.
 
     * pure Python version of standard library's itertools.accumulate
     * function f does not default to addition (for typing flexibility)
     * begins accumulation with an optional starting value
     * itertools.accumulate had mypy issues
-    * assumes iterable follows iterable protocol
 
     """
     it = iter(iterable)
@@ -175,7 +174,7 @@ def foldL(iterable: Iterable[D],
           init: Optional[L]=None,
           sent: Optional[S]=None) -> L|S:
     """
-    #### Folds an iterable left with optional initial value.
+    ##### Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function f
     * note that ~S and ~L can be the same types
@@ -224,7 +223,7 @@ def foldR(iterable: Reversible[D],
           init: Optional[R]=None,
           sent: Optional[S]=None) -> R|S:
     """
-    #### Folds a reversible iterable right with an optional initial value.
+    ##### Folds a reversible iterable right with an optional initial value.
 
     * traditional FP type order given for function f
     * note that ~S and ~R can be the same types
@@ -283,16 +282,16 @@ def foldL_sc(iterable: Iterable[D|S],
              pred: Optional[Callable[[D, T], MB[T]]]=None,
              istate: Optional[T]=None) -> L|S:
     """
-    #### Shortcut version of foldL.
+    ##### Shortcut version of foldL.
 
     * stop fold if sentinel value `sent` is encountered
       * if the iterable returns the sentinel value, stop the fold at that point
         * f is never passed the sentinel value
-        * predicate `pred` provides a "shortcut" function
-          * the default `pred` does not "shortcut"
+        * predicate `pred` provides a "short circuit" capability
+          * the default `pred` does not "short circuit"
             * ignores the data
-            * just passes along an initial state `istate` unchanged
-    * folding function `f` never passed the sentinel value
+            * just passes along the initial state `istate` unchanged
+    * folding function `f` is never passed the sentinel value
 
     """
     sentinel = cast(S, sent)
@@ -359,29 +358,29 @@ def foldR_sc(iterable: Iterable[D|S],
              pred: Optional[Callable[[D, T], MB[T]]]=None,
              istate: Optional[T]=None) -> R|S:
     """
-    #### Shortcut version of foldR.
+    ##### Shortcut version of foldR.
 
     * start fold if sentinel value `sent` is encountered
       * if the iterable returns the sentinel value, start the fold at that point
         * f is never passed the sentinel value
-        * predicate `pred` provides a "shortcut" function
-          * the default `pred` does not "shortcut"
+        * predicate `pred` provides a "shortcut circuit" capability
+          * the default `pred` does not "short circuit"
             * ignores the data
-            * just passes along an initial state `istate` unchanged
-    * folding function `f` never passed the sentinel value
+            * just passes along the initial state `istate` unchanged
+    * folding function `f` is never passed the sentinel value
     * does not require iterable to be reversible, iterable never "reversed"
     * does not raise RecursionError, recursion simulated with Python list
 
     """
     sentinel = cast(S, sent)
-    imitial_state = cast(T, istate)
+    initial_state = cast(T, istate)
     if pred is None:
         predicate: Callable[[D, T], MB[T]]  = lambda d, t: MB(t)
     else:
         predicate = pred
 
     it = iter(iterable)
-    state_mb = MB(imitial_state)
+    state_mb = MB(initial_state)
 
     acc: R
 

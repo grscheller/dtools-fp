@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""#### An attempt to give Python a "bottom" type
+"""### An attempt to give Python a "bottom" type
 
 While a true bottom type has no instances, `nada` is a singleton. Python's
 evolving typing system seems to reject the concept of a true bottom type.
@@ -38,7 +38,7 @@ _sentinel: Final[_S] = _S((None, (None, (None, ()))))
 
 class Nada():
     """
-    #### Singleton semantically represents a missing value.
+    ##### Singleton semantically represents a missing value.
 
     * singleton nada: Nada = Nada() represents a non-existent value
     * returns itself for arbitrary method calls

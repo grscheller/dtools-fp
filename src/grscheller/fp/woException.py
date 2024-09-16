@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """
-#### Maybe and Either Monads
+### Maybe and Either Monads
 
-Functional data types to use in lieu of exceptions.
+##### Functional data types to use in lieu of exceptions.
+
 """
-
 from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
@@ -34,7 +34,7 @@ class MB(Generic[T]):
     """
     #### Maybe Monad
 
-    Class representing a potentially missing value.
+    ##### Class representing a potentially missing value.
 
     * where `MB(value)` contains a possible value of type `~T`
     * `MB( )` semantically represent a non-existent or missing value of type ~T
@@ -92,7 +92,7 @@ class MB(Generic[T]):
 
     def map(self, f: Callable[[T], S]) -> MB[S]:
         """
-        #### Map over the `MB`
+        ##### Map over the MB
 
         Map MB function f over the 0 or 1 elements of this data structure.
         """
@@ -106,8 +106,7 @@ class XOR(Generic[L, R]):
     """
     #### Either Monad
 
-    Class that can semantically contains either a "left" value or "right" value,
-    but not both.
+    ##### Class semantically containing either a "left" or "right" value but not both.
 
     * implements a left biased Either Monad
       * `XOR(left, right)` produces a "left" and default potential "right" value
@@ -118,11 +117,11 @@ class XOR(Generic[L, R]):
       * both are left values or both are right values which
         * contain the same value or
         * whose values compare as equal
-    * immutable, an XOR does not change after being created
+    * immutable, an `XOR` does not change after being created
       * immutable semantics, map & flatMap return new instances
       * warning: contained values need not be immutable
-    * raises ValueError if both if
-      * a right value is needed but a potential "right" value is not given
+    * raises `ValueError` if
+      * a "right" value is needed but a potential "right" value was not given
 
     """
     __slots__ = '_left', '_right'
@@ -258,15 +257,19 @@ class XOR(Generic[L, R]):
 
     def mapRight(self, g: Callable[[R], R]) -> XOR[L, R]:
         """
-        ##### Map right
-
-        Map over a right or potential right value.
+        ##### Map right - map over a right or potential right value.
 
         """
         return XOR(self._left, g(cast(R, self._right)))
 
     def flatMap(self, f: Callable[[L], XOR[S, R]]) -> XOR[S, R]:
-        """Map and flatten a Left value, propagate Right values."""
+        """
+        ##### Flatmap - Monadically bind
+
+        * map over then flatten left values
+        * propagate right values
+
+        """
         if self._left is nada:
             return XOR(nada, self._right)
         else:
@@ -276,7 +279,7 @@ class XOR(Generic[L, R]):
 
 def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
     """
-    #### Convert a MB to an XOR.
+    ##### Convert a MB to an XOR.
 
     """
     if m:
@@ -286,7 +289,7 @@ def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
 
 def xor_to_mb(e: XOR[T,S]) -> MB[T]:
     """
-    ####Convert an XOR to a MB.
+    ##### Convert an XOR to a MB.
 
     """
     if e:
