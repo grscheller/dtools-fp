@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 from grscheller.fp.iterables import foldL_sc, foldR_sc
 from grscheller.fp.nada import Nada, nada
+from grscheller.fp.woException import MB
 
 class Test_fp_no_sc_folds:
     def test_fold(self) -> None:
@@ -56,31 +58,31 @@ class Test_fp_no_sc_folds:
         stuff3: list[int] = []
         stuff4 = 42,
 
-        assert foldL_sc(stuff1, add, sentinel=None) == 15
-        assert foldL_sc(stuff1, add, None, sentinel=None) == 15
-        assert foldL_sc(stuff1, add, 10, sentinel=None) == 25
-        # assert foldR_sc(stuff1, add, sentinel=None) == 15
-        assert foldL_sc(stuff2, add, sentinel=None) == 14
-        # assert foldR_sc(stuff2, add, sentinel=None) == 14
-        assert foldL_sc(stuff3, add, sentinel=None) == None
-        # assert foldR_sc(stuff3, add, sentinel=None) == None
-        assert foldL_sc(stuff4, add, sentinel=None) == 42
-        # assert foldR_sc(stuff4, add, sentinel=None) == 42
-        assert foldL_sc(stuff3, add, sentinel=nada) is nada
-        assert foldL_sc(stuff3, add, sentinel=nada) != nada
+        assert foldL_sc(stuff1, add, sent=None) == 15
+        assert foldL_sc(stuff1, add, None, sent=None) == 15
+        assert foldL_sc(stuff1, add, 10, sent=None) == 25
+        assert foldR_sc(stuff1, add, sent=None) == 15
+        assert foldL_sc(stuff2, add, sent=None) == 14
+        assert foldR_sc(stuff2, add, sent=None) == 14
+        assert foldL_sc(stuff3, add, sent=None) is None
+        assert foldR_sc(stuff3, add, sent=None) is None
+        assert foldL_sc(stuff4, add, sent=None) == 42
+        assert foldR_sc(stuff4, add, sent=None) == 42
+        assert foldL_sc(stuff3, add, sent=nada) is nada
+        assert foldL_sc(stuff3, add, sent=nada) != nada
         assert foldL_sc(stuff3, add) is None
         assert foldR_sc(stuff3, add) is None
         assert foldL_sc(stuff4, add) == 42
         assert foldR_sc(stuff4, add) == 42
 
-        assert foldL_sc(stuff1, funcL, sentinel=nada) == -156
-        assert foldR_sc(stuff1, funcR, sentinel=nada) == 0
-        assert foldL_sc(stuff2, funcL, sentinel=nada) == 84
-        assert foldR_sc(stuff2, funcR, sentinel=nada) == 39
-        assert foldL_sc(stuff3, funcL, sentinel=nada) is nada
-        assert foldR_sc(stuff3, funcR, sentinel=nada) is nada
+        assert foldL_sc(stuff1, funcL, sent=nada) == -156
+        assert foldR_sc(stuff1, funcR, sent=nada) == 0
+        assert foldL_sc(stuff2, funcL, sent=nada) == 84
+        assert foldR_sc(stuff2, funcR, sent=nada) == 39
+        assert foldL_sc(stuff3, funcL, sent=nada) is nada
+        assert foldR_sc(stuff3, funcR, sent=nada) is nada
         assert foldL_sc(stuff4, funcL) == 42
-        assert foldR_sc(stuff4, funcR, sentinel=nada) == 42
+        assert foldR_sc(stuff4, funcR, sent=nada) == 42
         assert foldL_sc(stuff1, funcL) == -156
         assert foldR_sc(stuff1, funcR) == 0
         assert foldL_sc(stuff2, funcL) == 84
@@ -90,43 +92,63 @@ class Test_fp_no_sc_folds:
         assert foldL_sc(stuff4, funcL) == 42
         assert foldR_sc(stuff4, funcR) == 42
 
-    def test_fold_sc(self) -> None:
-        def add2(ii: int, jj: int) -> int|Nada:
-            if (kk := ii+jj) < 42:
-                return kk
+    def test_foldL_sc(self) -> None:
+        def add42(ii: Optional[int], jj: Optional[int]) -> Optional[int]:
+            if type(jj) == int:
+                if (kk := ii+jj) < 42:
+                    return kk
+                else:
+                    return None
             else:
-                return nada
+                return None
 
-        data1 = (1, 2, 3, 4, 5, nada, 6, 7, 8, 9, 10)
+        data1 = (1, 2, 3, 4, 5, None, 6, 7, 8, 9, 10)
         data2 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
         data3 = [1, 2, 3, 4, 5, 6]
         data4: tuple[int, ...] = ()
         data5 = 10,
         data6 = 15, 20, 25, 30
 
-        assert foldL_sc(data1, add2, sentinel=nada) == 15
-    #   assert foldR_sc(data1, add2, sentinel=nada) == 15
-        assert foldL_sc(data2, add2, sentinel=nada) == 36
-    #   assert foldR_sc(data2, add2, sentinel=nada) == 36
-        assert foldL_sc(data3, add2, sentinel=nada) == 21
-    #   assert foldR_sc(data3, add2, sentinel=nada) == 21
-        assert foldL_sc(data4, add2, sentinel=nada) is nada
-    #   assert foldR_sc(data4, add2, sentinel=nada) == nada
-        assert foldL_sc(data5, add2, sentinel=nada) == 10
-    #   assert foldR_sc(data5, add2, sentinel=nada) == 10
-        assert foldL_sc(data6, add2, sentinel=nada) == 35
-    #   assert foldR_sc(data6, add2, sentinel=nada) == 30
-        assert foldL_sc(data1, add2, 10, sentinel=nada) == 25
-    #   assert foldR_sc(data1, add2, sentinel=nada, 10) == 25
-        assert foldL_sc(data2, add2, 10, sentinel=nada) == 38
-    #   assert foldR_sc(data2, add2, sentinel=nada, 10) == 37
-        assert foldL_sc(data3, add2, 20, sentinel=nada) == 41
-    #   assert foldR_sc(data3, add2, sentinel=nada, 20) == 39
-        assert foldL_sc(data4, add2, 10, sentinel=nada) == 10
-    #   assert foldR_sc(data4, add2, sentinel=nada, 10) == 10
-        assert foldL_sc(data5, add2, 10, sentinel=nada) == 20
-    #   assert foldR_sc(data5, add2, sentinel=nada, 10) == 20
-        assert foldL_sc(data6, add2, 10, sentinel=nada) == 25
-    #   assert foldR_sc(data6, add2, sentinel=nada, 10) == 40
+        assert foldL_sc(data1, add42) == 15
+        assert foldL_sc(data2, add42) == 36
+        assert foldL_sc(data3, add42) == 21
+        assert foldL_sc(data4, add42) is None
+        assert foldL_sc(data5, add42) == 10
+        assert foldL_sc(data6, add42) == 35
+        assert foldL_sc(data1, add42, 10) == 25
+        assert foldL_sc(data2, add42, 10) == 38
+        assert foldL_sc(data3, add42, 20) == 41
+        assert foldL_sc(data4, add42, 10) == 10
+        assert foldL_sc(data5, add42, 10) == 20
+        assert foldL_sc(data6, add42, 10) == 25
 
+    def test_foldR_sc(self) -> None:
+        def add(ii: int, jj: int) -> int:
+            return ii + jj
 
+        def fold_lt42(d: int, fold_total: int) -> MB[int]:
+            fold_total += d
+            if fold_total < 42:
+                return MB(fold_total)
+            else:
+                return MB()
+
+        data1 = (1, 2, 3, 4, 5, -1, 6, 7, 8, 9, 10)
+        data2 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        data3 = [1, 2, 3, 4, 5, 6]
+        data4: tuple[int, ...] = ()
+        data5 = 10,
+        data6 = 15, 20, 25, 30
+
+        assert foldR_sc(data1, add, sent=-1, pred=fold_lt42, istate=0) == 15
+        assert foldR_sc(data2, add, sent=-1, pred=fold_lt42, istate=0) == 36
+        assert foldR_sc(data3, add, sent=-1, pred=fold_lt42, istate=0) == 21
+        assert foldR_sc(data4, add, sent=-1, pred=fold_lt42, istate=0) == -1
+        assert foldR_sc(data5, add, sent=-1, pred=fold_lt42, istate=0) == 10
+        assert foldR_sc(data6, add, sent=-1, pred=fold_lt42, istate=0) == 35
+        assert foldR_sc(data1, add, 10, sent=-1, pred=fold_lt42, istate=10) == 25
+        assert foldR_sc(data2, add, 10, sent=-1, pred=fold_lt42, istate=10) == 38
+        assert foldR_sc(data3, add, 20, sent=-1, pred=fold_lt42, istate=20) == 41
+        assert foldR_sc(data4, add, 10, sent=-1, pred=fold_lt42, istate=10) == 10
+        assert foldR_sc(data5, add, 10, sent=-1, pred=fold_lt42, istate=10) == 20
+        assert foldR_sc(data6, add, 10, sent=-1, pred=fold_lt42, istate=10) == 25
