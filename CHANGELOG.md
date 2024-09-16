@@ -20,6 +20,12 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.3.4 - Commit Date: 2024-09-16
+
+* foldL\_sc & foldR\_sc for fp.iterables now have
+  * common paradigm
+  * similar signatures
+
 ### Version 0.3.3.3 - Commit Date: 2024-09-15
 
 * added fp.iterables function foldR_sc

@@ -30,7 +30,7 @@ from .nada import Nada, nada
 from .woException import MB
 
 __all__ = [ 'concat', 'merge', 'exhaust', 'FM',
-            'accumulate', 'foldL', 'foldR', 'foldL_sc' ]
+            'accumulate', 'foldL', 'foldR', 'foldL_sc', 'foldR_sc' ]
 
 class FM(Enum):
     CONCAT = auto()
@@ -175,14 +175,13 @@ def foldL(iterable: Iterable[D],
           init: Optional[L]=None,
           sent: Optional[S]=None) -> L|S|None:
     """
-    #### Folds iterable left with optional initial value.
+    #### Folds an iterable left with optional initial value.
 
-    * note that ~S can be the same type as ~L
-      * note that when an initial value not given then ~L = ~D
-      * if iterable empty & no initial value given, return default
     * traditional FP type order given for function f
+    * note that ~S and ~L can be the same types
+      * when an initial value is not given then ~L = ~D
+      * if iterable empty & no initial value given, return default
     * never returns if iterable generates an infinite iterator
-    * raises TypeError if the "iterable" is not iterable
 
     """
     acc: L
@@ -222,13 +221,12 @@ def foldR(iterable: Reversible[D],
           init: Optional[R]=None,
           sent: Optional[S]=None) -> R|S|None:
     """
-    #### Folds reversible iterable right with an optional initial value.
+    #### Folds a reversible iterable right with an optional initial value.
 
-    * note that ~S can be the same type as ~R
-      * note that when an initial value not given then ~R = ~D
-      * if iterable empty & no initial value given, return default
     * traditional FP type order given for function f
-    * raises TypeError if "iterable" is not reversible
+    * note that ~S and ~R can be the same types
+      * if initial value is not given then ~R = ~D
+      * if iterable empty & no initial value given, return sentinel value
 
     """
     acc: R
@@ -248,28 +246,30 @@ def foldR(iterable: Reversible[D],
     return acc
 
 def foldL_sc(iterable: Iterable[D|S],
-             f: Callable[[L, D], L|S],
+             f: Callable[[L, D], L],
              init: Optional[L]=None,
-             sent: Optional[S]=None) -> L|S|None:
+             sent: Optional[S]=None,
+             pred: Optional[Callable[[D, T], MB[T]]]=None,
+             istate: Optional[T]=None) -> L|S|None:
     """
     #### Shortcut version of foldL.
 
-    * stop fold if sentinel value is encountered
+    * stop fold if sentinel value `sent` is encountered
       * if the iterable returns the sentinel value, stop the fold at that point
         * f is never passed the sentinel value
-      * if f returns the sentinel value, stop the fold at that point
-        * do not include sentinel in fold
-    * note that ~S can be the same type as ~L
-      * note that when an initial value not given then ~L = ~D
-      * if iterable empty & no initial value given, return default
-      * None is the "default" sentinel value
-    * traditional FP type order given for function f
-    * never returns if iterable infinite and sentinel never encountered
-    * raises TypeError if the "iterable" is not iterable
+        * predicate `pred` provides a "shortcut" function
+          * the default `pred` does not "shortcut"
+            * ignores the data
+            * just passes along as initial state `istate` unchanged
+    * folding function `f` never passed the sentinel value
 
     """
-    acc: L
     it = iter(iterable)
+    if pred is None:
+        pred = lambda d, t: MB(t)
+    acc: L
+
+    state_mb = MB(istate)
 
     if init is None:
         try:
@@ -282,11 +282,12 @@ def foldL_sc(iterable: Iterable[D|S],
     for d in it:
         if d is sent or d == sent:
             break
-        f_ret = f(acc, cast(D, d))
-        if f_ret is sent or f_ret == sent:
-            break
-        acc = cast(L, f_ret)
-
+        else:
+            if (state_mb := pred(d, state_mb.get())):
+                f_ret = f(acc, cast(D, d))
+                acc = f_ret
+            else:
+                break
     return acc
 
 def foldR_sc(iterable: Iterable[D|S],
@@ -298,22 +299,15 @@ def foldR_sc(iterable: Iterable[D|S],
     """
     #### Shortcut version of foldR.
 
-    * stop fold if sentinel value `sent` is encountered
-      * if the iterable returns the sentinel value, stop the fold at that point
+    * start fold if sentinel value `sent` is encountered
+      * if the iterable returns the sentinel value, start the fold at that point
         * f is never passed the sentinel value
-      * if f returns the sentinel value, stop the fold at that point
-        * do not include sentinel in fold
-        * unlike `foldL_sc`, the fold `f` itself does not "shortcut"
         * predicate `pred` provides a "shortcut" function
-          * default `pred` does not "shortcut"
+          * the default `pred` does not "shortcut"
             * ignores the data
-            * just passes along the state
+            * just passes along an initial state `istate` unchanged
+    * folding function `f` never passed the sentinel value
     * does not require iterable to be reversible, iterable never "reversed"
-    * note that ~S can be the same type as ~R
-      * note that when an initial value not given then ~R = ~D
-    * traditional FP type order given for function f
-    * never returns if iterable infinite and sentinel never encountered
-    * raises TypeError if the "iterable" is not iterable
     * does not raise RecursionError, recursion simulated with Python list
 
     """
@@ -343,5 +337,4 @@ def foldR_sc(iterable: Iterable[D|S],
 
     while ds:
         acc = f(ds.pop(), acc)
- 
     return acc
