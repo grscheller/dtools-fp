@@ -154,26 +154,26 @@ def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
                 acc = f(acc, ii)
             yield acc
 
-@overload
-def foldL(iterable: Iterable[D],
-          f: Callable[[L, D], L],
-          init: L,
-          sent: S) -> L: ...
-@overload
-def foldL(iterable: Iterable[D],
-          f: Callable[[L, D], L],
-          init: L) -> L: ...
-@overload
-def foldL(iterable: Iterable[D],
-          f: Callable[[D, D], D]) -> D|None: ...
-@overload
-def foldL(iterable: Iterable[D],
-          f: Callable[[D, D], D],
-          init: D) -> D: ...
+# @overload
+# def foldL(iterable: Iterable[D],
+#           f: Callable[[L, D], L],
+#           init: L,
+#           sent: S) -> L: ...
+# @overload
+# def foldL(iterable: Iterable[D],
+#           f: Callable[[L, D], L],
+#           init: L) -> L: ...
+# @overload
+# def foldL(iterable: Iterable[D],
+#           f: Callable[[D, D], D]) -> D|None: ...
+# @overload
+# def foldL(iterable: Iterable[D],
+#           f: Callable[[D, D], D],
+#           init: D) -> D: ...
 def foldL(iterable: Iterable[D],
           f: Callable[[L, D], L],
           init: Optional[L]=None,
-          sent: Optional[S]=None) -> L|S|None:
+          sent: Optional[S]=None) -> L|S:
     """
     #### Folds an iterable left with optional initial value.
 
@@ -184,42 +184,45 @@ def foldL(iterable: Iterable[D],
     * never returns if iterable generates an infinite iterator
 
     """
-    acc: L
     it = iter(iterable)
+    _init: L = cast(L, init)
+    _sent: S = cast(S, sent)
 
-    if init is None:
+    acc: L
+
+    if _init is None:
         try:
             acc = cast(L, next(it))
         except StopIteration:
-            return sent
+            return _sent
     else:
-        acc = init
+        acc = _init
 
     for v in it:
         acc = f(acc, v)
 
     return acc
 
-@overload
-def foldR(iterable: Reversible[D],
-          f: Callable[[D, R], R],
-          init: R,
-          sent: S) -> R: ...
-@overload
-def foldR(iterable: Reversible[D],
-          f: Callable[[D, R], R],
-          init: R) -> R: ...
-@overload
-def foldR(iterable: Reversible[D],
-          f: Callable[[D, D], D]) -> D|None: ...
-@overload
-def foldR(iterable: Reversible[D],
-          f: Callable[[D, D], D],
-          init: D) -> D: ...
+# @overload
+# def foldR(iterable: Reversible[D],
+#           f: Callable[[D, R], R],
+#           init: R,
+#           sent: S) -> R: ...
+# @overload
+# def foldR(iterable: Reversible[D],
+#           f: Callable[[D, R], R],
+#           init: R) -> R: ...
+# @overload
+# def foldR(iterable: Reversible[D],
+#           f: Callable[[D, D], D]) -> D|None: ...
+# @overload
+# def foldR(iterable: Reversible[D],
+#           f: Callable[[D, D], D],
+#           init: D) -> D: ...
 def foldR(iterable: Reversible[D],
           f: Callable[[D, R], R],
           init: Optional[R]=None,
-          sent: Optional[S]=None) -> R|S|None:
+          sent: Optional[S]=None) -> R|S:
     """
     #### Folds a reversible iterable right with an optional initial value.
 
@@ -229,28 +232,56 @@ def foldR(iterable: Reversible[D],
       * if iterable empty & no initial value given, return sentinel value
 
     """
-    acc: R
     it = reversed(iterable)
+    _init: R = cast(R, init)
+    _sent: S = cast(S, sent)
 
-    if init is None:
+    acc: R
+
+    if _init is None:
         try:
             acc = cast(R, next(it))
         except StopIteration:
-            return sent
+            return _sent
     else:
-        acc = init
+        acc = _init
 
     for v in it:
         acc = f(v, acc)
 
     return acc
 
+# @overload
+# def foldL_sc(iterable: Iterable[D|S],
+#              f: Callable[[L, D], L],
+#              init: L,
+#              sent: S,
+#              pred: Callable[[D, T], MB[T]],
+#              istate: T) -> L: ...
+# @overload
+# def foldL_sc(iterable: Iterable[D],
+#              f: Callable[[L, D], L],
+#              init: L,
+#              sent: S,
+#              pred: Callable[[D, T], MB[T]],
+#              istate: T) -> L: ...
+# @overload
+# def foldL_sc(iterable: Iterable[D],
+#              f: Callable[[L, D], L],
+#              init: L) -> L: ...
+# @overload
+# def foldL_sc(iterable: Iterable[D],
+#              f: Callable[[D, D], D]) -> D|None: ...
+# @overload
+# def foldL_sc(iterable: Iterable[D],
+#              f: Callable[[D, D], D],
+#              init: D) -> D: ...
 def foldL_sc(iterable: Iterable[D|S],
              f: Callable[[L, D], L],
              init: Optional[L]=None,
              sent: Optional[S]=None,
              pred: Optional[Callable[[D, T], MB[T]]]=None,
-             istate: Optional[T]=None) -> L|S|None:
+             istate: Optional[T]=None) -> L|S:
     """
     #### Shortcut version of foldL.
 
@@ -260,42 +291,73 @@ def foldL_sc(iterable: Iterable[D|S],
         * predicate `pred` provides a "shortcut" function
           * the default `pred` does not "shortcut"
             * ignores the data
-            * just passes along as initial state `istate` unchanged
+            * just passes along an initial state `istate` unchanged
     * folding function `f` never passed the sentinel value
 
     """
-    it = iter(iterable)
+    sentinel = cast(S, sent)
+    initial_state = cast(T, istate)
     if pred is None:
-        pred = lambda d, t: MB(t)
-    acc: L
+        predicate: Callable[[D, T], MB[T]]  = lambda d, t: MB(t)
+    else:
+        predicate = pred
 
-    state_mb = MB(istate)
+    it = iter(iterable)
+    state_mb = MB(initial_state)
+
+    acc: L
 
     if init is None:
         try:
             acc = cast(L, next(it))  # in this case L = D
         except StopIteration:
-            return cast(S, sent)  # if sentinel = None, then S is None
+            return sentinel  # if sentinel defaults to None, we take S to be NoneType
     else:
         acc = init
 
     for d in it:
-        if d is sent or d == sent:
+        if d is sentinel or d == sentinel:
             break
         else:
-            if (state_mb := pred(d, state_mb.get())):
+            if (state_mb := predicate(cast(D, d), state_mb.get())):
                 f_ret = f(acc, cast(D, d))
                 acc = f_ret
             else:
                 break
+
     return acc
 
+# @overload
+# def foldR_sc(iterable: Iterable[D|S],
+#              f: Callable[[D, R], R],
+#              init: R,
+#              sent: S,
+#              pred: Callable[[D, T], MB[T]],
+#              istate: T) -> R: ...
+# @overload
+# def foldR_sc(iterable: Iterable[D],
+#              f: Callable[[D, R], R],
+#              init: R,
+#              sent: S,
+#              pred: Callable[[D, T], MB[T]],
+#              istate: T) -> R: ...
+# @overload
+# def foldR_sc(iterable: Iterable[D],
+#              f: Callable[[D, R], R],
+#              init: R) -> R: ...
+# @overload
+# def foldR_sc(iterable: Iterable[D],
+#              f: Callable[[D, D], D]) -> D|None: ...
+# @overload
+# def foldR_sc(iterable: Iterable[D],
+#              f: Callable[[D, D], D],
+#              init: D) -> D: ...
 def foldR_sc(iterable: Iterable[D|S],
              f: Callable[[D, R], R],
              init: Optional[R]=None,
              sent: Optional[S]=None,
              pred: Optional[Callable[[D, T], MB[T]]]=None,
-             istate: Optional[T]=None) -> R|S|None:
+             istate: Optional[T]=None) -> R|S:
     """
     #### Shortcut version of foldR.
 
@@ -311,30 +373,37 @@ def foldR_sc(iterable: Iterable[D|S],
     * does not raise RecursionError, recursion simulated with Python list
 
     """
-    it = iter(iterable)
+    sentinel = cast(S, sent)
+    imitial_state = cast(T, istate)
     if pred is None:
-        pred = lambda d, t: MB(t)
+        predicate: Callable[[D, T], MB[T]]  = lambda d, t: MB(t)
+    else:
+        predicate = pred
 
-    state_mb = MB(istate)
+    it = iter(iterable)
+    state_mb = MB(imitial_state)
+
+    acc: R
 
     ds: list[D] = []
     for d in it:
-        if d is sent or d == sent:
+        if d is sentinel or d == sentinel:
             break
         else:
-            if (state_mb := pred(d, state_mb.get())):
+            if (state_mb := predicate(cast(D, d), state_mb.get())):
                 ds.append(cast(D, d))
             else:
                 break
 
     if init is None:
         if len(ds) == 0:
-            return cast(S, sent)  # if sentinel = None, then S is NoneType
+            return sentinel  # if sentinel defaults to None, we take S to be NoneType
         else:
-            acc = cast(R, ds.pop())
+            acc = cast(R, ds.pop())  # in this case R = D
     else:
         acc = init
 
     while ds:
         acc = f(ds.pop(), acc)
+
     return acc
