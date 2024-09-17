@@ -91,8 +91,8 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 <li>iterables are not necessarily iterators</li>
 <li>at all times iterator protocol is assumed to be followed, that is
 <ul>
-<li>for all iterators <code>foo</code> we assume <code>iter(foo) is foo</code></li>
 <li>all iterators are assumed to be iterable</li>
+<li>for all iterators <code>foo</code> we assume <code>iter(foo) is foo</code></li>
 </ul></li>
 </ul>
 </div>
@@ -120,8 +120,8 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">* iterables are not necessarily iterators</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">* at all times iterator protocol is assumed to be followed, that is</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">  * for all iterators `foo` we assume `iter(foo) is foo`</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">  * all iterators are assumed to be iterable</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">  * all iterators are assumed to be iterable</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">  * for all iterators `foo` we assume `iter(foo) is foo`</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
@@ -150,7 +150,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">    ##### Sequentially concatenate multiple iterables together.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">    Sequentially concatenate multiple iterables together.</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="sd">    * pure Python version of standard library&#39;s itertools.chain</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">    * iterator sequentially yields each iterable until all are exhausted</span>
@@ -169,7 +169,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="k">def</span> <span class="nf">exhaust</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    ##### Shuffle together multiple iterables until all are exhausted.</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    Shuffle together multiple iterables until all are exhausted.</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">    * iterator yields until all iterables are exhausted</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
@@ -197,7 +197,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">yield_partials</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    ##### Shuffle together multiple iterables until one is exhausted.</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    Shuffle together multiple iterables until one is exhausted.</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    * iterator yields until one of the iterables is exhausted</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    * if yield_partials is true, yield any unmatched yielded values from the other iterables</span>
@@ -225,7 +225,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">accumulate</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>               <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">L</span><span class="p">]:</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    ##### Returns an iterator of accumulated values.</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    Returns an iterator of accumulated values.</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">    * pure Python version of standard library&#39;s itertools.accumulate</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    * function f does not default to addition (for typing flexibility)</span>
@@ -277,7 +277,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>          <span class="n">init</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>          <span class="n">sent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">S</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">    ##### Folds an iterable left with optional initial value.</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">    Folds an iterable left with optional initial value.</span>
 </span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>
 </span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">    * traditional FP type order given for function f</span>
 </span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">    * note that ~S and ~L can be the same types</span>
@@ -326,7 +326,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>          <span class="n">init</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>          <span class="n">sent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">S</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">    ##### Folds a reversible iterable right with an optional initial value.</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">    Folds a reversible iterable right with an optional initial value.</span>
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="sd">    * traditional FP type order given for function f</span>
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">    * note that ~S and ~R can be the same types</span>
@@ -385,7 +385,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>             <span class="n">pred</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">MB</span><span class="p">[</span><span class="n">T</span><span class="p">]]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>             <span class="n">istate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">    ##### Shortcut version of foldL.</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">    Shortcut version of foldL.</span>
 </span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a>
 </span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="sd">    * stop fold if sentinel value `sent` is encountered</span>
 </span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">      * if the iterable returns the sentinel value, stop the fold at that point</span>
@@ -461,7 +461,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>             <span class="n">pred</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">MB</span><span class="p">[</span><span class="n">T</span><span class="p">]]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>             <span class="n">istate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a><span class="sd">    ##### Shortcut version of foldR.</span>
+</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a><span class="sd">    Shortcut version of foldR.</span>
 </span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>
 </span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a><span class="sd">    * start fold if sentinel value `sent` is encountered</span>
 </span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a><span class="sd">      * if the iterable returns the sentinel value, start the fold at that point</span>
@@ -526,7 +526,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
     <a class="headerlink" href="#concat"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="concat-49"><a href="#concat-49"><span class="linenos">49</span></a><span class="k">def</span> <span class="nf">concat</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
 </span><span id="concat-50"><a href="#concat-50"><span class="linenos">50</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="concat-51"><a href="#concat-51"><span class="linenos">51</span></a><span class="sd">    ##### Sequentially concatenate multiple iterables together.</span>
+</span><span id="concat-51"><a href="#concat-51"><span class="linenos">51</span></a><span class="sd">    Sequentially concatenate multiple iterables together.</span>
 </span><span id="concat-52"><a href="#concat-52"><span class="linenos">52</span></a>
 </span><span id="concat-53"><a href="#concat-53"><span class="linenos">53</span></a><span class="sd">    * pure Python version of standard library&#39;s itertools.chain</span>
 </span><span id="concat-54"><a href="#concat-54"><span class="linenos">54</span></a><span class="sd">    * iterator sequentially yields each iterable until all are exhausted</span>
@@ -545,7 +545,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="sequentially-concatenate-multiple-iterables-together">Sequentially concatenate multiple iterables together.</h5>
+            <div class="docstring"><p>Sequentially concatenate multiple iterables together.</p>
 
 <ul>
 <li>pure Python version of standard library's itertools.chain</li>
@@ -570,7 +570,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
     <a class="headerlink" href="#merge"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="merge-96"><a href="#merge-96"><span class="linenos"> 96</span></a><span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">yield_partials</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
 </span><span id="merge-97"><a href="#merge-97"><span class="linenos"> 97</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="merge-98"><a href="#merge-98"><span class="linenos"> 98</span></a><span class="sd">    ##### Shuffle together multiple iterables until one is exhausted.</span>
+</span><span id="merge-98"><a href="#merge-98"><span class="linenos"> 98</span></a><span class="sd">    Shuffle together multiple iterables until one is exhausted.</span>
 </span><span id="merge-99"><a href="#merge-99"><span class="linenos"> 99</span></a>
 </span><span id="merge-100"><a href="#merge-100"><span class="linenos">100</span></a><span class="sd">    * iterator yields until one of the iterables is exhausted</span>
 </span><span id="merge-101"><a href="#merge-101"><span class="linenos">101</span></a><span class="sd">    * if yield_partials is true, yield any unmatched yielded values from the other iterables</span>
@@ -595,7 +595,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="shuffle-together-multiple-iterables-until-one-is-exhausted">Shuffle together multiple iterables until one is exhausted.</h5>
+            <div class="docstring"><p>Shuffle together multiple iterables until one is exhausted.</p>
 
 <ul>
 <li>iterator yields until one of the iterables is exhausted</li>
@@ -619,7 +619,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
     <a class="headerlink" href="#exhaust"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="exhaust-68"><a href="#exhaust-68"><span class="linenos">68</span></a><span class="k">def</span> <span class="nf">exhaust</span><span class="p">(</span><span class="o">*</span><span class="n">iterables</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
 </span><span id="exhaust-69"><a href="#exhaust-69"><span class="linenos">69</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="exhaust-70"><a href="#exhaust-70"><span class="linenos">70</span></a><span class="sd">    ##### Shuffle together multiple iterables until all are exhausted.</span>
+</span><span id="exhaust-70"><a href="#exhaust-70"><span class="linenos">70</span></a><span class="sd">    Shuffle together multiple iterables until all are exhausted.</span>
 </span><span id="exhaust-71"><a href="#exhaust-71"><span class="linenos">71</span></a>
 </span><span id="exhaust-72"><a href="#exhaust-72"><span class="linenos">72</span></a><span class="sd">    * iterator yields until all iterables are exhausted</span>
 </span><span id="exhaust-73"><a href="#exhaust-73"><span class="linenos">73</span></a>
@@ -647,7 +647,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="shuffle-together-multiple-iterables-until-all-are-exhausted">Shuffle together multiple iterables until all are exhausted.</h5>
+            <div class="docstring"><p>Shuffle together multiple iterables until all are exhausted.</p>
 
 <ul>
 <li>iterator yields until all iterables are exhausted</li>
@@ -737,7 +737,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
             <div class="pdoc-code codehilite"><pre><span></span><span id="accumulate-123"><a href="#accumulate-123"><span class="linenos">123</span></a><span class="k">def</span> <span class="nf">accumulate</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">D</span><span class="p">],</span> <span class="n">f</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">L</span><span class="p">,</span> <span class="n">D</span><span class="p">],</span> <span class="n">L</span><span class="p">],</span>
 </span><span id="accumulate-124"><a href="#accumulate-124"><span class="linenos">124</span></a>               <span class="n">initial</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">L</span><span class="p">]:</span>
 </span><span id="accumulate-125"><a href="#accumulate-125"><span class="linenos">125</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="accumulate-126"><a href="#accumulate-126"><span class="linenos">126</span></a><span class="sd">    ##### Returns an iterator of accumulated values.</span>
+</span><span id="accumulate-126"><a href="#accumulate-126"><span class="linenos">126</span></a><span class="sd">    Returns an iterator of accumulated values.</span>
 </span><span id="accumulate-127"><a href="#accumulate-127"><span class="linenos">127</span></a>
 </span><span id="accumulate-128"><a href="#accumulate-128"><span class="linenos">128</span></a><span class="sd">    * pure Python version of standard library&#39;s itertools.accumulate</span>
 </span><span id="accumulate-129"><a href="#accumulate-129"><span class="linenos">129</span></a><span class="sd">    * function f does not default to addition (for typing flexibility)</span>
@@ -770,7 +770,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="returns-an-iterator-of-accumulated-values">Returns an iterator of accumulated values.</h5>
+            <div class="docstring"><p>Returns an iterator of accumulated values.</p>
 
 <ul>
 <li>pure Python version of standard library's itertools.accumulate</li>
@@ -798,7 +798,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="foldL-175"><a href="#foldL-175"><span class="linenos">175</span></a>          <span class="n">init</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">L</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="foldL-176"><a href="#foldL-176"><span class="linenos">176</span></a>          <span class="n">sent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">S</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="foldL-177"><a href="#foldL-177"><span class="linenos">177</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="foldL-178"><a href="#foldL-178"><span class="linenos">178</span></a><span class="sd">    ##### Folds an iterable left with optional initial value.</span>
+</span><span id="foldL-178"><a href="#foldL-178"><span class="linenos">178</span></a><span class="sd">    Folds an iterable left with optional initial value.</span>
 </span><span id="foldL-179"><a href="#foldL-179"><span class="linenos">179</span></a>
 </span><span id="foldL-180"><a href="#foldL-180"><span class="linenos">180</span></a><span class="sd">    * traditional FP type order given for function f</span>
 </span><span id="foldL-181"><a href="#foldL-181"><span class="linenos">181</span></a><span class="sd">    * note that ~S and ~L can be the same types</span>
@@ -828,7 +828,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="folds-an-iterable-left-with-optional-initial-value">Folds an iterable left with optional initial value.</h5>
+            <div class="docstring"><p>Folds an iterable left with optional initial value.</p>
 
 <ul>
 <li>traditional FP type order given for function f</li>
@@ -859,7 +859,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="foldR-224"><a href="#foldR-224"><span class="linenos">224</span></a>          <span class="n">init</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">R</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="foldR-225"><a href="#foldR-225"><span class="linenos">225</span></a>          <span class="n">sent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">S</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="foldR-226"><a href="#foldR-226"><span class="linenos">226</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="foldR-227"><a href="#foldR-227"><span class="linenos">227</span></a><span class="sd">    ##### Folds a reversible iterable right with an optional initial value.</span>
+</span><span id="foldR-227"><a href="#foldR-227"><span class="linenos">227</span></a><span class="sd">    Folds a reversible iterable right with an optional initial value.</span>
 </span><span id="foldR-228"><a href="#foldR-228"><span class="linenos">228</span></a>
 </span><span id="foldR-229"><a href="#foldR-229"><span class="linenos">229</span></a><span class="sd">    * traditional FP type order given for function f</span>
 </span><span id="foldR-230"><a href="#foldR-230"><span class="linenos">230</span></a><span class="sd">    * note that ~S and ~R can be the same types</span>
@@ -888,7 +888,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="folds-a-reversible-iterable-right-with-an-optional-initial-value">Folds a reversible iterable right with an optional initial value.</h5>
+            <div class="docstring"><p>Folds a reversible iterable right with an optional initial value.</p>
 
 <ul>
 <li>traditional FP type order given for function f</li>
@@ -920,7 +920,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="foldL_sc-283"><a href="#foldL_sc-283"><span class="linenos">283</span></a>             <span class="n">pred</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">MB</span><span class="p">[</span><span class="n">T</span><span class="p">]]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="foldL_sc-284"><a href="#foldL_sc-284"><span class="linenos">284</span></a>             <span class="n">istate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">L</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="foldL_sc-285"><a href="#foldL_sc-285"><span class="linenos">285</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="foldL_sc-286"><a href="#foldL_sc-286"><span class="linenos">286</span></a><span class="sd">    ##### Shortcut version of foldL.</span>
+</span><span id="foldL_sc-286"><a href="#foldL_sc-286"><span class="linenos">286</span></a><span class="sd">    Shortcut version of foldL.</span>
 </span><span id="foldL_sc-287"><a href="#foldL_sc-287"><span class="linenos">287</span></a>
 </span><span id="foldL_sc-288"><a href="#foldL_sc-288"><span class="linenos">288</span></a><span class="sd">    * stop fold if sentinel value `sent` is encountered</span>
 </span><span id="foldL_sc-289"><a href="#foldL_sc-289"><span class="linenos">289</span></a><span class="sd">      * if the iterable returns the sentinel value, stop the fold at that point</span>
@@ -966,7 +966,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="shortcut-version-of-foldl">Shortcut version of foldL.</h5>
+            <div class="docstring"><p>Shortcut version of foldL.</p>
 
 <ul>
 <li>stop fold if sentinel value <code>sent</code> is encountered
@@ -1008,7 +1008,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="foldR_sc-359"><a href="#foldR_sc-359"><span class="linenos">359</span></a>             <span class="n">pred</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">D</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">MB</span><span class="p">[</span><span class="n">T</span><span class="p">]]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="foldR_sc-360"><a href="#foldR_sc-360"><span class="linenos">360</span></a>             <span class="n">istate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">R</span><span class="o">|</span><span class="n">S</span><span class="p">:</span>
 </span><span id="foldR_sc-361"><a href="#foldR_sc-361"><span class="linenos">361</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="foldR_sc-362"><a href="#foldR_sc-362"><span class="linenos">362</span></a><span class="sd">    ##### Shortcut version of foldR.</span>
+</span><span id="foldR_sc-362"><a href="#foldR_sc-362"><span class="linenos">362</span></a><span class="sd">    Shortcut version of foldR.</span>
 </span><span id="foldR_sc-363"><a href="#foldR_sc-363"><span class="linenos">363</span></a>
 </span><span id="foldR_sc-364"><a href="#foldR_sc-364"><span class="linenos">364</span></a><span class="sd">    * start fold if sentinel value `sent` is encountered</span>
 </span><span id="foldR_sc-365"><a href="#foldR_sc-365"><span class="linenos">365</span></a><span class="sd">      * if the iterable returns the sentinel value, start the fold at that point</span>
@@ -1059,7 +1059,7 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span></pre></div>
 
 
-            <div class="docstring"><h5 id="shortcut-version-of-foldr">Shortcut version of foldR.</h5>
+            <div class="docstring"><p>Shortcut version of foldR.</p>
 
 <ul>
 <li>start fold if sentinel value <code>sent</code> is encountered

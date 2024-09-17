@@ -17,8 +17,8 @@
 
 * iterables are not necessarily iterators
 * at all times iterator protocol is assumed to be followed, that is
-  * for all iterators `foo` we assume `iter(foo) is foo`
   * all iterators are assumed to be iterable
+  * for all iterators `foo` we assume `iter(foo) is foo`
 
 """
 
@@ -47,7 +47,7 @@ T = TypeVar('T')      # T for sTate
 
 def concat(*iterables: Iterable[D]) -> Iterator[D]:
     """
-    ##### Sequentially concatenate multiple iterables together.
+    Sequentially concatenate multiple iterables together.
 
     * pure Python version of standard library's itertools.chain
     * iterator sequentially yields each iterable until all are exhausted
@@ -66,7 +66,7 @@ def concat(*iterables: Iterable[D]) -> Iterator[D]:
 
 def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
     """
-    ##### Shuffle together multiple iterables until all are exhausted.
+    Shuffle together multiple iterables until all are exhausted.
 
     * iterator yields until all iterables are exhausted
 
@@ -94,7 +94,7 @@ def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
 
 def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
     """
-    ##### Shuffle together multiple iterables until one is exhausted.
+    Shuffle together multiple iterables until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
@@ -122,7 +122,7 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
 def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
                initial: Optional[L]=None) -> Iterator[L]:
     """
-    ##### Returns an iterator of accumulated values.
+    Returns an iterator of accumulated values.
 
     * pure Python version of standard library's itertools.accumulate
     * function f does not default to addition (for typing flexibility)
@@ -174,7 +174,7 @@ def foldL(iterable: Iterable[D],
           init: Optional[L]=None,
           sent: Optional[S]=None) -> L|S:
     """
-    ##### Folds an iterable left with optional initial value.
+    Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function f
     * note that ~S and ~L can be the same types
@@ -223,7 +223,7 @@ def foldR(iterable: Reversible[D],
           init: Optional[R]=None,
           sent: Optional[S]=None) -> R|S:
     """
-    ##### Folds a reversible iterable right with an optional initial value.
+    Folds a reversible iterable right with an optional initial value.
 
     * traditional FP type order given for function f
     * note that ~S and ~R can be the same types
@@ -282,7 +282,7 @@ def foldL_sc(iterable: Iterable[D|S],
              pred: Optional[Callable[[D, T], MB[T]]]=None,
              istate: Optional[T]=None) -> L|S:
     """
-    ##### Shortcut version of foldL.
+    Shortcut version of foldL.
 
     * stop fold if sentinel value `sent` is encountered
       * if the iterable returns the sentinel value, stop the fold at that point
@@ -358,7 +358,7 @@ def foldR_sc(iterable: Iterable[D|S],
              pred: Optional[Callable[[D, T], MB[T]]]=None,
              istate: Optional[T]=None) -> R|S:
     """
-    ##### Shortcut version of foldR.
+    Shortcut version of foldR.
 
     * start fold if sentinel value `sent` is encountered
       * if the iterable returns the sentinel value, start the fold at that point

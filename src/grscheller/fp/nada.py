@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### An attempt to give Python a "bottom" type
+"""
+### An attempt to give Python a "bottom" type
 
 While a true bottom type has no instances, `nada` is a singleton. Python's
 evolving typing system seems to reject the concept of a true bottom type.
 
-   * types like `None` and `()` make for lousy bottoms
-     * they take few methods (much less EVERY method)
-     * `None` has no length and not indexable, `()` is at least iterable
-     * returned values must be constantly checked for
-       * preventing one from blissfully go down the "happy path"
-     * `None` and `()` are commonly used as sentinel values
-       * hindering both as being interpreted as "nothingness"
+* types like `None` and `()` make for lousy bottoms
+  * they take few methods (much less EVERY method)
+  * `None` has no length and not indexable, `()` is at least iterable
+  * returned values must be constantly checked for
+    * preventing one from blissfully go down the "happy path"
+  * `None` and `()` are commonly used as sentinel values
+    * hindering both as being interpreted as "nothingness"
 
 The `nada` object makes for a better bottom like singleton
 object than either `None` and `()` do."""
@@ -38,17 +39,20 @@ _sentinel: Final[_S] = _S((None, (None, (None, ()))))
 
 class Nada():
     """
-    ##### Singleton semantically represents a missing value.
+    Class for a singleton semantically represents a missing value.
 
     * singleton nada: Nada = Nada() represents a non-existent value
     * returns itself for arbitrary method calls
     * returns itself if called as a Callable with arbitrary arguments
     * interpreted as an empty container by standard Python functions
-    * comparison ops compare true only when 2 non-missing values compare true
-      * when compared to itself behaves somewhat like IEEE Float NAN's
-        * `nada is nada` is true
-        * `nada == nada` is false
-        * `nada != nada` is true
+    * warning: non-standard equality semantics
+      * comparison compares true only when 2 non-missing values compare true
+        * when compared to itself behaves somewhat like IEEE Float NAN's
+          * `nada is nada` is true
+          * `nada == nada` is false
+          * `nada != nada` is true
+        * thus a == b means two non-missing values compare as equal
+
     """
     __slots__ = ()
 
@@ -86,11 +90,9 @@ class Nada():
         return Nada()
 
     def __eq__(self, right: Any) -> bool:
-        """Never equals anything, even itself."""
         return False
 
     def __ne__(self, right: Any) -> bool:
-        """Always does not equal anything, even itself."""
         return True
 
     def __ge__(self, right: Any) -> bool:
@@ -122,7 +124,8 @@ class Nada():
 
     def get(self, alt: Any=_sentinel) -> Any:
         """
-        ##### Get an alternate value, defaults to Nada().
+        Get an alternate value, defaults to Nada().
+
         """
         if alt == _sentinel:
             return Nada()
