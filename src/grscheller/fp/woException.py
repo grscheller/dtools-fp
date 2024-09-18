@@ -20,7 +20,7 @@ Functional data types to use in lieu of exceptions.
 ##### Monadic types:
 
 * **MB:** Maybe monad
-* **XOR:** Left biased either monad
+* **XOR:** Left biased Either monad
 
 """
 from __future__ import annotations
@@ -30,12 +30,12 @@ __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
 from typing import Callable, cast, Final, Generic, Iterator, Never, TypeVar
 from .nada import Nada, nada
 
-T = TypeVar('T')
-S = TypeVar('S')
+D = TypeVar('D')
+U = TypeVar('U')
 L = TypeVar('L')
 R = TypeVar('R')
 
-class MB(Generic[T]):
+class MB(Generic[D]):
     """
     #### Maybe Monad
 
@@ -52,15 +52,15 @@ class MB(Generic[T]):
     """
     __slots__ = '_value',
 
-    def __init__(self, value: T|Nada=nada) -> None:
+    def __init__(self, value: D|Nada=nada) -> None:
         self._value = value
 
     def __bool__(self) -> bool:
         return not self._value is nada
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator[D]:
         if self:
-            yield cast(T, self._value)
+            yield cast(D, self._value)
 
     def __repr__(self) -> str:
         if self:
@@ -79,7 +79,7 @@ class MB(Generic[T]):
             return True
         return self._value == other._value
 
-    def get(self, alt: T|Nada=nada) -> T|Never:
+    def get(self, alt: D|Nada=nada) -> D|Never:
         """
         Return the contained value if it exists, otherwise an alternate value.
 
@@ -88,27 +88,27 @@ class MB(Generic[T]):
 
         """
         if self._value is not nada:
-            return cast(T, self._value)
+            return cast(D, self._value)
         else:
             if alt is not nada:
-                return cast(T, alt)
+                return cast(D, alt)
             else:
                 msg = 'An alternate return type not provided.'
                 raise ValueError(msg)
 
-    def map(self, f: Callable[[T], S]) -> MB[S]:
+    def map(self, f: Callable[[D], U]) -> MB[U]:
         """
         Map function f over the 0 or 1 elements of this data structure.
 
         """
-        return (MB(f(cast(T, self._value))) if self else MB())
+        return (MB(f(cast(D, self._value))) if self else MB())
 
-    def flatmap(self, f: Callable[[T], MB[S]]) -> MB[S]:
+    def flatmap(self, f: Callable[[D], MB[U]]) -> MB[U]:
         """
         Map MB with function f and flatten.
 
         """
-        return (f(cast(T, self._value)) if self else MB())
+        return (f(cast(D, self._value)) if self else MB())
 
 class XOR(Generic[L, R]):
     """
@@ -237,7 +237,7 @@ class XOR(Generic[L, R]):
         else:
             return XOR(self.get(), right)
 
-    def map(self, f: Callable[[L], S]) -> XOR[S, R]:
+    def map(self, f: Callable[[L], U]) -> XOR[U, R]:
         """
         Map over if a left value.
 
@@ -252,7 +252,7 @@ class XOR(Generic[L, R]):
 
         """
         if self._left is nada:
-            return cast(XOR[S, R], XOR(right=self._right))
+            return cast(XOR[U, R], XOR(right=self._right))
 
         try:
             applied = f(cast(L, self._left))
@@ -268,7 +268,7 @@ class XOR(Generic[L, R]):
         """
         return XOR(self._left, g(cast(R, self._right)))
 
-    def flatMap(self, f: Callable[[L], XOR[S, R]]) -> XOR[S, R]:
+    def flatMap(self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
         """
         Flatmap - Monadically bind
 
@@ -283,7 +283,7 @@ class XOR(Generic[L, R]):
 
 # Conversion functions
 
-def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
+def mb_to_xor(m: MB[D], right: R) -> XOR[D, R]:
     """
     Convert a MB to an XOR.
 
@@ -293,7 +293,7 @@ def mb_to_xor(m: MB[T], right: R) -> XOR[T, R]:
     else:
         return XOR(nada, right)
 
-def xor_to_mb(e: XOR[T,S]) -> MB[T]:
+def xor_to_mb(e: XOR[D,U]) -> MB[D]:
     """
     Convert an XOR to a MB.
 
