@@ -39,7 +39,7 @@ _sentinel: Final[_S] = _S((None, (None, (None, ()))))
 
 class Nada():
     """
-    Class for a singleton semantically represents a missing value.
+    #### Singleton representing a missing value
 
     * singleton nada: Nada = Nada() represents a non-existent value
     * returns itself for arbitrary method calls
