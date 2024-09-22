@@ -16,39 +16,38 @@ PyPI grscheller.fp project.
   * significant documentation updates
 * forth digit (development environment only)
   * commit count of "non-trivial" changes/regressions
-  * third digit now plays the role of the second
 
 ## Releases and Important Milestones
 
 ### Version 0.3.3.4 - Commit Date: 2024-09-16
 
-* foldL\_sc & foldR\_sc for fp.iterables now have
+* fp.iterables `foldL_sc` & `foldR_sc` now have
   * common paradigm
   * similar signatures
 
 ### Version 0.3.3.3 - Commit Date: 2024-09-15
 
-* added fp.iterables function foldR_sc
-  * shortcut version of foldR
+* added fp.iterables function `foldR_sc`
+  * shortcut version of `foldR`
   * not fully tested
   * docstring not updated
 
 ### Version 0.3.3.2 - Commit Date: 2024-09-14
 
-* added fp.iterables function foldL_sc
+* added fp.iterables function `foldL_sc`
   * shortcut version of foldL
 
 ### Version 0.3.3 - PyPI Release: 2024-08-25
 
-* removed method
-  * getDefaultRight(self) -> R:
+* removed woException `XOR` method 
+  * `getDefaultRight(self) -> R`:
 * added methods
   * makeRight(self, right: R|Nada=nada) -> XOR[L, R]:
   * swapRight(self, right: R) -> XOR[L, R]:
 
 ### Version 0.3.1 - PyPI Release: 2024-08-20
 
-* fp.iterables no longer exports CONCAT, MERGE, EXHAUST
+* fp.iterables no longer exports `CONCAT`, `MERGE`, `EXHAUST`
   * for grscheller.datastructures
     * grscheller.datastructures.ftuple
     * grscheller.datastructures.split\_ends
@@ -78,6 +77,6 @@ PyPI grscheller.fp package release v0.2.1
 ### Version 0.1.0 - Initial PyPI Release: 2024-07-11
 
 * replicated functionality from grscheller.datastructures
-  * grscheller.datastructures.fp.MB  -> grscheller.fp.wo_exception.MB
-  * grscheller.datastructures.fp.XOR -> grscheller.fp.wo_exception.XOR
+  * grscheller.datastructures.fp.MB  -> grscheller.fp.wo\_exception.MB
+  * grscheller.datastructures.fp.XOR -> grscheller.fp.wo\_exception.XOR
   * grscheller.core.iterlib          -> grscheller.fp.iterators
