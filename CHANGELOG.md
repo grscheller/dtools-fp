@@ -14,10 +14,19 @@ PyPI grscheller.fp project.
   * bug fixes
   * minor changes
   * significant documentation updates
+  * breaking API or major changes (development environment only)
 * forth digit (development environment only)
   * commit count of "non-trivial" changes/regressions
 
 ## Releases and Important Milestones
+
+### Version 0.3.3.7 - Commit Date: 2024-09-22
+
+* added more functions to fp.iterables module
+  * take(it: Iterable[D], n: int) -> Iterator[D]
+  * takeWhile(it: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]
+  * drop(it: Iterable[D], n: int) -> Iterator[D]
+  * dropWhile(it: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]
 
 ### Version 0.3.3.4 - Commit Date: 2024-09-16
 

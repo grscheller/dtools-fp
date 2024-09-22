@@ -14,9 +14,18 @@
 
 from grscheller.fp.iterables import concat, merge, exhaust
 from grscheller.fp.iterables import accumulate
+from grscheller.fp.iterables import drop, take, dropWhile, takeWhile
 
 class Test_fp_iterables:
-    def test_identity(self) -> None:
+    def test_taking_dropping(self) -> None:
+        foo = tuple(range(10))
+        assert list(foo) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        assert list(take(foo, 5)) == [0, 1, 2, 3, 4]
+        assert list(drop(foo, 5)) == [5, 6, 7, 8, 9]
+        assert list(takeWhile(foo, lambda x: x <= 4)) == [0, 1, 2, 3, 4]
+        assert list(dropWhile(foo, lambda x: x <=4 )) == [5, 6, 7, 8, 9]
+
+    def test_iterable_composition(self) -> None:
         ones = (1, 2, 3, 4, 5, 6, 7, 8, 9)
         tens = [10, 20, 30, 40, 50]
         hundreds = range(100, 800, 100)

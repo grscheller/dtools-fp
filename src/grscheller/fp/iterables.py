@@ -29,7 +29,8 @@ from typing import overload, Optional, Reversible, TypeVar
 from .nada import Nada, nada
 from .woException import MB
 
-__all__ = [ 'concat', 'merge', 'exhaust', 'FM',
+__all__ = [ 'drop', 'dropWhile', 'take', 'takeWhile',
+            'concat', 'merge', 'exhaust', 'FM',
             'accumulate', 'foldL', 'foldR', 'foldL_sc', 'foldR_sc' ]
 
 class FM(Enum):
@@ -55,11 +56,10 @@ def concat(*iterables: Iterable[D]) -> Iterator[D]:
     * performant to chain
 
     """
-    iterator: Iterator[D]
     for iterator in map(lambda x: iter(x), iterables):
         while True:
             try:
-                value: D = next(iterator)
+                value = next(iterator)
                 yield value
             except StopIteration:
                 break
@@ -116,6 +116,56 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
         if yield_partials:
             for value in values:
                 yield value
+
+## dropping and taking
+
+def drop(iterable: Iterable[D], n: int) -> Iterator[D]:
+    """Drop the next `n` values from `iterable`."""
+    it = iter(iterable)
+    for _ in range(n):
+        try:
+            value = next(it)
+        except StopIteration:
+            break
+    return it
+
+def dropWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
+    """Drop initial values from `iterable` while predicate is true."""
+    it = iter(iterable)
+    while True:
+        try:
+            value = next(it)
+            if not pred(value):
+                break
+        except StopIteration:
+            break
+    return concat((value,), it)
+
+def take(iterable: Iterable[D], n: int) -> Iterator[D]:
+    """Take up to `n` values from `iterable`."""
+    it = iter(iterable)
+    for _ in range(n):
+        try:
+            value = next(it)
+            yield value
+        except StopIteration:
+            break
+
+def takeWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
+    """Yield values from `iterable` while predicate is true.
+
+       * potential value loss if iterable is iterator with external references
+    """
+    it = iter(iterable)
+    while True:
+        try:
+            value = next(it)
+            if pred(value):
+                yield value
+            else:
+                break
+        except StopIteration:
+            break
 
 ## reducing and accumulating
 
