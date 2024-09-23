@@ -132,11 +132,16 @@ def drop(iterable: Iterable[D], n: int) -> Iterator[D]:
 def dropWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
     """Drop initial values from `iterable` while predicate is true."""
     it = iter(iterable)
+    try:
+        value = next(it)
+    except:
+        return it
+
     while True:
         try:
-            value = next(it)
             if not pred(value):
                 break
+            value = next(it)
         except StopIteration:
             break
     return concat((value,), it)

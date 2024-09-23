@@ -23,7 +23,13 @@ class Test_fp_iterables:
         assert list(take(foo, 5)) == [0, 1, 2, 3, 4]
         assert list(drop(foo, 5)) == [5, 6, 7, 8, 9]
         assert list(takeWhile(foo, lambda x: x <= 4)) == [0, 1, 2, 3, 4]
-        assert list(dropWhile(foo, lambda x: x <=4 )) == [5, 6, 7, 8, 9]
+        assert list(dropWhile(foo, lambda x: x <= 4 )) == [5, 6, 7, 8, 9]
+
+        empty: list[int] = []
+        assert list(take(empty, 5)) == []
+        assert list(drop(empty, 5)) == []
+        assert list(takeWhile(empty, lambda x: x <= 4)) == []
+        assert list(dropWhile(empty, lambda x: x <= 4 )) == []
 
     def test_iterable_composition(self) -> None:
         ones = (1, 2, 3, 4, 5, 6, 7, 8, 9)
