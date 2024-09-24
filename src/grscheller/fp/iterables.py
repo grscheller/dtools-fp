@@ -21,7 +21,6 @@
   * for all iterators `foo` we assume `iter(foo) is foo`
 
 """
-
 from __future__ import annotations
 from enum import auto, Enum
 from typing import Callable, cast, Final, Iterator, Iterable
@@ -47,8 +46,7 @@ T = TypeVar('T')      # T for sTate
 ## Iterate over multiple Iterables
 
 def concat(*iterables: Iterable[D]) -> Iterator[D]:
-    """
-    Sequentially concatenate multiple iterables together.
+    """Sequentially concatenate multiple iterables together.
 
     * pure Python version of standard library's itertools.chain
     * iterator sequentially yields each iterable until all are exhausted
@@ -65,8 +63,7 @@ def concat(*iterables: Iterable[D]) -> Iterator[D]:
                 break
 
 def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
-    """
-    Shuffle together multiple iterables until all are exhausted.
+    """Shuffle together multiple iterables until all are exhausted.
 
     * iterator yields until all iterables are exhausted
 
@@ -93,8 +90,7 @@ def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
             yield value
 
 def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
-    """
-    Shuffle together multiple iterables until one is exhausted.
+    """Shuffle together multiple iterables until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
     * if yield_partials is true, yield any unmatched yielded values from the other iterables
@@ -160,6 +156,7 @@ def takeWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
        * potential value loss if iterable is iterator with external references
+
     """
     it = iter(iterable)
     while True:

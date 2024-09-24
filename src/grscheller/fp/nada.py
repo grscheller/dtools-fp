@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-### An attempt to give Python a "bottom" type
+"""### An attempt to give Python a "bottom" type
 
 While a true bottom type has no instances, `nada` is a singleton. Python's
 evolving typing system seems to reject the concept of a true bottom type.
@@ -27,8 +26,9 @@ evolving typing system seems to reject the concept of a true bottom type.
     * hindering both as being interpreted as "nothingness"
 
 The `nada` object makes for a better bottom like singleton
-object than either `None` and `()` do."""
+object than either `None` and `()` do.
 
+"""
 from __future__ import annotations
 from typing import Any, Callable, Final, Iterator, NewType
 
@@ -38,8 +38,7 @@ _S = NewType('_S', tuple[None, tuple[None, tuple[None, tuple[()]]]])
 _sentinel: Final[_S] = _S((None, (None, (None, ()))))
 
 class Nada():
-    """
-    #### Singleton representing a missing value
+    """#### Singleton representing a missing value
 
     * singleton nada: Nada = Nada() represents a non-existent value
     * returns itself for arbitrary method calls
@@ -52,7 +51,7 @@ class Nada():
           * `nada == nada` is false
           * `nada != nada` is true
         * thus a == b means two non-missing values compare as equal
-
+    * warning: does not handle named arguments
     """
     __slots__ = ()
 
@@ -123,10 +122,7 @@ class Nada():
         return method
 
     def get(self, alt: Any=_sentinel) -> Any:
-        """
-        Get an alternate value, defaults to Nada().
-
-        """
+        """Get an alternate value, defaults to Nada()."""
         if alt == _sentinel:
             return Nada()
         else:
