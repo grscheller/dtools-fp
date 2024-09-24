@@ -39,13 +39,18 @@ class MB(Generic[D]):
 
     Class representing a potentially missing value.
 
-    * where `MB(value)` contains a possible value of type `~T`
-    * `MB( )` semantically represent a non-existent or missing value of type ~T
+    * where `MB(value)` contains a possible value of type `~D`
+    * `MB( )` semantically represent a non-existent or missing value of type ~D
     * immutable, a MB does not change after being created
     * immutable semantics, map and flatMap produce new instances
-    * implementation detail
+    * immutable, a `MB` does not change after being created
+      * immutable semantics, map & flatMap return new instances
+      * warning: contained values need not be immutable
+      * warning: not hashable if a mutable value is contained
+    * implementation detail:
       * `MB( )` contains `nada` as a sentinel value
         * as a result, a MB cannot semantically contain `nada`
+    * raises `ValueError` if empty and get method not given default value
 
     """
     __slots__ = '_value',
@@ -80,7 +85,7 @@ class MB(Generic[D]):
     def get(self, alt: D|Nada=nada) -> D|Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
-        * alternate value must me of type ~T
+        * alternate value must me of type ~D
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
@@ -108,7 +113,8 @@ class XOR(Generic[L, R]):
     but not both.
 
     * implements a left biased Either Monad
-      * `XOR(left, right)` produces a "left" and default potential "right" value
+      * `XOR(left: L, right: R)` produces a "left" value
+        * with a default potential "right" value
       * `XOR(left)` produces a "left" value
       * `XOR(right=right)` produces a "right" value
     * in a Boolean context, returns True if a "left", False if a "right"
@@ -119,8 +125,9 @@ class XOR(Generic[L, R]):
     * immutable, an `XOR` does not change after being created
       * immutable semantics, map & flatMap return new instances
       * warning: contained values need not be immutable
-    * raises `ValueError` if
-      * a "right" value is needed but a potential "right" value was not given
+      * warning: not hashable if a mutable value, or potential right, contained
+    * `get` and `getRight` methods can raises `ValueError`
+      * when a "right" value is needed but a potential "right" value not given
 
     """
     __slots__ = '_left', '_right'
@@ -163,7 +170,7 @@ class XOR(Generic[L, R]):
         else:
             return False
 
-    def get(self, alt: L|Nada=nada) -> L:
+    def get(self, alt: L|Nada=nada) -> L|Never:
         """Get value if a Left.
 
         * if the XOR is a left, return its value
@@ -181,7 +188,7 @@ class XOR(Generic[L, R]):
         else:
             return cast(L, self._left)
 
-    def getRight(self, alt: R|Nada=nada) -> R:
+    def getRight(self, alt: R|Nada=nada) -> R|Never:
         """Get value of `XOR` if a Right, potential right value if a left.
 
         * if XOR is a right, return its value
@@ -228,7 +235,6 @@ class XOR(Generic[L, R]):
           * if `f` successful return a left XOR[S, R]
           * if `f` unsuccessful return right `XOR`
             * swallows any exceptions `f` may throw
-            * FUTURE TODO: create class that is a "wrapped" XOR(~T, Exception)
         * if `XOR` is a "right"
           * return new `XOR(right=self._right): XOR[S, R]`
           * use method mapRight to adjust the returned value

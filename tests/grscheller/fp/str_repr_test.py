@@ -25,7 +25,7 @@ def addLt42(x: int, y: int) -> int|Nada:
     return Nada()
 
 class Test_str:
-    def test_MB(self) -> None:
+    def test_MB_str(self) -> None:
         n1: MB[int] = MB()
         o1 = MB(42)
         assert str(n1) == 'MB()'
@@ -41,7 +41,7 @@ class Test_str:
         assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
         assert str(s1) == 'MB(1)'
 
-    def test_XOR(self) -> None:
+    def test_XOR_str(self) -> None:
         nothing = Nada()
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
@@ -50,14 +50,14 @@ class Test_str:
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
 
-    def test_Nothing(self) -> None:
+    def test_Nada_str(self) -> None:
         bot1 = Nada()
         bot2 = Nada()
         assert str(bot1) == 'nada'
         assert str(bot2) == 'nada'
 
 class Test_repr:
-    def test_mb(self) -> None:
+    def test_mb_repr(self) -> None:
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
         mb3: MB[object] = MB(nada)
@@ -97,7 +97,7 @@ class Test_repr:
         assert foofoo2 == foofoo
         assert repr(foofoo) == "MB(MB('foo'))"
 
-    def test_xor(self) -> None:
+    def test_xor_repr(self) -> None:
         nothing = Nada()
         e1: XOR[int, str] = XOR(nothing, 'Nobody home!')
         e2: XOR[int, str] = XOR(nothing, 'Somebody not home!')
@@ -140,6 +140,6 @@ class Test_repr:
         assert repr(e7) == "XOR(nada, 'was to be 7')"
         assert repr(e8) ==  "XOR(nada, 'was to be 8')"
 
-    def test_Nothing(self) -> None:
+    def test_Nada_repr(self) -> None:
         bot1 = Nada()
         assert repr(bot1) == 'nada'
