@@ -208,13 +208,13 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Shuffle together multiple iterables until one is exhausted.</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">    * iterator yields until one of the iterables is exhausted</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    * if yield_partials is true, yield any unmatched yielded values from the other iterables</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    * this prevents data lose if any of the iterables are iterators with external references</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    * if yield_partials is true, yield any unmatched yielded values from other iterables</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">      * prevents data lose if any of the iterables are iterators with external references</span>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="n">iterList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">iter</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">iterables</span><span class="p">))</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">numIters</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterList</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">numIters</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterList</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>            <span class="k">try</span><span class="p">:</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>                <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numIters</span><span class="p">):</span>
@@ -764,13 +764,13 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 </span><span id="merge-94"><a href="#merge-94"><span class="linenos"> 94</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Shuffle together multiple iterables until one is exhausted.</span>
 </span><span id="merge-95"><a href="#merge-95"><span class="linenos"> 95</span></a>
 </span><span id="merge-96"><a href="#merge-96"><span class="linenos"> 96</span></a><span class="sd">    * iterator yields until one of the iterables is exhausted</span>
-</span><span id="merge-97"><a href="#merge-97"><span class="linenos"> 97</span></a><span class="sd">    * if yield_partials is true, yield any unmatched yielded values from the other iterables</span>
-</span><span id="merge-98"><a href="#merge-98"><span class="linenos"> 98</span></a><span class="sd">    * this prevents data lose if any of the iterables are iterators with external references</span>
+</span><span id="merge-97"><a href="#merge-97"><span class="linenos"> 97</span></a><span class="sd">    * if yield_partials is true, yield any unmatched yielded values from other iterables</span>
+</span><span id="merge-98"><a href="#merge-98"><span class="linenos"> 98</span></a><span class="sd">      * prevents data lose if any of the iterables are iterators with external references</span>
 </span><span id="merge-99"><a href="#merge-99"><span class="linenos"> 99</span></a>
 </span><span id="merge-100"><a href="#merge-100"><span class="linenos">100</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="merge-101"><a href="#merge-101"><span class="linenos">101</span></a>    <span class="n">iterList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">iter</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">iterables</span><span class="p">))</span>
-</span><span id="merge-102"><a href="#merge-102"><span class="linenos">102</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">numIters</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterList</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="merge-103"><a href="#merge-103"><span class="linenos">103</span></a>        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="merge-102"><a href="#merge-102"><span class="linenos">102</span></a>    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="merge-103"><a href="#merge-103"><span class="linenos">103</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">numIters</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterList</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 </span><span id="merge-104"><a href="#merge-104"><span class="linenos">104</span></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 </span><span id="merge-105"><a href="#merge-105"><span class="linenos">105</span></a>            <span class="k">try</span><span class="p">:</span>
 </span><span id="merge-106"><a href="#merge-106"><span class="linenos">106</span></a>                <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numIters</span><span class="p">):</span>
@@ -790,8 +790,10 @@ grscheller<wbr>.<a href="./../fp.html">fp</a><wbr>.iterables    </h1>
 
 <ul>
 <li>iterator yields until one of the iterables is exhausted</li>
-<li>if yield_partials is true, yield any unmatched yielded values from the other iterables</li>
-<li>this prevents data lose if any of the iterables are iterators with external references</li>
+<li>if yield_partials is true, yield any unmatched yielded values from other iterables
+<ul>
+<li>prevents data lose if any of the iterables are iterators with external references</li>
+</ul></li>
 </ul>
 </div>
 

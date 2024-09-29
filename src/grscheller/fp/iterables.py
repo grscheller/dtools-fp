@@ -93,13 +93,13 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
     """Shuffle together multiple iterables until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
-    * if yield_partials is true, yield any unmatched yielded values from the other iterables
-    * this prevents data lose if any of the iterables are iterators with external references
+    * if yield_partials is true, yield any unmatched yielded values from other iterables
+      * prevents data lose if any of the iterables are iterators with external references
 
     """
     iterList = list(map(lambda x: iter(x), iterables))
+    values = []
     if (numIters := len(iterList)) > 0:
-        values = []
         while True:
             try:
                 for ii in range(numIters):
