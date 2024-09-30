@@ -14,7 +14,7 @@
 
 """### Pythonic Functional Programming Tools"""
 
-__version__ = "0.3.3.9"
+__version__ = "0.3.4.0"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"

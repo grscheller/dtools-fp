@@ -20,6 +20,13 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.4.0 - Commit Date: 2024-09-30
+
+* API change for fp.iterables
+  * function name changes
+    * `foldL`, `foldR`, `foldLsc`, `foldRsc`
+  * paradigm shift, all now use class woException.MB
+
 ### Version 0.3.3.7 - Commit Date: 2024-09-22
 
 * added more functions to fp.iterables module

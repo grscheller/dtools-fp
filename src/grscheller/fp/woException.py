@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Maybe and Either Monads
+"""### Maybe and Either Monads.
 
 Functional data types to use in lieu of exceptions.
 

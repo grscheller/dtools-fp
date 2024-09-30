@@ -14,6 +14,7 @@
 
 from grscheller.fp.iterables import foldL, foldR
 from grscheller.fp.nada import Nada, nada
+from grscheller.fp.woException import MB
 
 class Test_fp_folds:
     def test_fold(self) -> None:
@@ -31,61 +32,59 @@ class Test_fp_folds:
         data3: tuple[int, ...] = ()
         data4 = 42,
 
-        assert foldL(data1, add2) == 5050
-        assert foldR(data1, add2) == 5050
-        assert foldL(data1, add2, 10) == 5060
-        assert foldR(data1, add2, 10) == 5060
+        assert foldL(data1, add2) == MB(5050)
+        assert foldR(data1, add2) == MB(5050)
+        assert foldL(data1, add2, 10) == MB(5060)
+        assert foldR(data1, add2, 10) == MB(5060)
 
-        assert foldL(data2, add2) == 5049
-        assert foldR(data2, add2) == 5049
-        assert foldL(data2, add2, 10) == 5059
-        assert foldR(data2, add2, 10) == 5059
+        assert foldL(data2, add2) == MB(5049)
+        assert foldR(data2, add2) == MB(5049)
+        assert foldL(data2, add2, 10) == MB(5059)
+        assert foldR(data2, add2, 10) == MB(5059)
 
-        assert foldL(data3, add2) is None
-        assert foldR(data3, add2) is None
-        assert foldL(data3, add2, 10) == 10
-        assert foldR(data3, add2, 10) == 10
+        assert foldL(data3, add2) == MB()
+        assert foldR(data3, add2) == MB()
+        assert foldL(data3, add2, 10) == MB(10)
+        assert foldR(data3, add2, 10) == MB(10)
 
-        assert foldL(data4, add2) == 42
-        assert foldR(data4, add2) == 42
-        assert foldL(data4, add2, 10) == 52
-        assert foldR(data4, add2, 10) == 52
+        assert foldL(data4, add2) == MB(42)
+        assert foldR(data4, add2) == MB(42)
+        assert foldL(data4, add2, 10) == MB(52)
+        assert foldR(data4, add2, 10) == MB(52)
 
         stuff1 = (1, 2, 3, 4, 5)
         stuff2 = (2, 3, 4, 5)
         stuff3: list[int] = []
         stuff4 = 42,
 
-        assert foldL(stuff1, add2) == 15
-        assert foldR(stuff1, add2) == 15
-        assert foldL(stuff1, add2, 10, 1000) == 25
-        assert foldR(stuff1, add2) == 15
-        assert foldL(stuff2, add2) == 14
-        assert foldR(stuff2, add2) == 14
-        assert foldL(stuff3, add2) == None
-        assert foldR(stuff3, add2) == None
-        assert foldL(stuff4, add2) == 42
-        assert foldR(stuff4, add2) == 42
-        assert foldL(stuff3, add2, sent=nada) is nada
-        assert foldL(stuff3, add2, sent=1000) == 1000
-        assert foldL(stuff3, add2) is None
-        assert foldR(stuff3, add2) is None
-        assert foldL(stuff4, add2) == 42
-        assert foldR(stuff4, add2) == 42
+        assert foldL(stuff1, add2) == MB(15)
+        assert foldR(stuff1, add2) == MB(15)
+        assert foldL(stuff1, add2, 10) == MB(25)
+        assert foldR(stuff1, add2) == MB(15)
+        assert foldL(stuff2, add2) == MB(14)
+        assert foldR(stuff2, add2) == MB(14)
+        assert foldL(stuff3, add2) == MB()
+        assert foldR(stuff3, add2) == MB()
+        assert foldL(stuff4, add2) == MB(42)
+        assert foldR(stuff4, add2) == MB(42)
+        assert foldL(stuff4, add2).get(-1) == 42
+        assert foldR(stuff4, add2).get(-1) == 42
+        assert foldR(stuff3, add2).get(-1) == -1
+        assert foldL(stuff3, add2).get(-1) == -1
 
-        assert foldL(stuff1, funcL, sent=nada) == -156
-        assert foldR(stuff1, funcR, sent=nada) == 0
-        assert foldL(stuff2, funcL, sent=nada) == 84
-        assert foldR(stuff2, funcR, sent=nada) == 39
-        assert foldL(stuff3, funcL, sent=nada) is nada
-        assert foldR(stuff3, funcR, sent=nada) is nada
-        assert foldL(stuff4, funcL, sent=nada) == 42
-        assert foldR(stuff4, funcR, sent=nada) == 42
-        assert foldL(stuff1, funcL) == -156
-        assert foldR(stuff1, funcR) == 0
-        assert foldL(stuff2, funcL) == 84
-        assert foldR(stuff2, funcR) == 39
-        assert foldL(stuff3, funcL) is None
-        assert foldR(stuff3, funcR) is None
-        assert foldL(stuff4, funcL) == 42
-        assert foldR(stuff4, funcR) == 42
+        assert foldL(stuff1, funcL) == MB(-156)
+        assert foldR(stuff1, funcR) == MB(0)
+        assert foldL(stuff2, funcL) == MB(84)
+        assert foldR(stuff2, funcR) == MB(39)
+        assert foldL(stuff3, funcL) == MB()
+        assert foldR(stuff3, funcR) == MB()
+        assert foldL(stuff3, funcL).get(-1) == -1
+        assert foldR(stuff3, funcR).get(-2) == -2
+        assert foldL(stuff4, funcL) == MB(42)
+        assert foldR(stuff4, funcR) == MB(42)
+        assert foldL(stuff1, funcL) == MB(-156)
+        assert foldR(stuff1, funcR) == MB(0)
+        assert foldL(stuff2, funcL) == MB(84)
+        assert foldR(stuff2, funcR) == MB(39)
+        assert foldL(stuff2, funcL).get() == 84
+        assert foldR(stuff2, funcR).get() == 39
