@@ -37,12 +37,10 @@ R = TypeVar('R')
 class MB(Generic[D]):
     """#### Maybe Monad
 
-    Class representing a potentially missing value.
+    Class wrapping a potentially missing value.
 
     * where `MB(value)` contains a possible value of type `~D`
     * `MB( )` semantically represent a non-existent or missing value of type ~D
-    * immutable, a MB does not change after being created
-    * immutable semantics, map and flatMap produce new instances
     * immutable, a `MB` does not change after being created
       * immutable semantics, map & flatMap return new instances
       * warning: contained values need not be immutable
@@ -50,7 +48,7 @@ class MB(Generic[D]):
     * implementation detail:
       * `MB( )` contains `nada` as a sentinel value
         * as a result, a MB cannot semantically contain `nada`
-    * raises `ValueError` if empty and get method not given default value
+    * raises `ValueError` if empty and get method not given a default value
 
     """
     __slots__ = '_value',
@@ -125,9 +123,9 @@ class XOR(Generic[L, R]):
     * immutable, an `XOR` does not change after being created
       * immutable semantics, map & flatMap return new instances
       * warning: contained values need not be immutable
-      * warning: not hashable if a mutable value, or potential right, contained
-    * `get` and `getRight` methods can raises `ValueError`
-      * when a "right" value is needed but a potential "right" value not given
+      * warning: not hashable if value or potential right value mutable
+    * `get` and `getRight` methods can raises `ValueError` when
+      * a "right" value is needed but a potential "right" value was not given
 
     """
     __slots__ = '_left', '_right'

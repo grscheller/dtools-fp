@@ -25,7 +25,8 @@ PyPI grscheller.fp project.
 * API change for fp.iterables
   * function name changes
     * `foldL`, `foldR`, `foldLsc`, `foldRsc`
-  * paradigm shift, all now use class woException.MB
+    * `sc` stands for "short circuit"
+  * all now return class woException.MB
 
 ### Version 0.3.3.7 - Commit Date: 2024-09-22
 

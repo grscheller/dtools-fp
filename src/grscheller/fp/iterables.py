@@ -263,13 +263,12 @@ def foldR(iterable: Reversible[D],
 def foldLsc(iterable: Iterable[D],
             f: Callable[[L, D], L],
             initial: Optional[L]=None,
-            stopfold: Callable[[D, S], MB[S]]=lambda d, t: MB(t),
+            stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
             istate: Optional[S]=None) -> MB[L]:
     """
-    Shortcut version of foldL.
+    Short circuit version of foldL.
 
-    * Callable `stopfold` purpose is to prematurely stop fold
-      * used in Boolean context as a predicate
+    * Callable `stopfold` purpose is to prematurely stop fold before end
       * useful for infinite iterables
 
     """
@@ -296,13 +295,13 @@ def foldLsc(iterable: Iterable[D],
 def foldRsc(iterable: Iterable[D],
             f: Callable[[D, R], R],
             initial: Optional[R]=None,
-            stopfold: Callable[[D, S], MB[S]]=lambda d, t: MB(t),
+            startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
             istate: Optional[S]=None) -> MB[R]:
     """
-    Shortcut version of foldR.
+    Short circuit version of foldR.
 
-    * Callable `stopfold` purpose is to prematurely start fold before end
-      * used in Boolean context as a predicate
+    * Callable `startfold` purpose is to start fold before end
+      * does NOT start fold at end and prematurely stop
       * useful for infinite and non-reversible iterables
 
     """
@@ -314,7 +313,7 @@ def foldRsc(iterable: Iterable[D],
 
     ds: list[D] = []
     for d in it:
-        if (state := stopfold(d, state.get())):
+        if (state := startfold(d, state.get())):
             ds.append(d)
         else:
             break
