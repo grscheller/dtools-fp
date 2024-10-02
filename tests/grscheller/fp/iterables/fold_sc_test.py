@@ -14,7 +14,6 @@
 
 from typing import Optional, cast, Never
 from grscheller.fp.iterables import foldLsc, foldRsc
-from grscheller.fp.nada import Nada, nada
 from grscheller.fp.woException import MB
 
 class Test_fp_no_sc_folds:
@@ -28,17 +27,6 @@ class Test_fp_no_sc_folds:
             if jj is None:
                 jj = 0
             return ii+jj
-
-        def nada_add(ii: int|Nada, jj: int|Nada) -> int|Nada:
-            if ii is nada:
-                i = 0
-            else:
-                i = cast(int, ii)
-            if jj is nada:
-                j = 0
-            else:
-                j = cast(int, jj)
-            return i+j
 
         def funcL(acc: int, jj: int) -> int:
             return (acc - 1)*(jj + 1)
@@ -74,7 +62,7 @@ class Test_fp_no_sc_folds:
         stuff1 = (1, 2, 3, 4, 5)
         stuff2 = (2, 3, 4, 5)
         stuff3: list[int|None] = []
-        stuff4: tuple[int|Nada] = 42,
+        stuff4: tuple[int|None] = 42,
         stuff5: list[int] = []
         stuff6: tuple[int] = 42,
 
@@ -86,8 +74,8 @@ class Test_fp_no_sc_folds:
         assert foldRsc(stuff2, add) == MB(14)
         assert foldLsc(stuff3, none_add) == MB()
         assert foldRsc(stuff3, none_add).get(None) is None
-        assert foldLsc(stuff4, nada_add).get(-2) == 42
-        assert foldRsc(stuff4, nada_add).get(-2) == 42
+        assert foldLsc(stuff4, none_add).get(-2) == 42
+        assert foldRsc(stuff4, none_add).get(-2) == 42
         assert foldLsc(stuff5, add).get(-2) == -2
         assert foldRsc(stuff5, add).get(-2) == -2
         assert foldLsc(stuff5, add) == MB()

@@ -15,14 +15,13 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.woException import MB, XOR
-from grscheller.fp.nada import Nada, nada
+from grscheller.fp.woException import MB, XOR, _Sentinel, sentinel
 
-def addLt42(x: int, y: int) -> int|Nada:
+def addLt42(x: int, y: int) -> int|_Sentinel:
     sum = x + y
     if sum < 42:
         return sum
-    return Nada()
+    return sentinel
 
 class Test_str:
     def test_MB_str(self) -> None:
@@ -35,42 +34,38 @@ class Test_str:
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
-        nt2: MB[int] = MB(Nada())
+        nt2: MB[int] = MB(sentinel)
         nt3: MB[int] = MB()
         s1 = MB(1)
         assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
         assert str(s1) == 'MB(1)'
 
     def test_XOR_str(self) -> None:
-        nothing = Nada()
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
         assert str(XOR(addLt42(10, 40), '')) == "< |  >"
-        assert str(XOR(nada, 'Foofoo rules')) == "< | Foofoo rules >"
+        assert str(XOR(sentinel, 'Foofoo rules')) == "< | Foofoo rules >"
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
 
-    def test_Nada_str(self) -> None:
-        bot1 = Nada()
-        bot2 = Nada()
-        assert str(bot1) == 'nada'
-        assert str(bot2) == 'nada'
+    def test_sentinel_str(self) -> None:
+        assert str(sentinel) == 'sentinel'
 
 class Test_repr:
     def test_mb_repr(self) -> None:
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
-        mb3: MB[object] = MB(nada)
+        mb3: MB[object] = MB(sentinel)
         assert mb1 == mb2 == mb3 == MB()
         assert repr(mb2) == 'MB()'
         mb4 = eval(repr(mb3))
         assert mb4 == mb3
 
-        def lt5orNothing1(x: int) -> int|Nada:
+        def lt5orNothing1(x: int) -> int|_Sentinel:
             if x < 5:
                 return x
             else:
-                return nada
+                return sentinel
 
         def lt5orNothing2(x: int) -> MB[int]:
             if x < 5:
@@ -98,36 +93,35 @@ class Test_repr:
         assert repr(foofoo) == "MB(MB('foo'))"
 
     def test_xor_repr(self) -> None:
-        nothing = Nada()
-        e1: XOR[int, str] = XOR(nothing, 'Nobody home!')
-        e2: XOR[int, str] = XOR(nothing, 'Somebody not home!')
-        e3: XOR[int, str] = XOR(nothing, '')
+        e1: XOR[int, str] = XOR(right='Nobody home!')
+        e2: XOR[int, str] = XOR(right='Somebody not home!')
+        e3: XOR[int, str] = XOR(right='')
         assert e1 != e2
         e5 = eval(repr(e2))
-        assert e2 != XOR(nothing, 'Nobody home!')
-        assert e2 == XOR(nothing, 'Somebody not home!')
+        assert e2 != XOR(right='Nobody home!')
+        assert e2 == XOR(right='Somebody not home!')
         assert e5 == e2
         assert e5 != e3
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5OrNothing(x: int) -> int|Nada:
+        def lt5_or_nothing(x: int) -> int|_Sentinel:
             if x < 5:
                 return x
             else:
-                return Nada()
+                return sentinel
 
-        def lt5OrNoneXOR(x: int) -> XOR[int, str]:
+        def lt5_or_none_XOR(x: int) -> XOR[int, str]:
             if x < 5:
                 return XOR(x, 'None!')
             else:
-                return XOR(nothing, f'was to be {x}')
+                return XOR(sentinel, f'was to be {x}')
 
-        e1 = XOR(lt5OrNothing(2), 'potential right value does not matter')
-        e2 = lt5OrNoneXOR(2)
-        e3 = lt5OrNoneXOR(3)
-        e7: XOR[int, str] = XOR(lt5OrNothing(7), 'was to be 7')
-        e8 = XOR(8, 'no go for 8').flatMap(lt5OrNoneXOR)
+        e1 = XOR(lt5_or_nothing(2), 'potential right value does not matter')
+        e2 = lt5_or_none_XOR(2)
+        e3 = lt5_or_none_XOR(3)
+        e7: XOR[int, str] = XOR(lt5_or_nothing(7), 'was to be 7')
+        e8 = XOR(8, 'no go for 8').flatMap(lt5_or_none_XOR)
 
         assert e1 == e2
         assert e2 != e3
@@ -137,9 +131,5 @@ class Test_repr:
         assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
         assert repr(e2) ==  "XOR(2, 'None!')"
         assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(nada, 'was to be 7')"
-        assert repr(e8) ==  "XOR(nada, 'was to be 8')"
-
-    def test_Nada_repr(self) -> None:
-        bot1 = Nada()
-        assert repr(bot1) == 'nada'
+        assert repr(e7) == "XOR(sentinel, 'was to be 7')"
+        assert repr(e8) ==  "XOR(sentinel, 'was to be 8')"

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from grscheller.fp.iterables import foldL, foldR
-from grscheller.fp.nada import Nada, nada
 from grscheller.fp.woException import MB
 
 class Test_fp_folds:

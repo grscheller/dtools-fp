@@ -25,7 +25,6 @@ from __future__ import annotations
 from enum import auto, Enum
 from typing import Callable, cast, Final, Iterator, Iterable
 from typing import overload, Optional, Reversible, TypeVar
-from .nada import Nada, nada
 from .woException import MB
 
 __all__ = [ 'drop', 'dropWhile', 'take', 'takeWhile',

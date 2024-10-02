@@ -10,8 +10,6 @@ Functional programming tools which endeavor to be Pythonic.
 
 ### Modules
 
-* grscheller.fp.nada
-  * singleton representing the absence of a value
 * grscheller.fp.iterables
   * iteration tools implemented in Python
 * grscheller.fp.woException
