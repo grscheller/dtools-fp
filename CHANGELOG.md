@@ -20,6 +20,10 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.4.0 - PyPI Release: 2024-10-03
+
+* long overdue PyPI release
+
 ### Version 0.3.5.1 - Commit Date: 2024-10-03
 
 * New module `grscheller.fp.nothingness` for

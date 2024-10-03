@@ -19,7 +19,7 @@ from __future__ import annotations
 
 __all__ = [ '_NoValue', 'noValue' ]
 
-from typing import Final, Never
+from typing import Final
 
 class _NoValue():
     """#### Singleton class representing a missing value.
