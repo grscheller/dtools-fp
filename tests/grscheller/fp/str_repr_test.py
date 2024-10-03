@@ -15,13 +15,14 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.woException import MB, XOR, _Sentinel, sentinel
+from grscheller.fp.nothingness import _NoValue, noValue
+from grscheller.fp.woException import MB, XOR
 
-def addLt42(x: int, y: int) -> int|_Sentinel:
+def addLt42(x: int, y: int) -> int|_NoValue:
     sum = x + y
     if sum < 42:
         return sum
-    return sentinel
+    return noValue
 
 class Test_str:
     def test_MB_str(self) -> None:
@@ -34,7 +35,7 @@ class Test_str:
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
-        nt2: MB[int] = MB(sentinel)
+        nt2: MB[int] = MB(noValue)
         nt3: MB[int] = MB()
         s1 = MB(1)
         assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
@@ -44,28 +45,28 @@ class Test_str:
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
         assert str(XOR(addLt42(10, 40), '')) == "< |  >"
-        assert str(XOR(sentinel, 'Foofoo rules')) == "< | Foofoo rules >"
+        assert str(XOR(noValue, 'Foofoo rules')) == "< | Foofoo rules >"
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
 
-    def test_sentinel_str(self) -> None:
-        assert str(sentinel) == 'sentinel'
+    def test_noValue_str(self) -> None:
+        assert str(noValue) == 'noValue'
 
 class Test_repr:
     def test_mb_repr(self) -> None:
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
-        mb3: MB[object] = MB(sentinel)
+        mb3: MB[object] = MB(noValue)
         assert mb1 == mb2 == mb3 == MB()
         assert repr(mb2) == 'MB()'
         mb4 = eval(repr(mb3))
         assert mb4 == mb3
 
-        def lt5orNothing1(x: int) -> int|_Sentinel:
+        def lt5orNothing1(x: int) -> int|_NoValue:
             if x < 5:
                 return x
             else:
-                return sentinel
+                return noValue
 
         def lt5orNothing2(x: int) -> MB[int]:
             if x < 5:
@@ -105,17 +106,17 @@ class Test_repr:
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5_or_nothing(x: int) -> int|_Sentinel:
+        def lt5_or_nothing(x: int) -> int|_NoValue:
             if x < 5:
                 return x
             else:
-                return sentinel
+                return noValue
 
         def lt5_or_none_XOR(x: int) -> XOR[int, str]:
             if x < 5:
                 return XOR(x, 'None!')
             else:
-                return XOR(sentinel, f'was to be {x}')
+                return XOR(noValue, f'was to be {x}')
 
         e1 = XOR(lt5_or_nothing(2), 'potential right value does not matter')
         e2 = lt5_or_none_XOR(2)
@@ -131,5 +132,5 @@ class Test_repr:
         assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
         assert repr(e2) ==  "XOR(2, 'None!')"
         assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(sentinel, 'was to be 7')"
-        assert repr(e8) ==  "XOR(sentinel, 'was to be 8')"
+        assert repr(e7) == "XOR(noValue, 'was to be 7')"
+        assert repr(e8) ==  "XOR(noValue, 'was to be 8')"

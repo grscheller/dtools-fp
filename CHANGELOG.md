@@ -20,6 +20,17 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 0.3.5.1 - Commit Date: 2024-10-03
+
+* New module `grscheller.fp.nothingness` for
+  * Singleton `noValue` representing a missing value
+    * similar to `None` but while
+      * `None` represent "returned no values"
+      * `noValue: _NoValue = _NoValue()` represents an absent value
+    * mostly used as an implementation detail
+      * allows client code to use `None` as a sentinel value
+    * prefer class `MB` to represent a missing value in client code
+
 ### Version 0.3.4.0 - Commit Date: 2024-09-30
 
 * API change for fp.iterables

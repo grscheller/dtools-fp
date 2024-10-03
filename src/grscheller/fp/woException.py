@@ -24,20 +24,15 @@ Functional data types to use in lieu of exceptions.
 """
 from __future__ import annotations
 
-__all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb', '_Sentinel', 'sentinel' ]
+__all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
 
 from typing import Callable, cast, Final, Generic, Iterator, Never, TypeVar
+from .nothingness import _NoValue, noValue
 
 D = TypeVar('D')
 U = TypeVar('U')
 L = TypeVar('L')
 R = TypeVar('R')
-
-class _Sentinel():
-    def __repr__(self) -> str:
-        return 'sentinel'
-
-sentinel: Final[_Sentinel] = _Sentinel()
 
 class MB(Generic[D]):
     """#### Maybe Monad
@@ -58,11 +53,11 @@ class MB(Generic[D]):
     """
     __slots__ = '_value',
 
-    def __init__(self, value: D|_Sentinel=sentinel) -> None:
+    def __init__(self, value: D|_NoValue=noValue) -> None:
         self._value = value
 
     def __bool__(self) -> bool:
-        return not self._value is sentinel
+        return not self._value is noValue
 
     def __iter__(self) -> Iterator[D]:
         if self:
@@ -85,17 +80,17 @@ class MB(Generic[D]):
             return True
         return self._value == other._value
 
-    def get(self, alt: D|_Sentinel=sentinel) -> D|Never:
+    def get(self, alt: D|_NoValue=noValue) -> D|Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
         * alternate value must me of type ~D
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
-        if self._value is not sentinel:
+        if self._value is not noValue:
             return cast(D, self._value)
         else:
-            if alt is not sentinel:
+            if alt is not noValue:
                 return cast(D, alt)
             else:
                 msg = 'An alternate return type not provided.'
@@ -135,14 +130,14 @@ class XOR(Generic[L, R]):
     """
     __slots__ = '_left', '_right'
 
-    def __init__(self, left: L|_Sentinel=sentinel, right: R|_Sentinel=sentinel) -> None:
+    def __init__(self, left: L|_NoValue=noValue, right: R|_NoValue=noValue) -> None:
         self._left, self._right = left, right
 
     def __bool__(self) -> bool:
-        return self._left is not sentinel
+        return self._left is not noValue
 
     def __iter__(self) -> Iterator[L]:
-        if self._left is not sentinel:
+        if self._left is not noValue:
             yield cast(L, self._left)
 
     def __repr__(self) -> str:
@@ -173,7 +168,7 @@ class XOR(Generic[L, R]):
         else:
             return False
 
-    def get(self, alt: L|_Sentinel=sentinel) -> L|Never:
+    def get(self, alt: L|_NoValue=noValue) -> L|Never:
         """Get value if a Left.
 
         * if the XOR is a left, return its value
@@ -182,8 +177,8 @@ class XOR(Generic[L, R]):
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
-        if self._left is sentinel:
-            if alt is sentinel:
+        if self._left is noValue:
+            if alt is noValue:
                 msg = 'An alt return value was needed by get, but none was provided.'
                 raise ValueError(msg)
             else:
@@ -191,7 +186,7 @@ class XOR(Generic[L, R]):
         else:
             return cast(L, self._left)
 
-    def getRight(self, alt: R|_Sentinel=sentinel) -> R|Never:
+    def getRight(self, alt: R|_NoValue=noValue) -> R|Never:
         """Get value of `XOR` if a Right, potential right value if a left.
 
         * if XOR is a right, return its value
@@ -201,8 +196,8 @@ class XOR(Generic[L, R]):
 
         """
         if self:
-            if alt is sentinel:
-                if self._right is sentinel:
+            if alt is noValue:
+                if self._right is noValue:
                     msg = 'A potential right was needed by get, but none was provided.'
                     raise ValueError(msg)
                 else:
@@ -212,13 +207,13 @@ class XOR(Generic[L, R]):
         else:
             return cast(R, self._right)
 
-    def makeRight(self, right: R|_Sentinel=sentinel) -> XOR[L, R]:
+    def makeRight(self, right: R|_NoValue=noValue) -> XOR[L, R]:
         """Make right
 
         Return a new instance transformed into a right `XOR`. Change the right
         value to `right` if given.
         """
-        if right is sentinel:
+        if right is noValue:
             right = self.getRight()
         return cast(XOR[L, R], XOR(right=right))
 
@@ -226,7 +221,7 @@ class XOR(Generic[L, R]):
         """Swap in a new right value, returns a new instance with a new right
         (or potential right) value.
         """
-        if self._left is sentinel:
+        if self._left is noValue:
             return cast(XOR[L, R], XOR(right=right))
         else:
             return XOR(self.get(), right)
@@ -243,7 +238,7 @@ class XOR(Generic[L, R]):
           * use method mapRight to adjust the returned value
 
         """
-        if self._left is sentinel:
+        if self._left is noValue:
             return cast(XOR[U, R], XOR(right=self._right))
 
         try:
@@ -264,8 +259,8 @@ class XOR(Generic[L, R]):
         * propagate right values
 
         """
-        if self._left is sentinel:
-            return XOR(sentinel, self._right)
+        if self._left is noValue:
+            return XOR(noValue, self._right)
         else:
             return f(cast(L, self._left))
 
@@ -276,7 +271,7 @@ def mb_to_xor(m: MB[D], right: R) -> XOR[D, R]:
     if m:
         return XOR(m.get(), right)
     else:
-        return XOR(sentinel, right)
+        return XOR(noValue, right)
 
 def xor_to_mb(e: XOR[D,U]) -> MB[D]:
     """Convert an XOR to a MB."""

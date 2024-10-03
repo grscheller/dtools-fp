@@ -15,8 +15,8 @@
 from __future__ import annotations
 
 from typing import Optional
+from grscheller.fp.nothingness import _NoValue, noValue
 from grscheller.fp.woException import MB, XOR, mb_to_xor, xor_to_mb
-from grscheller.fp.woException import _Sentinel, sentinel
 
 def add2(x: int) -> int:
     return x + 2
@@ -91,12 +91,12 @@ class TestMB:
         mb42 == mb42
         mbno == mbno
 
-def gt42(x: int) -> bool|_Sentinel:
+def gt42(x: int) -> bool|_NoValue:
     if x > 42:
         return True
     if x == 42:
         return False
-    return sentinel
+    return noValue
 
 class TestXOR:
     def test_equal_self(self) -> None:
@@ -138,8 +138,8 @@ class TestXOR:
 
         assert repr(hymie) == "XOR(True, 'Hymie says: orig 86')"
         assert repr(chief) == "XOR(True, 'Chief says: orig 86')"
-        assert repr(ratton) == "XOR(sentinel, 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(sentinel, 'Seigfried says: orig 21')"
+        assert repr(ratton) == "XOR(noValue, 'Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(noValue, 'Seigfried says: orig 21')"
 
         assert xor_12.map(gt42).swapRight('not greater than 42') == XOR(right='not greater than 42')
 
@@ -201,13 +201,12 @@ class TestXOR:
         assert e5 != e6
         assert e6 == e6
 
-    # TODO: Rename Sentinel to something else??? Flag, No, NoValue, woMissing
     def test_either_right(self) -> None:
-        def noMoreThan5(x: int) -> int|_Sentinel:
+        def noMoreThan5(x: int) -> int|_NoValue:
             if x <= 5:
                 return x
             else:
-                return sentinel
+                return noValue
 
         s1 = XOR(3, right = 'foofoo rules')
         s2 = s1.map(noMoreThan5).mapRight(lambda _: 'more than 5')
