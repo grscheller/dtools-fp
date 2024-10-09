@@ -40,9 +40,13 @@ Documentation = "https://grscheller.github.io/fp/"
 exclude = ["dist", "docs", ".gitignore", ".mypy_cache"]
 
 [tool.pylsp-mypy]
+enabled = true
 live-mode = true
 strict = true
 report_progress = true
+
+[tool.mypy]
+enable_incomplete_feature = ["NewGenericSyntax"]
 
 [tool.ruff]
 target-version = "py313"
