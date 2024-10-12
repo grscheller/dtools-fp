@@ -141,7 +141,10 @@ class XOR(Generic[L, R]):
             yield cast(L, self._left)
 
     def __repr__(self) -> str:
-        return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
+        if self._left is noValue:
+            return 'XOR(right=' + repr(self._right) + ')'
+        else:
+            return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
 
     def __str__(self) -> str:
         if self:
