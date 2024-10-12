@@ -132,5 +132,5 @@ class Test_repr:
         assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
         assert repr(e2) ==  "XOR(2, 'None!')"
         assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(noValue, 'was to be 7')"
-        assert repr(e8) ==  "XOR(noValue, 'was to be 8')"
+        assert repr(e7) == "XOR(right='was to be 7')"
+        assert repr(e8) ==  "XOR(right='was to be 8')"

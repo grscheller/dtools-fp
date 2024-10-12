@@ -138,8 +138,8 @@ class TestXOR:
 
         assert repr(hymie) == "XOR(True, 'Hymie says: orig 86')"
         assert repr(chief) == "XOR(True, 'Chief says: orig 86')"
-        assert repr(ratton) == "XOR(noValue, 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(noValue, 'Seigfried says: orig 21')"
+        assert repr(ratton) == "XOR(right='Dr. Ratton says: orig 21')"
+        assert repr(seigfried) == "XOR(right='Seigfried says: orig 21')"
 
         assert xor_12.map(gt42).swapRight('not greater than 42') == XOR(right='not greater than 42')
 
