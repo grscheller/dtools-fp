@@ -26,15 +26,10 @@ from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
 
-from typing import Callable, cast, Final, Generic, Iterator, Never, TypeVar
+from typing import Callable, cast, Final, Iterator, Never
 from .nothingness import _NoValue, noValue
 
-D = TypeVar('D')
-U = TypeVar('U')
-L = TypeVar('L')
-R = TypeVar('R')
-
-class MB(Generic[D]):
+class MB[D]():
     """#### Maybe Monad
 
     Class wrapping a potentially missing value.
@@ -96,15 +91,15 @@ class MB(Generic[D]):
                 msg = 'An alternate return type not provided.'
                 raise ValueError(msg)
 
-    def map(self, f: Callable[[D], U]) -> MB[U]:
+    def map[U](self, f: Callable[[D], U]) -> MB[U]:
         """Map function f over the 0 or 1 elements of this data structure."""
         return (MB(f(cast(D, self._value))) if self else MB())
 
-    def flatmap(self, f: Callable[[D], MB[U]]) -> MB[U]:
+    def flatmap[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map MB with function f and flatten."""
         return (f(cast(D, self._value)) if self else MB())
 
-class XOR(Generic[L, R]):
+class XOR[L,R]():
     """#### Either Monad
 
     Class semantically containing either a "left" or a "right" value,
@@ -229,7 +224,7 @@ class XOR(Generic[L, R]):
         else:
             return XOR(self.get(), right)
 
-    def map(self, f: Callable[[L], U]) -> XOR[U, R]:
+    def map[U](self, f: Callable[[L], U]) -> XOR[U, R]:
         """Map over if a left value.
 
         * if `XOR` is a "left" then map `f` over its value
@@ -255,7 +250,7 @@ class XOR(Generic[L, R]):
         """Map over a right or potential right value."""
         return XOR(self._left, g(cast(R, self._right)))
 
-    def flatMap(self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
+    def flatMap[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
         """Flatmap - Monadically bind
 
         * map over then flatten left values
@@ -269,14 +264,14 @@ class XOR(Generic[L, R]):
 
 # Conversion functions
 
-def mb_to_xor(m: MB[D], right: R) -> XOR[D, R]:
+def mb_to_xor[D,R](m: MB[D], right: R) -> XOR[D, R]:
     """Convert a MB to an XOR."""
     if m:
         return XOR(m.get(), right)
     else:
         return XOR(noValue, right)
 
-def xor_to_mb(e: XOR[D,U]) -> MB[D]:
+def xor_to_mb[D,U](e: XOR[D,U]) -> MB[D]:
     """Convert an XOR to a MB."""
     if e:
         return MB(e.get())

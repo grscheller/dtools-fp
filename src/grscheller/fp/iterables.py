@@ -23,8 +23,7 @@
 """
 from __future__ import annotations
 from enum import auto, Enum
-from typing import Callable, cast, Final, Iterator, Iterable
-from typing import overload, Optional, Reversible, TypeVar
+from typing import Callable, cast, Iterator, Iterable, Optional, Reversible
 from .woException import MB
 
 __all__ = [ 'drop', 'dropWhile', 'take', 'takeWhile',
@@ -36,14 +35,9 @@ class FM(Enum):
     MERGE = auto()
     EXHAUST = auto()
 
-D = TypeVar('D')      # D for Data
-L = TypeVar('L')      # L for Left
-R = TypeVar('R')      # R for Right
-S = TypeVar('S')      # S for State
-
 ## Iterate over multiple Iterables
 
-def concat(*iterables: Iterable[D]) -> Iterator[D]:
+def concat[D](*iterables: Iterable[D]) -> Iterator[D]:
     """Sequentially concatenate multiple iterables together.
 
     * pure Python version of standard library's itertools.chain
@@ -60,7 +54,7 @@ def concat(*iterables: Iterable[D]) -> Iterator[D]:
             except StopIteration:
                 break
 
-def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
+def exhaust[D](*iterables: Iterable[D]) -> Iterator[D]:
     """Shuffle together multiple iterables until all are exhausted.
 
     * iterator yields until all iterables are exhausted
@@ -87,7 +81,7 @@ def exhaust(*iterables: Iterable[D]) -> Iterator[D]:
         for value in values:
             yield value
 
-def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
+def merge[D](*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
     """Shuffle together multiple iterables until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
@@ -113,7 +107,7 @@ def merge(*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
 
 ## dropping and taking
 
-def drop(iterable: Iterable[D], n: int) -> Iterator[D]:
+def drop[D](iterable: Iterable[D], n: int) -> Iterator[D]:
     """Drop the next `n` values from `iterable`."""
     it = iter(iterable)
     for _ in range(n):
@@ -123,7 +117,7 @@ def drop(iterable: Iterable[D], n: int) -> Iterator[D]:
             break
     return it
 
-def dropWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
+def dropWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
     """Drop initial values from `iterable` while predicate is true."""
     it = iter(iterable)
     try:
@@ -140,7 +134,7 @@ def dropWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
             break
     return concat((value,), it)
 
-def take(iterable: Iterable[D], n: int) -> Iterator[D]:
+def take[D](iterable: Iterable[D], n: int) -> Iterator[D]:
     """Take up to `n` values from `iterable`."""
     it = iter(iterable)
     for _ in range(n):
@@ -150,7 +144,7 @@ def take(iterable: Iterable[D], n: int) -> Iterator[D]:
         except StopIteration:
             break
 
-def takeWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
+def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
        * potential value loss if iterable is iterator with external references
@@ -169,8 +163,8 @@ def takeWhile(iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
 
 ## reducing and accumulating
 
-def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
-               initial: Optional[L]=None) -> Iterator[L]:
+def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
+                  initial: Optional[L]=None) -> Iterator[L]:
     """
     Returns an iterator of accumulated values.
 
@@ -203,7 +197,7 @@ def accumulate(iterable: Iterable[D], f: Callable[[L, D], L],
                 acc = f(acc, ii)
             yield acc
 
-def foldL(iterable: Iterable[D],
+def foldL[D,L](iterable: Iterable[D],
           f: Callable[[L, D], L],
           initial: Optional[L]=None) -> MB[L]:
     """
@@ -231,7 +225,7 @@ def foldL(iterable: Iterable[D],
 
     return MB(acc)
 
-def foldR(iterable: Reversible[D],
+def foldR[D,R](iterable: Reversible[D],
           f: Callable[[D, R], R],
           initial: Optional[R]=None) -> MB[R]:
     """
@@ -259,7 +253,7 @@ def foldR(iterable: Reversible[D],
 
     return MB(acc)
 
-def foldLsc(iterable: Iterable[D],
+def foldLsc[D,L,S](iterable: Iterable[D],
             f: Callable[[L, D], L],
             initial: Optional[L]=None,
             stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
@@ -291,7 +285,7 @@ def foldLsc(iterable: Iterable[D],
 
     return MB(acc)
 
-def foldRsc(iterable: Iterable[D],
+def foldRsc[D,R,S](iterable: Iterable[D],
             f: Callable[[D, R], R],
             initial: Optional[R]=None,
             startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
