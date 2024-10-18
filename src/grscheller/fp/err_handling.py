@@ -14,7 +14,7 @@
 
 """### Maybe and Either Monads.
 
-Functional data types to use in lieu of exceptions.
+Monadic functional data types to use in lieu of exceptions.
 
 ##### Monadic types:
 

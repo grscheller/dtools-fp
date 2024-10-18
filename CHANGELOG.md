@@ -20,6 +20,13 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 1.0.0 - PyPI Release: 2024-10-18
+
+* decided to make this release first stable release
+* renamed module fp.woException to fp.err\_handling
+  * better captures module's use case
+* pytest improvements based on pytest documentation
+
 ### Version 0.4.0 - PyPI Release: 2024-10-03
 
 * long overdue PyPI release
