@@ -43,7 +43,7 @@ class MB[D]():
     * implementation detail:
       * `MB( )` contains `sentinel` as a sentinel value
         * as a result, a MB cannot semantically contain the `sentinel` value
-    * raises `ValueError` if empty and get method not given a default value
+    * raises `ValueError` if get method not given a default value
 
     """
     __slots__ = '_value',

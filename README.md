@@ -17,8 +17,8 @@ Functional programming tools which endeavor to be Pythonic.
     * similar to `None` but while
       * `None` represent "returned no values"
       * `noValue: _NoValue = _NoValue()` represents the absence of a value
-* grscheller.fp.woException
-  * tools for handling "exceptional" events without exceptions
+* grscheller.fp.err\_handling
+  * monadic tools for handling "exceptional" events without exceptions
 
 ### Benefits of FP
 

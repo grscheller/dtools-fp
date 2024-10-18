@@ -14,7 +14,7 @@
 
 from typing import Optional, cast, Never
 from grscheller.fp.iterables import foldLsc, foldRsc
-from grscheller.fp.woException import MB
+from grscheller.fp.err_handling import MB
 
 class Test_fp_no_sc_folds:
     def test_fold(self) -> None:

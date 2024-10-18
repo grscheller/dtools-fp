@@ -24,7 +24,7 @@
 from __future__ import annotations
 from enum import auto, Enum
 from typing import Callable, cast, Iterator, Iterable, Optional, Reversible
-from .woException import MB
+from .err_handling import MB
 
 __all__ = [ 'drop', 'dropWhile', 'take', 'takeWhile',
             'concat', 'merge', 'exhaust', 'FM',
