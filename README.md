@@ -30,4 +30,4 @@ Functional programming tools which endeavor to be Pythonic.
 
 [1]: https://pypi.org/project/grscheller.fp/
 [2]: https://github.com/grscheller/fp/
-[3]: https://grscheller.github.io/fp/
+[3]: https://grscheller.github.io/grscheller-pypi-namespace-docs/fp/
