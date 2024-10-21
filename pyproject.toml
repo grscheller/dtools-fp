@@ -30,12 +30,11 @@ keywords = [
 
 [project.optional-dependencies]
 test = ["pytest >=8.3"]
-docs = ["pdoc >=14.6.0"]
 
 [project.urls]
 Source = "https://github.com/grscheller/fp"
 Changelog = "https://github.com/grscheller/fp/blob/main/CHANGELOG.md"
-Documentation = "https://grscheller.github.io/fp/"
+Documentation = "https://grscheller.github.io/grscheller-pypi-namespace-docs/fp"
 
 [tool.flit.sdist]
 exclude = ["dist", "docs", ".gitignore", ".mypy_cache"]
