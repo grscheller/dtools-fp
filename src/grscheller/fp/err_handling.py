@@ -24,9 +24,9 @@ Monadic functional data types to use in lieu of exceptions.
 """
 from __future__ import annotations
 
-__all__ = [ 'MB', 'XOR', 'mb_to_xor', 'xor_to_mb' ]
+__all__ = [ 'MB', 'sequence_mb', 'XOR', 'mb_to_xor', 'xor_to_mb', 'mb_to_xor2', 'xor_to_mb2' ]
 
-from typing import Callable, cast, Final, Iterator, Never
+from typing import Callable, cast, Final, Iterator, List, Never, Sequence
 from .nothingness import _NoValue, noValue
 
 class MB[D]():
@@ -262,8 +262,6 @@ class XOR[L,R]():
         else:
             return f(cast(L, self._left))
 
-# Conversion functions
-
 def mb_to_xor[D,R](m: MB[D], right: R) -> XOR[D, R]:
     """Convert a MB to an XOR."""
     if m:
@@ -277,3 +275,84 @@ def xor_to_mb[D,U](e: XOR[D,U]) -> MB[D]:
         return MB(e.get())
     else:
         return MB()
+
+def sequence_mb[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
+    """Sequence an indexable container of MB[D]
+
+    If all the MB's contained in the contain are not empty,
+
+    * return a MB of a container containing the values contained in the MB's
+    * otherwise return an empty MB.
+
+    """
+    l: List[D] = []
+
+    for mb_d in seq_mb_d:
+        if mb_d:
+            l.append(mb_d.get())
+        else:
+            return MB()
+    
+    ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # at runtime it's a subclass of Sequence
+    return MB(ds)
+
+def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]]) -> XOR[Sequence[L],R]:
+    """Sequence an indexable container of XOR[L,R]
+
+    If all the XOR's contained in the container are lefts,
+
+    * return an XOR of the same type container of all the left values
+    * otherwise return a right XOR containing the right value of the first right
+
+    """
+    l: List[L] = []
+
+    for xor_lr in seq_xor_lr:
+        if xor_lr:
+            l.append(xor_lr.get())
+        else:
+            return XOR(right=xor_lr.getRight())
+
+    ls = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # at runtime it's a subclass of Sequence
+    return XOR(ls)
+
+def sequence_mb2[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
+    """Sequence an indexable container of MB[D]
+
+    If all the MB's contained in the contain are not empty,
+
+    * return a MB of a container containing the values contained in the MB's
+    * otherwise return an empty MB.
+
+    """
+    l: List[D] = []
+
+    for mb_d in seq_mb_d:
+        if mb_d:
+            l.append(mb_d.get())
+        else:
+            return MB()
+    
+    ds = cast(Sequence[D], type(seq_mb_d)(*l))  # type: ignore # at runtime it's a subclass of Sequence
+    return MB(ds)
+
+def sequence_xor2[L,R](seq_xor_lr: Sequence[XOR[L,R]]) -> XOR[Sequence[L],R]:
+    """Sequence an indexable container of XOR[L,R]
+
+    If all the XOR's contained in the container are lefts,
+
+    * return an XOR of the same type container of all the left values
+    * otherwise return a right XOR containing the right value of the first right
+
+    """
+    l: List[L] = []
+
+    for xor_lr in seq_xor_lr:
+        if xor_lr:
+            l.append(xor_lr.get())
+        else:
+            return XOR(right=xor_lr.getRight())
+
+    ls = cast(Sequence[L], type(seq_xor_lr)(*l))  # type: ignore # at runtime it's a subclass of Sequence
+    return XOR(ls)
+
