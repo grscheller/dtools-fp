@@ -15,10 +15,10 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.nothingness import _NoValue, noValue
+from grscheller.fp.singletons import NoValue, noValue
 from grscheller.fp.err_handling import MB, XOR
 
-def addLt42(x: int, y: int) -> int|_NoValue:
+def addLt42(x: int, y: int) -> int|NoValue:
     sum = x + y
     if sum < 42:
         return sum
@@ -62,7 +62,7 @@ class Test_repr:
         mb4 = eval(repr(mb3))
         assert mb4 == mb3
 
-        def lt5orNothing1(x: int) -> int|_NoValue:
+        def lt5orNothing1(x: int) -> int|NoValue:
             if x < 5:
                 return x
             else:
@@ -106,7 +106,7 @@ class Test_repr:
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5_or_nothing(x: int) -> int|_NoValue:
+        def lt5_or_nothing(x: int) -> int|NoValue:
             if x < 5:
                 return x
             else:

@@ -11,6 +11,18 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 1.0.2.0 - PyPI release date 2024-10-20
+
+* breaking API changes, next PyPI release will be 1.1.0.
+* renamed module `nothingness` to `singletons`
+  * split class NoValue into class NoValue and Sentinel
+    * `noValue` represents a missing value
+    * `_sentinel` is intended to provide a "private" sentinel value
+      * frees up `None` and `()` for application use
+      * avoids name collisions with user code
+      * will be used in grscheller.datastructures
+* will redo docs in docs repo
+
 ### Version 1.0.1 - PyPI release date 2024-10-20
 
 * removed docs from repo

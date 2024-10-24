@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Optional
-from grscheller.fp.nothingness import _NoValue, noValue
+from grscheller.fp.singletons import NoValue, noValue
 from grscheller.fp.err_handling import MB, XOR, mb_to_xor, xor_to_mb
 
 def add2(x: int) -> int:
@@ -91,7 +91,7 @@ class TestMB:
         mb42 == mb42
         mbno == mbno
 
-def gt42(x: int) -> bool|_NoValue:
+def gt42(x: int) -> bool|NoValue:
     if x > 42:
         return True
     if x == 42:
@@ -202,7 +202,7 @@ class TestXOR:
         assert e6 == e6
 
     def test_either_right(self) -> None:
-        def noMoreThan5(x: int) -> int|_NoValue:
+        def noMoreThan5(x: int) -> int|NoValue:
             if x <= 5:
                 return x
             else:
