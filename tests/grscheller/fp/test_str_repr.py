@@ -18,11 +18,12 @@ from typing import Optional
 from grscheller.fp.singletons import NoValue, noValue
 from grscheller.fp.err_handling import MB, XOR
 
-def addLt42(x: int, y: int) -> int|NoValue:
+def addLt42(x: int, y: int) -> MB[int]:
     sum = x + y
     if sum < 42:
-        return sum
-    return noValue
+        return MB(sum)
+    else:
+        return MB()
 
 class Test_str:
     def test_MB_str(self) -> None:
@@ -30,22 +31,19 @@ class Test_str:
         o1 = MB(42)
         assert str(n1) == 'MB()'
         assert str(o1) == 'MB(42)'
-        mb1 = MB(addLt42(3, 7))
-        mb2 = MB(addLt42(15, 30))
+        mb1 = addLt42(3, 7)
+        mb2 = addLt42(15, 30)
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
-        nt2: MB[int] = MB(noValue)
-        nt3: MB[int] = MB()
         s1 = MB(1)
-        assert str(nt1) == str(nt2) == str(nt3) == str(mb2) =='MB()'
-        assert str(s1) == 'MB(1)'
+        assert str(nt1) == str(mb2) =='MB()'
 
     def test_XOR_str(self) -> None:
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
         assert str(XOR(addLt42(10, 40), '')) == "< |  >"
-        assert str(XOR(noValue, 'Foofoo rules')) == "< | Foofoo rules >"
+        assert str(XOR(MB(), 'Foofoo rules')) == "< | Foofoo rules >"
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
 
@@ -57,34 +55,29 @@ class Test_repr:
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
         mb3: MB[object] = MB(noValue)
-        assert mb1 == mb2 == mb3 == MB()
+        mb4: MB[object] = MB(42)
+        assert mb1 == mb2 == MB()
+        assert mb3 == MB(noValue) != MB()
         assert repr(mb2) == 'MB()'
-        mb4 = eval(repr(mb3))
-        assert mb4 == mb3
+        mb5 = eval(repr(mb3))
+        mb6 = eval(repr(mb4))
+        assert mb5 == mb3
+        assert mb6 == mb4
 
-        def lt5orNothing1(x: int) -> int|NoValue:
-            if x < 5:
-                return x
-            else:
-                return noValue
-
-        def lt5orNothing2(x: int) -> MB[int]:
+        def lt5orNothing(x: int) -> MD[int]:
             if x < 5:
                 return MB(x)
             else:
                 return MB()
 
-        mb5 = MB(lt5orNothing1(2))
-        mb6 = lt5orNothing2(2)
-        mb7 = lt5orNothing2(3)
-        mb8 = MB(lt5orNothing1(7))
-        mb9 = lt5orNothing2(8)
+        mb7 = lt5orNothing(3)
+        mb8 = lt5orNothing(9)
+        mb9 = lt5orNothing(18)
 
-        assert mb5 == mb6
         assert mb6 != mb7
         assert mb8 == mb9
 
-        assert repr(mb5) == repr(mb6) ==  'MB(2)'
+        assert repr(mb5) == repr(mb3) ==  'MB(noValue)'
         assert repr(mb7) ==  'MB(3)'
         assert repr(mb8) == repr(mb9) ==  'MB()'
 
@@ -106,17 +99,17 @@ class Test_repr:
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5_or_nothing(x: int) -> int|NoValue:
+        def lt5_or_nothing(x: int) -> M[int]:
             if x < 5:
-                return x
+                return MB(x)
             else:
-                return noValue
+                return MB()
 
         def lt5_or_none_XOR(x: int) -> XOR[int, str]:
             if x < 5:
                 return XOR(x, 'None!')
             else:
-                return XOR(noValue, f'was to be {x}')
+                return XOR(right = f'was to be {x}')
 
         e1 = XOR(lt5_or_nothing(2), 'potential right value does not matter')
         e2 = lt5_or_none_XOR(2)

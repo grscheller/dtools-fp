@@ -91,17 +91,19 @@ class TestMB:
         mb42 == mb42
         mbno == mbno
 
-def gt42(x: int) -> bool|NoValue:
+def gt42(x: int) -> MB[bool]:
     if x > 42:
-        return True
+        return MB(True)
     if x == 42:
-        return False
-    return noValue
+        return MB(False)
+    return MB()
 
 class TestXOR:
     def test_equal_self(self) -> None:
-        xor42 = XOR(40+2, 'forty-two')
-        xorno42: XOR[int, str] = XOR(right='no forty-two')
+        xor41 = XOR(40+1, '41')
+        xor42 = XOR(40+2, '42')
+        xor43 = XOR(40+3, '43')
+        xorno42: XOR[int, str] = XOR(right='no 42')
         xor_fortytwo = XOR('forty-two', 21*2)
         xor42tuple = XOR(42, (2, 3))
 
@@ -110,6 +112,7 @@ class TestXOR:
         assert xor_fortytwo == xor_fortytwo
         assert xor42tuple == xor42tuple
 
+        assert xor41 != xor43
         assert xor42 != xor_fortytwo
         assert xor42 == xor42tuple
 
@@ -117,6 +120,14 @@ class TestXOR:
         thing1: XOR[int, str] = xor42.mapRight(lambda s: s + '?').makeRight()
         thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(right='none?'))
         assert thing1 == thing2
+
+        fooL: list[XOR[int, str]] = []
+        for foo in (xor41, xor42, xor43):
+            fooL.append(foo.map(gt42))
+
+        assert fooL[0] == XOR(right='41')
+        assert fooL[1] == XOR(False, '')
+        assert fooL[2] == XOR(True, '')
 
         xor_99 = XOR(99, 'orig 99')
         xor_86 = XOR(86, 'orig 86')
@@ -202,11 +213,11 @@ class TestXOR:
         assert e6 == e6
 
     def test_either_right(self) -> None:
-        def noMoreThan5(x: int) -> int|NoValue:
+        def noMoreThan5(x: int) -> MB[int]:
             if x <= 5:
-                return x
+                return MB(x)
             else:
-                return noValue
+                return MB()
 
         s1 = XOR(3, right = 'foofoo rules')
         s2 = s1.map(noMoreThan5).mapRight(lambda _: 'more than 5')
