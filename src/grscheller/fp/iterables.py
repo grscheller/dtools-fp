@@ -26,16 +26,17 @@ from enum import auto, Enum
 from typing import Callable, cast, Iterator, Iterable, Optional, Reversible
 from .err_handling import MB
 
-__all__ = [ 'drop', 'dropWhile', 'take', 'takeWhile',
-            'concat', 'merge', 'exhaust', 'FM',
-            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc' ]
+__all__ = [ 'FM', 'concat', 'merge', 'exhaust',
+            'drop', 'dropWhile', 'take', 'takeWhile',
+            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc'
+            'itargs' ]
+
+## Iterate over multiple Iterables
 
 class FM(Enum):
     CONCAT = auto()
     MERGE = auto()
     EXHAUST = auto()
-
-## Iterate over multiple Iterables
 
 def concat[D](*iterables: Iterable[D]) -> Iterator[D]:
     """Sequentially concatenate multiple iterables together.
@@ -323,3 +324,14 @@ def foldRsc[D,R,S](iterable: Iterable[D],
         acc = f(ds.pop(), acc)
 
     return MB(acc)
+
+## Iterator related utility functions
+
+def itargs[A](*args: A) -> Iterator[A]:
+    """Function returning an iterators of its arguments.
+
+    Useful when an API only provides a constructor taking a single iterable.
+    """
+    for arg in args:
+        yield arg
+

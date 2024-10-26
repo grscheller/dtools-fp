@@ -29,7 +29,9 @@ keywords = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest >=8.3"]
+test = [
+    "pytest >=8.3",
+    "grscheller.circular-array >= "]
 
 [project.urls]
 Source = "https://github.com/grscheller/fp"
