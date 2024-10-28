@@ -96,4 +96,12 @@ class Sentinel():
         return False
 
 _sentinel: Final[Sentinel] = Sentinel()
+"""The singleton object produced by the Sentinel class.
+
+The original idea was to keep the constructor "private" and hand around this
+copy. Found that the Final annotation was not protecting _sentinel from being
+reassigned to some other random object.
+
+Found that just using Sentinel() itself accomplished what I wanted.
+"""
 
