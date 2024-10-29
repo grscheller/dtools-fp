@@ -28,7 +28,7 @@ from .err_handling import MB
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'dropWhile', 'take', 'takeWhile',
-            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc'
+            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc',
             'itargs' ]
 
 ## Iterate over multiple Iterables
