@@ -14,9 +14,11 @@
 
 from __future__ import annotations
 
-from typing import Optional
-from grscheller.fp.singletons import NoValue, noValue
+from typing import Optional, Final
+from grscheller.fp.singletons import NoValue
 from grscheller.fp.err_handling import MB, XOR
+
+noValue: Final[NoValue] = NoValue()
 
 def addLt42(x: int, y: int) -> MB[int]:
     sum = x + y

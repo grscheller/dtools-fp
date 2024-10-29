@@ -14,9 +14,9 @@
 
 from __future__ import annotations
 
-from typing import Optional
-from grscheller.fp.singletons import NoValue, noValue
-from grscheller.fp.err_handling import MB, XOR, mb_to_xor, xor_to_mb
+from typing import Optional, Final
+from grscheller.datastructures.tuples import FTuple, FT
+from grscheller.fp.err_handling import MB, XOR
 
 def add2(x: int) -> int:
     return x + 2
@@ -98,6 +98,13 @@ def gt42(x: int) -> MB[bool]:
         return MB(False)
     return MB()
 
+def lt42(x: int) -> XOR[bool, str]:
+    if x < 42:
+        return XOR(True, str(x))
+    if x == 42:
+        return XOR(False, str(x))
+    return XOR(right=str(x))
+
 class TestXOR:
     def test_equal_self(self) -> None:
         xor41 = XOR(40+1, '41')
@@ -116,18 +123,23 @@ class TestXOR:
         assert xor42 != xor_fortytwo
         assert xor42 == xor42tuple
 
-        xor42 = xor42.mapRight(lambda _: 'none')
-        thing1: XOR[int, str] = xor42.mapRight(lambda s: s + '?').makeRight()
-        thing2: XOR[int, str] = xor42.flatMap(lambda _: XOR(right='none?'))
+        xor_42 = xor42.mapRight(lambda _: 'none')
+        thing1: XOR[int, str] = xor_42.mapRight(lambda s: s + '?').makeRight()
+        thing2: XOR[int, str] = xor_42.flatMap(lambda _: XOR(right='none?'))
         assert thing1 == thing2
 
-        fooL: list[XOR[int, str]] = []
-        for foo in (xor41, xor42, xor43):
-            fooL.append(foo.map(gt42))
+        ft_xor_int_str = FT(xor41, xor42, xor43)
+        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.flatMap(lt42))
 
-        assert fooL[0] == XOR(right='41')
-        assert fooL[1] == XOR(False, '')
-        assert fooL[2] == XOR(True, '')
+        assert ft_xor_bool_str[0] == XOR(True, '41')
+        assert ft_xor_bool_str[1] == XOR(False, 'does not matter what we put here')
+        assert ft_xor_bool_str[2] == XOR(right='43')
+
+        ft_xor_bool_str_right = ft_xor_bool_str.map(lambda x: x.makeRight())
+
+        assert ft_xor_bool_str_right[0] == XOR(right='41')
+        assert ft_xor_bool_str_right[1] == XOR(right='42')
+        assert ft_xor_bool_str_right[2] == XOR(right='43')
 
         xor_99 = XOR(99, 'orig 99')
         xor_86 = XOR(86, 'orig 86')
@@ -297,12 +309,12 @@ class TestXOR:
         mb42 = MB(42)
         mbNot: MB[int] = MB()
 
-        left42 = mb_to_xor(mb42, 'fail!')
-        right = mb_to_xor(mbNot, 'Nobody home')
+        left42 = XOR[int, str](mb42, 'fail!')
+        right = XOR[int, str](mbNot, 'Nobody home')
         assert left42 == XOR(42, 'fail!')
         assert right == XOR(right='Nobody home')
 
-        ph42 = xor_to_mb(left42)
-        phNot = xor_to_mb(right)
+        ph42: MB[int] = MB(left42)
+        phNot: MB[int] = MB(right)
         assert mb42 == ph42
         assert mbNot == phNot

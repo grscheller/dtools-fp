@@ -17,7 +17,7 @@
 """
 from __future__ import annotations
 
-__all__ = [ 'NoValue', 'noValue', 'Sentinel', '_sentinel' ]
+__all__ = [ 'NoValue', 'Sentinel' ]
 
 from typing import Final, final
 
@@ -27,12 +27,12 @@ class NoValue():
 
     * similar to `None` but while
       * `None` represents "returned no values"
-      * `noValue: NoValue = NoValue()` represents the absence of a value
+      * `NoValue()` represents the absence of a value
     * usage
-      * import noValue, only import NoValue if needed for type annotation
-        * NoValue made exportable for
-          * type annotation
-          * documentation purposes
+      * import NoValue and then either
+        * use NoValue() directly
+        * define: noValue: Final[NoValue] = NoValue()
+          * safest not to export it
       * compare using `is` and `is not`
         * two non-existing values should not be comparable as equal
           * `None` means returned no values, so `None == None` makes sense
@@ -56,24 +56,26 @@ class NoValue():
     def __eq__(self, other: object) -> bool:
         return False
 
-noValue: Final[NoValue] = NoValue()
-
 @final
 class Sentinel():
     """#### Singleton class representing a sentinel value.
 
     * intended for library code, not application code
+      * using it in "user code" goes against its purpose
     * useful substitute for `None` as a hidden sentinel value
       * allows `None` to be stored in data structures
-      * allows end users to use `None` for a sentinel value
+      * allows end users to choose to use `None` for a sentinel value
       * allows equals itself (unlike `noValue`)
     * usage
-      * import both _sentinel & Sentinel into library code
-        * use just _sentinel if you can get away with it
-        * Sentinel exported
-          * to be used with type annotations
-          * for documentation purposes
-          * so eval(repr(_sentinel)) works as expected
+      * import Sentinel and then either
+        * use Sentinel() directly
+        * define: _sentinel: Final[Sentinel] = Sentinel()
+          * do not to export it
+      * compare using either
+        * `is` and `is not`
+        * `==` and `!=`
+          * the sentinel value always equals itself
+          * and never equals anything else
 
     """
     __slots__ = ()
@@ -94,14 +96,4 @@ class Sentinel():
         if self is other:
             return True
         return False
-
-_sentinel: Final[Sentinel] = Sentinel()
-"""The singleton object produced by the Sentinel class.
-
-The original idea was to keep the constructor "private" and hand around this
-copy. Found that the Final annotation was not protecting _sentinel from being
-reassigned to some other random object.
-
-Found that just using Sentinel() itself accomplished what I wanted.
-"""
 
