@@ -306,16 +306,20 @@ def sequence_mb[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
         else:
             return MB()
 
-    ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # at runtime it's a subclass of Sequence
+    ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
     return MB(ds)
 
-def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]]) -> XOR[Sequence[L],R]:
+def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]],
+                      potential_right: R|Sentinel=_sentinel,
+                      default_right: R|Sentinel=_sentinel) -> XOR[Sequence[L],R]:
     """Sequence an indexable container of XOR[L,R]
 
-    If all the XOR's contained in the container are lefts,
-
-    * return an XOR of the same type container of all the left values
-    * otherwise return a right XOR containing the right value of the first right
+    * if all the XOR\'s contained in the container are lefts, then
+      * return an XOR of the same type container of all the left values
+      * setting the potential right to `potential_right` if given
+    * if at least one of the XOR\'s contained in the container is a right,
+      * return a right XOR containing the right value of the first right
+      * if right does not contain an R, return right containing `default_right`
 
     """
     l: List[L] = []
@@ -324,8 +328,14 @@ def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]]) -> XOR[Sequence[L],R]:
         if xor_lr:
             l.append(xor_lr.get())
         else:
-            return XOR(right=xor_lr.getRight())
+            try:
+                return XOR(right=xor_lr.getRight())
+            except ValueError:
+                return XOR(right=default_right)
 
-    ls = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # at runtime it's a subclass of Sequence
-    return XOR(ls)
+    ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
+    if potential_right is _sentinel:
+        return XOR(ds)
+    else:
+        return XOR(ds, potential_right)
 
