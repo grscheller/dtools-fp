@@ -37,7 +37,7 @@ class MB[D]():
     Class wrapping a potentially missing value.
 
     * where `MB(value)` contains a possible value of type `~D`
-    * `MB( )` semantically represent a non-existent or missing value of type ~D
+    * `MB()` semantically represent a non-existent or missing value of type `~D`
     * immutable, a `MB` does not change after being created
       * immutable semantics, map & flatMap return new instances
       * warning: contained values need not be immutable
@@ -86,10 +86,9 @@ class MB[D]():
             return False
 
     def get(self, alt: D|Sentinel=_sentinel) -> D|Never:
-        """Return the contained value if it exists, otherwise an optional
-        alternate value.
+        """Return the contained value if it exists, otherwise an alternate value.
 
-        * alternate value must me of type ~D
+        * alternate value must me of type `~D`
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
@@ -103,25 +102,24 @@ class MB[D]():
                 raise ValueError(msg)
 
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
-        """Map function f over the 0 or 1 elements of this data structure."""
+        """Map function `f` over the 0 or 1 elements of this data structure."""
         return (MB(f(cast(D, self._value))) if self else MB())
 
     def flatmap[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
-        """Map MB with function f and flatten."""
+        """Map `MB` with function `f` and flatten."""
         return (f(cast(D, self._value)) if self else MB())
 
 class XOR[L,R]():
     """#### Either Monad
 
-    Class semantically containing either a "left" or a "right" value,
-    but not both.
+    Class semantically containing either a left or a right value, but not both.
 
     * implements a left biased Either Monad
-      * `XOR(left: L, right: R)` produces a "left" value
-        * with a default potential "right" value
-      * `XOR(left)` produces a "left" value
-      * `XOR(right=right)` produces a "right" value
-    * in a Boolean context, returns True if a "left", False if a "right"
+      * `XOR(left: ~L, right: ~R)` produces a left value of type `~L`
+        * with a default potential right value of type `~R`
+      * `XOR(left)` produces a left value
+      * `XOR(right=right)` produces a right value
+    * in a Boolean context `True` if a left, `False` if a right
     * two `XOR` objects compare as equal when
       * both are left values or both are right values which
         * contain the same value or
@@ -131,7 +129,7 @@ class XOR[L,R]():
       * warning: contained values need not be immutable
       * warning: not hashable if value or potential right value mutable
     * `get` and `getRight` methods can raises `ValueError` when
-      * a "right" value is needed but a potential "right" value was not given
+      * a right value is needed but a potential right value was not given
 
     """
     __slots__ = '_left', '_right'
@@ -192,11 +190,11 @@ class XOR[L,R]():
         return False
 
     def get(self, alt: L|Sentinel=_sentinel) -> L|Never:
-        """Get value if a Left.
+        """Get value if a left.
 
-        * if the XOR is a left, return its value
-        * otherwise, return alt: L if it is provided
-        * alternate value must me of type ~L
+        * if the `XOR` is a left, return its value
+        * otherwise, return `alt: ~L` if it is provided
+        * alternate value must me of type `~L`
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
@@ -214,8 +212,8 @@ class XOR[L,R]():
         """Get value of `XOR` if a Right, potential right value if a left.
 
         * if XOR is a right, return its value
-          * otherwise return a provided alternate value of type ~R
-        * if XOR is a left, return the potential right value
+          * otherwise return a provided alternate value of type `~R`
+        * if `XOR` is a left, return the potential right value
           * raises `ValueError` if a potential right value was not provided
 
         """
@@ -236,7 +234,7 @@ class XOR[L,R]():
         """Make right
 
         Return a new instance transformed into a right `XOR`. Change the right
-        value to `right` if given.
+        value to right if given.
         """
         if right is _sentinel:
             right = self.getRight()
@@ -254,13 +252,13 @@ class XOR[L,R]():
     def map[U](self, f: Callable[[L], U]) -> XOR[U, R]:
         """Map over if a left value.
 
-        * if `XOR` is a "left" then map `f` over its value
-          * if `f` successful return a left XOR[S, R]
+        * if `XOR` is a left then map `f` over its value
+          * if `f` successful return a left `XOR[S, R]`
           * if `f` unsuccessful return right `XOR`
             * swallows any exceptions `f` may throw
-        * if `XOR` is a "right"
+        * if `XOR` is a right
           * return new `XOR(right=self._right): XOR[S, R]`
-          * use method mapRight to adjust the returned value
+          * use method `mapRight` to adjust the returned value
 
         """
         if self._left is _sentinel:
@@ -290,12 +288,11 @@ class XOR[L,R]():
             return f(cast(L, self._left))
 
 def sequence_mb[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
-    """Sequence an indexable container of MB[D]
+    """Sequence an indexable container of `MB[~D]`
 
-    If all the MB's contained in the container are not empty,
-
-    * return a MB of a container containing the values contained in the MB's
-    * otherwise return an empty MB.
+    *if all the contained `MB` values in the container are not empty,
+      * return a `MB` of a container containing the values contained
+      * otherwise return an empty `MB`
 
     """
     l: List[D] = []
@@ -312,14 +309,14 @@ def sequence_mb[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
 def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]],
                       potential_right: R|Sentinel=_sentinel,
                       default_right: R|Sentinel=_sentinel) -> XOR[Sequence[L],R]:
-    """Sequence an indexable container of XOR[L,R]
+    """Sequence an indexable container of `XOR[L, R]`
 
-    * if all the XOR\'s contained in the container are lefts, then
-      * return an XOR of the same type container of all the left values
+    * if all the `XOR` values contained in the container are lefts, then
+      * return an `XOR` of the same type container of all the left values
       * setting the potential right to `potential_right` if given
-    * if at least one of the XOR\'s contained in the container is a right,
+    * if at least one of the `XOR` values contained in the container is a right,
       * return a right XOR containing the right value of the first right
-      * if right does not contain an R, return right containing `default_right`
+      * if right does not contain an `~R`, return right containing `default_right`
 
     """
     l: List[L] = []

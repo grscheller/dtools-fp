@@ -29,14 +29,14 @@ class NoValue():
       * `None` represents "returned no values"
       * `NoValue()` represents the absence of a value
     * usage
-      * import NoValue and then either
-        * use NoValue() directly
-        * define: noValue: Final[NoValue] = NoValue()
-          * safest not to export it
+      * import `NoValue` and then either
+        * use `NoValue()` directly
+        * or define `noValue: Final[NoValue] = NoValue()`
+          * for typed code safest not to export it
       * compare using `is` and `is not`
         * two non-existing values should not be comparable as equal
           * `None` means returned no values, so `None == None` makes sense
-          * if one or both values are "missing" then what is there to compare?
+          * if one or both values are missing then what is there to compare?
 
     """
     __slots__ = ()
@@ -60,16 +60,16 @@ class NoValue():
 class Sentinel():
     """#### Singleton class representing a sentinel value.
 
-    * intended for library code, not application code
-      * using it in "user code" goes against its purpose
+    * intended for library code, not to be exported/shared between modules
+      * otherwise some of its intended typing guarantees may be lost
     * useful substitute for `None` as a hidden sentinel value
       * allows `None` to be stored in data structures
-      * allows end users to choose to use `None` for a sentinel value
-      * allows equals itself (unlike `noValue`)
+      * allows end users to choose to use `None` or `()` as sentinel values
+      * always equals itself (unlike `noValue`)
     * usage
       * import Sentinel and then either
-        * use Sentinel() directly
-        * define: _sentinel: Final[Sentinel] = Sentinel()
+        * either use `Sentinel()` directly
+        * or define ``_sntinel: Final[Sentinel] = Sentinel()``
           * do not to export it
       * compare using either
         * `is` and `is not`

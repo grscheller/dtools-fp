@@ -41,10 +41,10 @@ class FM(Enum):
 def concat[D](*iterables: Iterable[D]) -> Iterator[D]:
     """Sequentially concatenate multiple iterables together.
 
-    * pure Python version of standard library's itertools.chain
+    * pure Python version of standard library's `itertools.chain`
     * iterator sequentially yields each iterable until all are exhausted
     * an infinite iterable will prevent subsequent iterables from yielding any values
-    * performant to chain
+    * performant to `itertools.chain`
 
     """
     for iterator in map(lambda x: iter(x), iterables):
@@ -83,10 +83,10 @@ def exhaust[D](*iterables: Iterable[D]) -> Iterator[D]:
             yield value
 
 def merge[D](*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]:
-    """Shuffle together multiple iterables until one is exhausted.
+    """Shuffle together the `iterables` until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
-    * if yield_partials is true, yield any unmatched yielded values from other iterables
+    * if `yield_partials` is true, yield any unmatched yielded values from other iterables
       * prevents data lose if any of the iterables are iterators with external references
 
     """
@@ -169,10 +169,10 @@ def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
     """
     Returns an iterator of accumulated values.
 
-    * pure Python version of standard library's itertools.accumulate
-    * function f does not default to addition (for typing flexibility)
-    * begins accumulation with an optional starting value
-    * itertools.accumulate had mypy issues
+    * pure Python version of standard library's `itertools.accumulate`
+    * function `f` does not default to addition (for typing flexibility)
+    * begins accumulation with an optional `initial` value
+    * `itertools.accumulate` had mypy issues
 
     """
     it = iter(iterable)
@@ -204,10 +204,10 @@ def foldL[D,L](iterable: Iterable[D],
     """
     Folds an iterable left with optional initial value.
 
-    * traditional FP type order given for function f
-    * when an initial value is not given then ~L = ~D
-    * if iterable empty & no initial value given, return empty MB()
-    * never returns if iterable generates an infinite iterator
+    * traditional FP type order given for function `f`
+    * when an initial value is not given then `~L = ~D`
+    * if iterable empty and no `initial` value given, return empty `MB()`
+    * never returns if `iterable` generates an infinite iterator
 
     """
     acc: L
@@ -230,12 +230,12 @@ def foldR[D,R](iterable: Reversible[D],
           f: Callable[[D, R], R],
           initial: Optional[R]=None) -> MB[R]:
     """
-    Folds a reversible iterable right with an optional initial value.
+    Folds a reversible `iterable` right with an optional `initial` value.
 
-    * iterable needs to be reversible
-    * traditional FP type order given for function f
-    * when initial value is not given then ~R = ~D
-    * if iterable empty & no initial value given, return return empty MB()
+    * `iterable` needs to be reversible
+    * traditional FP type order given for function `f`
+    * when initial value is not given then `~R = ~D`
+    * if iterable empty and no `initial` value given, return an empty `MB()`
 
     """
     acc: R
@@ -262,7 +262,7 @@ def foldLsc[D,L,S](iterable: Iterable[D],
     """
     Short circuit version of foldL.
 
-    * Callable `stopfold` purpose is to prematurely stop fold before end
+    * Callable `stopfold` purpose is to prematurely stop the fold before end
       * useful for infinite iterables
 
     """
