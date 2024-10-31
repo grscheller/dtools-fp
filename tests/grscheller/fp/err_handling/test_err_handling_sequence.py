@@ -36,15 +36,19 @@ class TestMB_sequence:
         assert mb_dqueue_int == MB(DoubleQueue(range(1, 2501)))
 
     def test_with_empties(self) -> None:
-        list_of_mb_int = [MB(), MB(2), MB(3), MB(4)]
+        list_of_mb_int = [MB[int](), MB(2), MB(3), MB(4)]
         tuple_of_mb_int = MB(1), MB[int](), MB(3), MB(4)
-        ftuple_of_mb_int = FT(MB(1), MB(2), MB(), MB(4))
-        dqueue_of_mb_int = DQ(MB(1), MB(2), MB(3), MB())
+        ftuple_of_mb_int = FT(MB(1), MB(2), MB[int](), MB(4))
+        dqueue_of_mb_int = DQ(MB(1), MB(2), MB(3), MB[int]())
 
         mb_list_int = sequence_mb(list_of_mb_int)
         mb_tuple_int = sequence_mb(tuple_of_mb_int)
         mb_ftuple_int = sequence_mb(ftuple_of_mb_int)
         mb_dqueue_int = sequence_mb(dqueue_of_mb_int)
+        # reveal_type(mb_list_int)
+        # reveal_type(mb_tuple_int)
+        # reveal_type(mb_ftuple_int)
+        # reveal_type(mb_dqueue_int)
 
         assert mb_list_int == MB()
         assert mb_tuple_int == MB()
