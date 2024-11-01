@@ -66,7 +66,7 @@ class Test_repr:
         assert mb5 == mb3
         assert mb6 == mb4
 
-        def lt5orNothing(x: int) -> MD[int]:
+        def lt5orNothing(x: int) -> MB[int]:
             if x < 5:
                 return MB(x)
             else:
@@ -86,7 +86,7 @@ class Test_repr:
         foofoo = MB(MB('foo'))
         foofoo2 = eval(repr(foofoo))
         assert foofoo2 == foofoo
-        assert repr(foofoo) == "MB(MB('foo'))"
+        assert repr(foofoo) == "MB('foo')"
 
     def test_xor_repr(self) -> None:
         e1: XOR[int, str] = XOR(right='Nobody home!')

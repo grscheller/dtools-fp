@@ -26,10 +26,9 @@ from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR', 'sequence_mb', 'sequence_xor' ]
 
-from typing import Any, Callable, cast, Final, Iterator, List, Never, Self, Sequence
+from typing import Any, Callable, cast, Final, Iterator
+from typing import List, Never, overload, Self, Sequence
 from .singletons import Sentinel
-
-_sentinel: Final[Sentinel] = Sentinel()
 
 class MB[D]():
     """#### Maybe Monad
@@ -51,15 +50,35 @@ class MB[D]():
     __slots__ = '_value',
     __match_args__ = ('_value',)
 
-    def __init__(self, value: D|XOR[D,Any]|Sentinel=_sentinel) -> None:
-        match value:
-            case XOR(left, _):  # type: ignore # this should have worked due to __future__ import???
-                self._value = left
-            case data:
-                self._value = data
+    sentinel: Final[Sentinel] = Sentinel()
+
+    @overload
+    def __init__(self) -> None: ...
+    @overload
+    def __init__(self, value: D) -> None: ...
+    @overload
+    def __init__(self, value: MB[D]) -> None: ...
+    @overload
+    def __init__(self, value: XOR[D, Any]) -> None: ...
+
+    def __init__[R](self, value: D|MB[D]|XOR[D, R]|Sentinel=sentinel) -> None:
+        sentinel: Final[Sentinel] = Sentinel()
+
+        if value is sentinel:
+            self._value: D|Sentinel = sentinel
+        else:
+            match value:
+                case MB(d):
+                    self._value = d
+                case MB():
+                    self._value = sentinel
+                case XOR(l, r):
+                    self._value = l
+                case d:
+                    self._value = cast(D, d)
 
     def __bool__(self) -> bool:
-        return self._value is not _sentinel
+        return self._value is not Sentinel()
 
     def __iter__(self) -> Iterator[D]:
         if self:
@@ -85,17 +104,17 @@ class MB[D]():
         else:
             return False
 
-    def get(self, alt: D|Sentinel=_sentinel) -> D|Never:
+    def get(self, alt: D|Sentinel=Sentinel()) -> D|Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
         * alternate value must me of type `~D`
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
-        if self._value is not _sentinel:
+        if self._value is not Sentinel():
             return cast(D, self._value)
         else:
-            if alt is not _sentinel:
+            if alt is not Sentinel():
                 return cast(D, alt)
             else:
                 msg = 'An alternate return type not provided.'
@@ -103,56 +122,84 @@ class MB[D]():
 
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
         """Map function `f` over the 0 or 1 elements of this data structure."""
-        return (MB(f(cast(D, self._value))) if self else MB())
+        if self._value is Sentinel():
+            return cast(MB[U], self)
+        else:
+            try:
+                return MB(f(cast(D, self._value)))
+            except Exception:
+                return MB()
 
     def flatmap[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map `MB` with function `f` and flatten."""
-        return (f(cast(D, self._value)) if self else MB())
+        try:
+            return (f(cast(D, self._value)) if self else MB())
+        except Exception:
+            return MB()
 
-class XOR[L,R]():
+class XOR[L, R]():
     """#### Either Monad
 
     Class semantically containing either a left or a right value, but not both.
 
     * implements a left biased Either Monad
-      * `XOR(left: ~L, right: ~R)` produces a left value of type `~L`
-        * with a default potential right value of type `~R`
-      * `XOR(left)` produces a left value
-      * `XOR(right=right)` produces a right value
-    * in a Boolean context `True` if a left, `False` if a right
+    * `XOR(left: ~L, right: ~R)` produces a left `XOR` which
+      * contains a value of type `~L`
+      * and a potential right value of type `~R`
+    * `XOR(right=right)` produces a right `XOR`
+    * throws `ValueError`
+      * when not given a right or potential right value
+    * in a Boolean context
+      * `True` if a left `XOR`
+      * `False` if a right `XOR`
     * two `XOR` objects compare as equal when
-      * both are left values or both are right values which
-        * contain the same value or
-        * whose values compare as equal
+      * both are left values or both are right values whose values
+        * are the same object
+        * compare as equal
     * immutable, an `XOR` does not change after being created
       * immutable semantics, map & flatMap return new instances
-      * warning: contained values need not be immutable
-      * warning: not hashable if value or potential right value mutable
-    * `get` and `getRight` methods can raises `ValueError` when
-      * a right value is needed but a potential right value was not given
+        * warning: contained values need not be immutable
+        * warning: not hashable if value or potential right value mutable
 
     """
     __slots__ = '_left', '_right'
     __match_args__ = ('_left', '_right')
 
-    def __init__(self,
-                 left: L|MB[L]|Sentinel=_sentinel,
-                 right: R|Sentinel=_sentinel) -> None:
+    sentinel: Final[Sentinel] = Sentinel()
+
+    @overload
+    def __init__(self, left: L, right: R) -> None: ...
+    @overload
+    def __init__(self, left: MB[L], right: R) -> None: ...
+    @overload
+    def __init__(self, left: L|Sentinel=sentinel, right: R|Sentinel=sentinel) -> None: ...
+
+    def __init__(self, left: L|MB[L]|Sentinel=Sentinel(), right: R|Sentinel=Sentinel()) -> None:
+        sentinel: Final[Sentinel] = Sentinel()
+        if right is sentinel:
+            msg = f'XOR: Exclusive OR must have a potential right value'
+            raise ValueError(msg)
+
         match left:
             case MB(l):
                 self._left, self._right = l, right
+            case MB():
+                self._left, self._right = sentinel, right
             case l:
-                self._left, self._right = l, right
+                if l is sentinel:
+                    self._left, self._right = sentinel, right
+                else:
+                    self._left, self._right = l, right
 
     def __bool__(self) -> bool:
-        return self._left is not _sentinel
+        return self._left is not Sentinel()
 
     def __iter__(self) -> Iterator[L]:
-        if self._left is not _sentinel:
+        if self._left is not Sentinel():
             yield cast(L, self._left)
 
     def __repr__(self) -> str:
-        if self._left is _sentinel:
+        if self._left is Sentinel():
             return 'XOR(right=' + repr(self._right) + ')'
         else:
             return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
@@ -189,7 +236,12 @@ class XOR[L,R]():
 
         return False
 
-    def get(self, alt: L|Sentinel=_sentinel) -> L|Never:
+    @overload
+    def getLeft(self) -> L|Never: ...
+    @overload
+    def getLeft(self, altLeft: L) -> L: ...
+
+    def getLeft(self, altLeft: L|Sentinel=Sentinel()) -> L|Never:
         """Get value if a left.
 
         * if the `XOR` is a left, return its value
@@ -198,56 +250,67 @@ class XOR[L,R]():
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
-        sent: Final[Sentinel] = _sentinel
-        if self._left is sent:
-            if alt is sent:
-                msg = 'An alt return value was needed by get, but none was provided.'
+        sentinel: Final[Sentinel] = Sentinel()
+        if self._left is sentinel:
+            if altLeft is sentinel:
+                msg = 'An alt return value was needed by getLeft, but none was provided.'
                 raise ValueError(msg)
             else:
-                return cast(L, alt)
+                return cast(L, altLeft)
         else:
             return cast(L, self._left)
 
-    def getRight(self, alt: R|Sentinel=_sentinel) -> R|Never:
-        """Get value of `XOR` if a Right, potential right value if a left.
+    @overload
+    def getRight(self) -> R|Never: ...
+    @overload
+    def getRight(self, altRight: R) -> R: ...
 
-        * if XOR is a right, return its value
-          * otherwise return a provided alternate value of type `~R`
+    def getRight(self, altRight: R|Sentinel=Sentinel()) -> R|Never:
+        """Get value of `XOR` if a right, potential right value if a left.
+
+        * if `XOR` is a right, return its value, otherwise return `altRight`
         * if `XOR` is a left, return the potential right value
           * raises `ValueError` if a potential right value was not provided
 
         """
-        if self:
-            sentinel: Final[Sentinel] = _sentinel
-            if alt is sentinel:
-                if self._right is sentinel:
-                    msg = 'A potential right was needed by get, but none was provided.'
-                    raise ValueError(msg)
-                else:
-                    return cast(R, self._right)
-            else:
-                return cast(R, alt)
-        else:
-            return cast(R, self._right)
+        sentinel: Final[Sentinel] = Sentinel()
 
-    def makeRight(self, right: R|Sentinel=_sentinel) -> XOR[L, R]:
-        """Make right
+        if altRight is sentinel:
+            if self._right is sentinel:
+                msg = 'A potential right was needed by getRight, but none was provided.'
+                raise ValueError(msg)
+        elif self._right is sentinel:
+            return cast(R, altRight)
 
-        Return a new instance transformed into a right `XOR`. Change the right
-        value to right if given.
+        return cast(R, self._right)
+
+    def makeRight(self, altRight: R) -> XOR[L, R]:
+        """Make a right based on the `XOR`.
+
+        * return a right based on potential right value
+        * if a potential right value not set, use altRight to form return value
+
         """
-        if right is _sentinel:
-            right = self.getRight()
-        return cast(XOR[L, R], XOR(right=right))
+        sentinel: Final[Sentinel] = Sentinel()
+
+        if self._right is sentinel:
+            return XOR(cast(L, sentinel), altRight)
+        elif self._left is sentinel:
+            return self
+        else:
+            return XOR(cast(L, sentinel), cast(R, self._right))
 
     def swapRight(self, right: R) -> XOR[L, R]:
-        """Swap in a new right value, returns a new instance with a new right
-        (or potential right) value.
+        """Swap in a right value. 
+
+        * returns a new instance with a new right (or potential right) value.
         """
-        if self._left is _sentinel:
-            return cast(XOR[L, R], XOR(right=right))
+        sentinel: Final[Sentinel] = Sentinel()
+
+        if self._left is sentinel:
+            return cast(XOR[L, R], XOR(sentinel, self._right))
         else:
-            return XOR(self.get(), right)
+            return XOR(self.getLeft(), right)
 
     def map[U](self, f: Callable[[L], U]) -> XOR[U, R]:
         """Map over if a left value.
@@ -261,19 +324,30 @@ class XOR[L,R]():
           * use method `mapRight` to adjust the returned value
 
         """
-        if self._left is _sentinel:
-            return cast(XOR[U, R], XOR(right=self._right))
+        sentinel: Final[Sentinel] = Sentinel()
 
+        if self._left is sentinel:
+            return cast(XOR[U, R], self)
         try:
             applied = f(cast(L, self._left))
         except Exception:
-            return XOR(right=self._right)
+            return cast(XOR[U, R], XOR(sentinel, self._right))
         else:
-            return XOR(applied, self._right)
+            return XOR(applied, cast(R, self._right))
 
-    def mapRight(self, g: Callable[[R], R]) -> XOR[L, R]:
+    def mapRight(self, g: Callable[[R], R], altRight: R) -> XOR[L, R]:
         """Map over a right or potential right value."""
-        return XOR(self._left, g(cast(R, self._right)))
+        sentinel: Final[Sentinel] = Sentinel()
+
+        if self._right is sentinel:
+            return self
+        else:
+            try:
+                applied = g(cast(R, self._right))
+            except:
+                return XOR(self._left, altRight)
+            else:
+                return XOR(self._left, g(cast(R, self._right)))
 
     def flatMap[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
         """Flatmap - Monadically bind
@@ -282,8 +356,8 @@ class XOR[L,R]():
         * propagate right values
 
         """
-        if self._left is _sentinel:
-            return XOR(right=self._right)
+        if self._left is Sentinel():
+            return cast(XOR[U, R], self)
         else:
             return f(cast(L, self._left))
 
@@ -306,9 +380,7 @@ def sequence_mb[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
     ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
     return MB(ds)
 
-def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]],
-                      potential_right: R|Sentinel=_sentinel,
-                      default_right: R|Sentinel=_sentinel) -> XOR[Sequence[L],R]:
+def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]], potential_right: R) -> XOR[Sequence[L],R]:
     """Sequence an indexable container of `XOR[L, R]`
 
     * if all the `XOR` values contained in the container are lefts, then
@@ -319,20 +391,16 @@ def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]],
       * if right does not contain an `~R`, return right containing `default_right`
 
     """
+    sentinel: Final[Sentinel] = Sentinel()
+
     l: List[L] = []
 
     for xor_lr in seq_xor_lr:
         if xor_lr:
-            l.append(xor_lr.get())
+            l.append(xor_lr.getLeft())
         else:
-            try:
-                return XOR(right=xor_lr.getRight())
-            except ValueError:
-                return XOR(right=default_right)
+            return cast(XOR[Sequence[L], R], XOR(sentinel, xor_lr.getRight()))
 
     ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
-    if potential_right is _sentinel:
-        return XOR(ds)
-    else:
-        return XOR(ds, potential_right)
+    return XOR(ds, potential_right)
 

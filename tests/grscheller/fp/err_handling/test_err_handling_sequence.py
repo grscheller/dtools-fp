@@ -62,10 +62,10 @@ class TestXOR_sequence:
         ftuple_of_xor_int_str = FTuple(map(lambda x: XOR(x, str(x)), range(1, 2501)))
         dqueue_of_xor_int_str = DoubleQueue(map(lambda x: XOR(x, str(x)), range(1, 2501)))
 
-        xor_listInt_str = sequence_xor(list_of_xor_int_str)
-        xor_tupleInt_str = sequence_xor(tuple_of_xor_int_str)
-        xor_ftupleInt_str: XOR[FTuple[int], str] = sequence_xor(ftuple_of_xor_int_str)
-        xor_dqueueInt_str: XOR[DoubleQueue[int], str] = sequence_xor(dqueue_of_xor_int_str)
+        xor_listInt_str = sequence_xor(list_of_xor_int_str, 'OK')
+        xor_tupleInt_str = sequence_xor(tuple_of_xor_int_str, 'OK')
+        xor_ftupleInt_str: XOR[FTuple[int], str] = sequence_xor(ftuple_of_xor_int_str, 'OK')
+        xor_dqueueInt_str: XOR[DoubleQueue[int], str] = sequence_xor(dqueue_of_xor_int_str, 'OK')
 
         assert xor_listInt_str == XOR(list(range(1, 2501)), 'does not matter')
         assert xor_tupleInt_str == XOR(tuple(range(1, 2501)), 'for this test')
@@ -73,15 +73,15 @@ class TestXOR_sequence:
         assert xor_dqueueInt_str == XOR(DoubleQueue(range(1, 2501)), 'none are wrong')
 
     def test_with_rights(self) -> None:
-        list_of_xor_int_str: list[XOR[int, str]] = [XOR(right='1'), XOR(2), XOR(3), XOR(4)]
-        tuple_of_xor_int_str: tuple[XOR[int, str], ...] = XOR(1), XOR(right='2'), XOR(3), XOR(4)
+        list_of_xor_int_str: list[XOR[int, str]] = [XOR(right='1'), XOR(2, '2'), XOR(3, '3'), XOR(4, '4')]
+        tuple_of_xor_int_str: tuple[XOR[int, str], ...] = XOR(1, '1'), XOR(right='2'), XOR(3, '3'), XOR(4, '4')
         ftuple_of_xor_int_str = FT(XOR(1, '1'), XOR(2, '2'), XOR(right='3'), XOR(4, '4'))
         dqueue_of_xor_int_str = DQ(XOR(1, '1'), XOR(2, '2'), XOR(3, '3'), XOR(right='4'))
 
-        xor_list_int = sequence_xor(list_of_xor_int_str)
-        xor_tuple_int = sequence_xor(tuple_of_xor_int_str)
-        xor_ftuple_int = sequence_xor(ftuple_of_xor_int_str)
-        xor_dqueue_int = sequence_xor(dqueue_of_xor_int_str)
+        xor_list_int = sequence_xor(list_of_xor_int_str, 'OK')
+        xor_tuple_int = sequence_xor(tuple_of_xor_int_str, 'OK')
+        xor_ftuple_int = sequence_xor(ftuple_of_xor_int_str, 'OK')
+        xor_dqueue_int = sequence_xor(dqueue_of_xor_int_str, 'OK')
 
         assert xor_list_int == XOR(right='1')
         assert xor_tuple_int == XOR(right='2')
