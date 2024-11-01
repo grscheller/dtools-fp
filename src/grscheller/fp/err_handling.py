@@ -241,7 +241,7 @@ class XOR[L, R]():
     @overload
     def getLeft(self, altLeft: L) -> L: ...
 
-    def getLeft(self, altLeft: L|Sentinel=Sentinel()) -> L|Never:
+    def getLeft(self, altLeft: L|Sentinel=sentinel) -> L|Never:
         """Get value if a left.
 
         * if the `XOR` is a left, return its value
@@ -253,54 +253,37 @@ class XOR[L, R]():
         sentinel: Final[Sentinel] = Sentinel()
         if self._left is sentinel:
             if altLeft is sentinel:
-                msg = 'An alt return value was needed by getLeft, but none was provided.'
-                raise ValueError(msg)
+                msg = 'XOR: getLeft method called on a right XOR'
+                raise(ValueError(msg))
             else:
                 return cast(L, altLeft)
         else:
             return cast(L, self._left)
 
-    @overload
-    def getRight(self) -> R|Never: ...
-    @overload
-    def getRight(self, altRight: R) -> R: ...
-
-    def getRight(self, altRight: R|Sentinel=Sentinel()) -> R|Never:
+    def getRight(self) -> R:
         """Get value of `XOR` if a right, potential right value if a left.
 
-        * if `XOR` is a right, return its value, otherwise return `altRight`
+        * if `XOR` is a right, return its value
         * if `XOR` is a left, return the potential right value
-          * raises `ValueError` if a potential right value was not provided
 
         """
-        sentinel: Final[Sentinel] = Sentinel()
-
-        if altRight is sentinel:
-            if self._right is sentinel:
-                msg = 'A potential right was needed by getRight, but none was provided.'
-                raise ValueError(msg)
-        elif self._right is sentinel:
-            return cast(R, altRight)
-
         return cast(R, self._right)
 
-    def makeRight(self, altRight: R) -> XOR[L, R]:
+    def makeRight(self) -> XOR[L, R]:
         """Make a right based on the `XOR`.
 
         * return a right based on potential right value
-        * if a potential right value not set, use altRight to form return value
+        * returns itself if already a right
 
         """
         sentinel: Final[Sentinel] = Sentinel()
 
-        if self._right is sentinel:
-            return XOR(cast(L, sentinel), altRight)
-        elif self._left is sentinel:
+        if self._left is sentinel:
             return self
         else:
-            return XOR(cast(L, sentinel), cast(R, self._right))
+            return cast(XOR[L, R], XOR(sentinel, self._right))
 
-    def swapRight(self, right: R) -> XOR[L, R]:
+    def newRight(self, right: R) -> XOR[L, R]:
         """Swap in a right value. 
 
         * returns a new instance with a new right (or potential right) value.
@@ -308,16 +291,16 @@ class XOR[L, R]():
         sentinel: Final[Sentinel] = Sentinel()
 
         if self._left is sentinel:
-            return cast(XOR[L, R], XOR(sentinel, self._right))
+            return cast(XOR[L, R], XOR(sentinel, right))
         else:
-            return XOR(self.getLeft(), right)
+            return XOR(self._left, right)
 
     def map[U](self, f: Callable[[L], U]) -> XOR[U, R]:
         """Map over if a left value.
 
         * if `XOR` is a left then map `f` over its value
           * if `f` successful return a left `XOR[S, R]`
-          * if `f` unsuccessful return right `XOR`
+          * if `f` unsuccessful return right `XOR[S, R]`
             * swallows any exceptions `f` may throw
         * if `XOR` is a right
           * return new `XOR(right=self._right): XOR[S, R]`
@@ -339,15 +322,12 @@ class XOR[L, R]():
         """Map over a right or potential right value."""
         sentinel: Final[Sentinel] = Sentinel()
 
-        if self._right is sentinel:
-            return self
+        try:
+            applied = g(cast(R, self._right))
+        except:
+            return XOR(self._left, altRight)
         else:
-            try:
-                applied = g(cast(R, self._right))
-            except:
-                return XOR(self._left, altRight)
-            else:
-                return XOR(self._left, g(cast(R, self._right)))
+            return XOR(self._left, applied)
 
     def flatMap[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
         """Flatmap - Monadically bind

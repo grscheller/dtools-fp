@@ -123,8 +123,8 @@ class TestXOR:
         assert xor42 != xor_fortytwo
         assert xor42 == xor42tuple
 
-        xor_42 = xor42.mapRight(lambda _: 'none')
-        thing1: XOR[int, str] = xor_42.mapRight(lambda s: s + '?').makeRight()
+        xor_42 = xor42.mapRight(lambda _: 'none', 'mapRight failed')
+        thing1: XOR[int, str] = xor_42.mapRight((lambda s: s + '?'), 'Not sure if I need this.').makeRight()
         thing2: XOR[int, str] = xor_42.flatMap(lambda _: XOR(right='none?'))
         assert thing1 == thing2
 
@@ -149,12 +149,14 @@ class TestXOR:
 
         assert xor_99.map(gt42) == xor_86.map(gt42)
         assert xor_21.map(gt42) != xor_12.map(gt42)
-        assert xor_21.map(gt42).swapRight('lt 42') == xor_12.map(gt42).swapRight('lt 42')
+        assert xor_21.map(gt42).newRight('lt 42') == xor_12.map(gt42).newRight('lt 42')
 
-        hymie = xor_86.map(gt42).mapRight(lambda s: f'Hymie says: {s}')
-        chief = xor_86.map(gt42).mapRight(lambda s: f'Chief says: {s}')
-        ratton = xor_21.map(gt42).mapRight(lambda s: f'Dr. Ratton says: {s}')
-        seigfried = xor_21.map(gt42).mapRight(lambda s: f'Seigfried says: {s}')
+        hymie = xor_86.map(gt42).mapRight((lambda s: f'Hymie says: {s}'), 'got some oil?')
+        chief = xor_86.map(gt42).mapRight((lambda s: f'Chief says: {s}'), 'not the dome of silence!')
+        ratton = xor_21.map(gt42).mapRight((lambda s: f'Dr. Ratton says: {s}'), 'where is hymie?')
+        seigfried_lambda = lambda s: f'Seigfried says: {s}'
+        seigfried_secret_headquarters = 'somewhere in NJ'
+        seigfried = xor_21.map(gt42).mapRight(seigfried_lambda, seigfried_secret_headquarters)
 
         assert hymie == chief
         assert ratton != seigfried
@@ -164,7 +166,7 @@ class TestXOR:
         assert repr(ratton) == "XOR(right='Dr. Ratton says: orig 21')"
         assert repr(seigfried) == "XOR(right='Seigfried says: orig 21')"
 
-        assert xor_12.map(gt42).swapRight('not greater than 42') == XOR(right='not greater than 42')
+        assert xor_12.map(gt42).newRight('not greater than 42') == XOR(right='not greater than 42')
 
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42, '')
@@ -232,22 +234,21 @@ class TestXOR:
                 return MB()
 
         s1 = XOR(3, right = 'foofoo rules')
-        s2 = s1.map(noMoreThan5).mapRight(lambda _: 'more than 5')
+        s2 = s1.map(noMoreThan5).mapRight((lambda _: 'more than 5'), 'failed')
         s3 = XOR(42, 'foofoo rules')
-        s4 = s3.map(noMoreThan5).mapRight(lambda _: 'more than 5')
-        assert s1.get() == 3
-        assert s2.get() == 3
-        assert s4.get(42) == 42
+        s4 = s3.map(noMoreThan5).mapRight((lambda s: s + ' more than 5'), 'failed')
+        assert s1.getLeft() == 3
+        assert s2.getLeft() == 3
+        assert s4.getLeft(42) == 42
         bar = 'barbell'
         bar = s1.getRight()
         assert bar == 'foofoo rules'
-        assert s2.getRight('everything OK') == 'everything OK'
-        assert s3.getRight('no rights here') == 'no rights here'
-        assert s4.getRight() == 'more than 5'
-        assert s1.get(0) == 3
-        assert s3.get(0) == 42
-        assert s4.get(0) == 0
-        assert s4.getRight() == 'more than 5'
+        assert s2.getRight() == 'more than 5'
+        assert s3.getRight() == 'foofoo rules'
+        assert s4.getRight() == 'foofoo rules more than 5'
+        assert s1.getLeft(0) == 3
+        assert s3.getLeft(0) == 42
+        assert s4.getLeft(0) == 0
 
     def test_either_flatMaps(self) -> None:
         def lessThan2(x: int) -> XOR[int, str]:
@@ -300,8 +301,10 @@ class TestXOR:
         assert lt5 == XOR(4, 'boo')
         assert lt5 != XOR(42, 'boohoo')
 
-        lt2 = left7.flatMap(lessThan2).mapRight(lambda _: 'greater than or equal 2')
-        lt5 = left7.flatMap(lessThan5).mapRight(lambda s: s + ', greater than or equal 5')
+        lt2 = left7.flatMap(lessThan2).mapRight(lambda _: 'greater than or equal 2',
+                                                altRight='failed')
+        lt5 = left7.flatMap(lessThan5).mapRight(lambda s: s + ', greater than or equal 5',
+                                                altRight='failed')
         assert lt2 == XOR(right='greater than or equal 2')
         assert lt5 == XOR(right='>=5, greater than or equal 5')
 
