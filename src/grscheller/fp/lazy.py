@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Lazy function evaluations.
+"""### Module fp.lazy: Lazy function evaluations
 
 Handle function evaluations later, if needed, usually in some inner scope.
 
 ##### Lazy tools:
 
-class **lazy:** Delay function evaluation
+**class Lazy:** Delay function evaluation
 
 """
 from __future__ import annotations
@@ -29,7 +29,7 @@ from typing import Callable, Iterator
 from .err_handling import MB, XOR
 
 class Lazy[D, R]():
-    """#### Delayed evaluation
+    """#### Delayed function evaluation
 
     Class delaying the executable of a function where `Lazy(f, ds)` constructs
     an object that can evaluate the Callable `f` at a later time. Usually in the
@@ -46,7 +46,10 @@ class Lazy[D, R]():
       * will first evaluate `f` with `*args` if needed
       * then, if successful, return a tuple of the resulting return values
       * otherwise, raise a RunTimeError
-        * guard against this by evaluating lazy: Lazy in a Boolean context
+        * guard against this by evaluating Lazy object in a Boolean context
+    * retrieve evaluated return values via
+      * Lazy object's `__call__` method
+      * Lazy object's `__iter__` method
 
     """
     __slots__ = '_f', '_args', '_results', '_pure'
