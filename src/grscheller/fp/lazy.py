@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Lazy evaluations.
+"""### Lazy function evaluations.
 
-Delay evaluations until needed or in right scope.
+Handle function evaluations later, if needed, usually in some inner scope.
 
 ##### Lazy tools:
 
@@ -25,20 +25,15 @@ from __future__ import annotations
 
 __all__ = [ 'Lazy' ]
 
-from typing import Any, Callable, cast, Final, Iterator
-from typing import List, Never, overload, Self, Sequence
+from typing import Callable, Iterator
 from .err_handling import MB, XOR
-import math
-
-
-#    __match_args__ = ('_value',)
 
 class Lazy[D, R]():
     """#### Delayed evaluation
 
     Class delaying the executable of a function where `Lazy(f, ds)` constructs
     an object that can evaluate the Callable `f` at a later time. Usually in the
-    context of another function call.
+    scope of some function or method call.
 
     * first argument takes a function of a variable number of arguments
     * second argument a tuple of arguments for the function `tuple[~D, ...]`
