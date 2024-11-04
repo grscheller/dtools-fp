@@ -24,10 +24,10 @@ Monadic functional data types to use in lieu of exceptions.
 """
 from __future__ import annotations
 
-__all__ = [ 'MB', 'XOR', 'sequence_mb', 'sequence_xor' ]
+__all__ = [ 'MB', 'XOR' ]
 
-from typing import Any, Callable, cast, Final, Iterator
-from typing import List, Never, overload, Self, Sequence
+from typing import Callable, cast, Final, Iterator
+from typing import Never, overload, Sequence
 from .singletons import Sentinel
 
 class MB[D]():
@@ -59,10 +59,8 @@ class MB[D]():
     def __init__(self, value: D) -> None: ...
     @overload
     def __init__(self, value: MB[D]) -> None: ...
-    @overload
-    def __init__(self, value: XOR[D, Any]) -> None: ...
 
-    def __init__[R](self, value: D|MB[D]|XOR[D, R]|Sentinel=sentinel) -> None:
+    def __init__[R](self, value: D|MB[D]|Sentinel=sentinel) -> None:
         sentinel: Final[Sentinel] = Sentinel()
 
         if value is sentinel:
@@ -139,6 +137,26 @@ class MB[D]():
             return (f(cast(D, self._value)) if self else MB())
         except Exception:
             return MB()
+
+    @staticmethod
+    def sequence(seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
+        """Sequence an indexable container of `MB[~D]`
+
+        *if all the contained `MB` values in the container are not empty,
+        * return a `MB` of a container containing the values contained
+        * otherwise return an empty `MB`
+
+        """
+        l: list[D] = []
+
+        for mb_d in seq_mb_d:
+            if mb_d:
+                l.append(mb_d.get())
+            else:
+                return MB()
+
+        ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
+        return MB(ds)
 
 class XOR[L, R]():
     """#### Either Monad
@@ -345,46 +363,28 @@ class XOR[L, R]():
         else:
             return f(cast(L, self._left))
 
-def sequence_mb[D](seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
-    """Sequence an indexable container of `MB[~D]`
+    @staticmethod
+    def sequence(seq_xor_lr: Sequence[XOR[L,R]], potential_right: R) -> XOR[Sequence[L],R]:
+        """Sequence an indexable container of `XOR[L, R]`
 
-    *if all the contained `MB` values in the container are not empty,
-      * return a `MB` of a container containing the values contained
-      * otherwise return an empty `MB`
+        * if all the `XOR` values contained in the container are lefts, then
+        * return an `XOR` of the same type container of all the left values
+        * setting the potential right to `potential_right` if given
+        * if at least one of the `XOR` values contained in the container is a right,
+        * return a right XOR containing the right value of the first right
+        * if right does not contain an `~R`, return right containing `default_right`
 
-    """
-    l: List[D] = []
+        """
+        sentinel: Final[Sentinel] = Sentinel()
 
-    for mb_d in seq_mb_d:
-        if mb_d:
-            l.append(mb_d.get())
-        else:
-            return MB()
+        l: list[L] = []
 
-    ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
-    return MB(ds)
+        for xor_lr in seq_xor_lr:
+            if xor_lr:
+                l.append(xor_lr.getLeft())
+            else:
+                return cast(XOR[Sequence[L], R], XOR(sentinel, xor_lr.getRight()))
 
-def sequence_xor[L,R](seq_xor_lr: Sequence[XOR[L,R]], potential_right: R) -> XOR[Sequence[L],R]:
-    """Sequence an indexable container of `XOR[L, R]`
-
-    * if all the `XOR` values contained in the container are lefts, then
-      * return an `XOR` of the same type container of all the left values
-      * setting the potential right to `potential_right` if given
-    * if at least one of the `XOR` values contained in the container is a right,
-      * return a right XOR containing the right value of the first right
-      * if right does not contain an `~R`, return right containing `default_right`
-
-    """
-    sentinel: Final[Sentinel] = Sentinel()
-
-    l: List[L] = []
-
-    for xor_lr in seq_xor_lr:
-        if xor_lr:
-            l.append(xor_lr.getLeft())
-        else:
-            return cast(XOR[Sequence[L], R], XOR(sentinel, xor_lr.getRight()))
-
-    ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
-    return XOR(ds, potential_right)
+        ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
+        return XOR(ds, potential_right)
 
