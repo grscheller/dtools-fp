@@ -18,7 +18,7 @@ Delay evaluations until needed or in right scope.
 
 ##### Lazy tools:
 
-**lazy:** Delay function evaluation
+class **lazy:** Delay function evaluation
 
 """
 from __future__ import annotations
@@ -34,18 +34,24 @@ import math
 #    __match_args__ = ('_value',)
 
 class Lazy[D, R]():
-    """#### Maybe Monad
+    """#### Delayed evaluation
 
     Class delaying the executable of a function where `Lazy(f, ds)` constructs
     an object that can evaluate the Callable `f` at a later time. Usually in the
     context of another function call.
 
     * first argument takes a function of a variable number of arguments
-    * takes a tuple of arguments: `tuple[~D, ...]` (`~D` frequently `All`)
-    * evaluates the function when the eval method i3 called
-    * eval returns: `XOR[tuple[~R, ...], Exception]]` (`~R` frequently `All`)
-      * TODO: define Try to wrap such an object???
-    * result is cached unless pure is set to false
+    * second argument a tuple of arguments for the function `tuple[~D, ...]`
+      * where `~D` usually inferred to be a Union of the argument types
+    * function is evaluated when the eval method is called
+      * self._results set to `XOR[tuple[~R, ...], MB[Exception]]`
+      * where `~R` usually inferred to be a Union of the return types
+    * result is cached unless `pure` is set to `False` in initializer
+    * class is callable with no arguments
+      * will first evaluate `f` with `*args` if needed
+      * then, if successful, return a tuple of the resulting return values
+      * otherwise, raise a RunTimeError
+        * guard against this by evaluating lazy: Lazy in a Boolean context
 
     """
     __slots__ = '_f', '_args', '_results', '_pure'
@@ -94,9 +100,15 @@ class Lazy[D, R]():
             msg = f"lazy: Lazy evaluated function raised exceptions"
             raise RuntimeError(msg)
 
+### TODO
+#   Write tests for what I got so far
+#   1. before code gets too complicated
+#   2. to help refine the API
 
-
-###
+### TODO: 
+#   Cache only certain sets of exceptions (determinable by an enumeration)
+#   1. when writing code don't catch SyntaxError or TypeError
+#   2. when testing code catch these if you don't want to "fail fast"
 
 ### Grouped exceptions
 
