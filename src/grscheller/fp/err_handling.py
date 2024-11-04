@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Maybe and Either Monads.
+"""#### Module fp.err_handling - monadic error handling
 
-Monadic functional data types to use in lieu of exceptions.
+Functional data types to use in lieu of exceptions.
 
-##### Monadic types:
+##### Error handling types:
 
-* **MB:** Maybe monad
-* **XOR:** Left biased Either monad
+* **class MB:** Maybe (Optional) monad
+* **class XOR:** Left biased Either monad
 
 """
 from __future__ import annotations
@@ -31,9 +31,7 @@ from typing import Never, overload, Sequence
 from .singletons import Sentinel
 
 class MB[D]():
-    """#### Maybe Monad
-
-    Class wrapping a potentially missing value.
+    """Maybe monad - class wrapping a potentially missing value.
 
     * where `MB(value)` contains a possible value of type `~D`
     * `MB()` semantically represent a non-existent or missing value of type `~D`
@@ -42,10 +40,10 @@ class MB[D]():
       * warning: contained values need not be immutable
       * warning: not hashable if a mutable value is contained
     * raises `ValueError` if get method not given default value & one is needed
-    * implementation details:
-      * `MB( )` contains `fp.singleton.Sentinel()` as a sentinel value
-        * as a result, a MB cannot semantically contain `Sentinel()` as a value
-        * best practice is for calling code not to import Sentinel
+    * immutable, a `MB` does not change after being created
+      * immutable semantics, map & flatMap return new instances
+        * warning: contained values need not be immutable
+        * warning: not hashable if contained value is mutable
 
     """
     __slots__ = '_value',
@@ -159,9 +157,8 @@ class MB[D]():
         return MB(ds)
 
 class XOR[L, R]():
-    """#### Either Monad
-
-    Class semantically containing either a left or a right value, but not both.
+    """Either monad - class semantically containing either a left or a right
+    value, but not both.
 
     * implements a left biased Either Monad
     * `XOR(left: ~L, right: ~R)` produces a left `XOR` which

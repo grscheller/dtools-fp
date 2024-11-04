@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.lazy: Lazy function evaluations
+"""### Module fp.lazy - lazy function evaluations
 
-Handle function evaluations later, if needed, usually in some inner scope.
+Delayed function evaluations, if needed, usually in some inner scope. FP tools
+for "non-strict" function evaluations.
 
-##### Lazy tools:
+##### Non-strict tooling:
 
 **class Lazy:** Delay function evaluation
 
@@ -29,11 +30,11 @@ from typing import Callable, Iterator
 from .err_handling import MB, XOR
 
 class Lazy[D, R]():
-    """#### Delayed function evaluation
+    """Delayed or non-strict function evaluation.
 
-    Class delaying the executable of a function where `Lazy(f, ds)` constructs
-    an object that can evaluate the Callable `f` at a later time. Usually in the
-    scope of some function or method call.
+    Class instance delays the executable of a function where `Lazy(f, ds)`
+    constructs an object that can evaluate the Callable `f` at a later time.
+    Usually in the scope of some function or method call.
 
     * first argument takes a function of a variable number of arguments
     * second argument a tuple of arguments for the function `tuple[~D, ...]`

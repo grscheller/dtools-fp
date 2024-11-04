@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Pythonic Functional Programming Tools"""
+"""### Package grscheller.fp - Pythonic Functional Programming Tooling
 
+Tools to aid with functional programming in Python yet still endeavoring to
+remain Pythonic.
+
+"""
 __version__ = "1.0.9.1"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
+

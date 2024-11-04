@@ -12,13 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-### Library of iterator related functions.
+"""#### Module fp.iterables - Iterator related tooling
+
+Library of iterator related functions and enumerations.
 
 * iterables are not necessarily iterators
 * at all times iterator protocol is assumed to be followed, that is
   * all iterators are assumed to be iterable
   * for all iterators `foo` we assume `iter(foo) is foo`
+
+##### Concatenating and merging iterables:
+
+* **function concat:** sequentially chain iterables
+* **function exhaust:** shuffle together iterables until all are exhausted
+* **function merge:** shuffle together iterables until one is exhausted
+
+##### Dropping and taking values from an iterable:
+
+* **function drop:** drop first `n` values from iterable
+* **function dropWhile:** drop values from iterable while predicate holds
+* **function take:** take up to `n` initial values from iterable
+* **function takeWhile:** take values from iterable while predicate holds
+
+##### Reducing and accumulating an iterable:
+
+* **function accumulate:** take iterable & function, return iterator of accumulated values
+* **function foldL:** fold iterable from the left with a function
+* **function foldR:** fold reversible iterable from the right with a function
+* **function foldLsc:** fold iterable from left with function and a premature stop condition
+* **function foldRsc:** fold iterable from right with function and a premature start condition
+
+##### Iterator related utility functions
+
+* **function itargs:** function reterning an iterator of its arguments
 
 """
 from __future__ import annotations

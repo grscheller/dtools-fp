@@ -12,7 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Singleton classes
+"""### Module fp.singletons - collection of singleton classes
+
+Classes permitting at most only one instantiation. Safer, but not as performant,
+than a non-exported module level global. Difficult, but not impossible, for
+a typical end-user to exploit. Tailored for different use cases.
+
+##### Singleton types:
+
+**class NoValue:** instances represent a missing or non-existent value
+**Class Sentinel:** instances represent a "hidden" sentinel value
 
 """
 from __future__ import annotations
@@ -23,7 +32,7 @@ from typing import Final, final
 
 @final
 class NoValue():
-    """#### Singleton class representing a missing value.
+    """Singleton class representing a missing value.
 
     * similar to `None` but while
       * `None` represents "returned no values"
@@ -58,7 +67,7 @@ class NoValue():
 
 @final
 class Sentinel():
-    """#### Singleton class representing a sentinel value.
+    """Singleton class representing a sentinel value.
 
     * intended for library code, not to be exported/shared between modules
       * otherwise some of its intended typing guarantees may be lost
