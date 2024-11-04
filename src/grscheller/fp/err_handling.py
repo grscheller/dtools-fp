@@ -42,7 +42,7 @@ class MB[D]():
       * warning: contained values need not be immutable
       * warning: not hashable if a mutable value is contained
     * raises `ValueError` if get method not given default value & one is needed
-    * implementation detail:
+    * implementation details:
       * `MB( )` contains `fp.singleton.Sentinel()` as a sentinel value
         * as a result, a MB cannot semantically contain `Sentinel()` as a value
         * best practice is for calling code not to import Sentinel
@@ -142,9 +142,9 @@ class MB[D]():
     def sequence(seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
         """Sequence an indexable container of `MB[~D]`
 
-        *if all the contained `MB` values in the container are not empty,
-        * return a `MB` of a container containing the values contained
-        * otherwise return an empty `MB`
+        * if all the contained `MB` values in the container are not empty,
+          * return a `MB` of a container containing the values contained
+          * otherwise return an empty `MB`
 
         """
         l: list[D] = []
@@ -208,10 +208,7 @@ class XOR[L, R]():
             case MB():
                 self._left, self._right = sentinel, right
             case l:
-                if l is sentinel:
-                    self._left, self._right = sentinel, right
-                else:
-                    self._left, self._right = l, right
+                self._left, self._right = l, right
 
     def __bool__(self) -> bool:
         return self._left is not Sentinel()
@@ -313,7 +310,7 @@ class XOR[L, R]():
         sentinel: Final[Sentinel] = Sentinel()
 
         if self._left is sentinel:
-            return cast(XOR[L, R], XOR(sentinel, right))
+            return cast(XOR[L, R], XOR(right=right))
         else:
             return XOR(self._left, right)
 
@@ -336,7 +333,7 @@ class XOR[L, R]():
         try:
             applied = f(cast(L, self._left))
         except Exception:
-            return cast(XOR[U, R], XOR(sentinel, self._right))
+            return cast(XOR[U, R], XOR(right=self._right))
         else:
             return XOR(applied, cast(R, self._right))
 
@@ -352,7 +349,7 @@ class XOR[L, R]():
             return XOR(self._left, applied)
 
     def flatMap[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
-        """Flatmap - Monadically bind
+        """Flatmap - bind
 
         * map over then flatten left values
         * propagate right values
@@ -368,11 +365,10 @@ class XOR[L, R]():
         """Sequence an indexable container of `XOR[L, R]`
 
         * if all the `XOR` values contained in the container are lefts, then
-        * return an `XOR` of the same type container of all the left values
-        * setting the potential right to `potential_right` if given
+          * return an `XOR` of the same type container of all the left values
+          * setting the potential right `potential_right`
         * if at least one of the `XOR` values contained in the container is a right,
-        * return a right XOR containing the right value of the first right
-        * if right does not contain an `~R`, return right containing `default_right`
+          * return a right XOR containing the right value of the first right
 
         """
         sentinel: Final[Sentinel] = Sentinel()
