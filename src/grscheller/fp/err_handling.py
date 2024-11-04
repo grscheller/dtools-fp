@@ -45,6 +45,7 @@ class MB[D]():
     * implementation detail:
       * `MB( )` contains `fp.singleton.Sentinel()` as a sentinel value
         * as a result, a MB cannot semantically contain `Sentinel()` as a value
+        * best practice is for calling code not to import Sentinel
 
     """
     __slots__ = '_value',
@@ -72,8 +73,6 @@ class MB[D]():
                     self._value = d
                 case MB():
                     self._value = sentinel
-                case XOR(l, r):
-                    self._value = l
                 case d:
                     self._value = cast(D, d)
 
@@ -121,7 +120,11 @@ class MB[D]():
                 raise ValueError(msg)
 
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
-        """Map function `f` over the 0 or 1 elements of this data structure."""
+        """Map function `f` over the 0 or 1 elements of this data structure.
+
+        * if `f` should fail, return a MB()
+
+        """
         if self._value is Sentinel():
             return cast(MB[U], self)
         else:
@@ -172,12 +175,13 @@ class XOR[L, R]():
     @overload
     def __init__(self, left: MB[L], right: R) -> None: ...
     @overload
-    def __init__(self, left: L|Sentinel=sentinel, right: R|Sentinel=sentinel) -> None: ...
+    def __init__(self, left: Sentinel=sentinel, right: R|Sentinel=sentinel) -> None: ...
 
     def __init__(self, left: L|MB[L]|Sentinel=Sentinel(), right: R|Sentinel=Sentinel()) -> None:
         sentinel: Final[Sentinel] = Sentinel()
+
         if right is sentinel:
-            msg = f'XOR: Exclusive OR must have a potential right value'
+            msg = f'XOR: Exclusive OR must have a right or potential right value'
             raise ValueError(msg)
 
         match left:

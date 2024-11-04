@@ -312,12 +312,37 @@ class TestXOR:
         mb42 = MB(42)
         mbNot: MB[int] = MB()
 
-        left42 = XOR[int, str](mb42, 'fail!')
+        left42 = XOR(mb42, 'failed')
         right = XOR[int, str](mbNot, 'Nobody home')
         assert left42 == XOR(42, 'fail!')
         assert right == XOR(right='Nobody home')
 
-        ph42: MB[int] = MB(left42)
-        phNot: MB[int] = MB(right)
-        assert mb42 == ph42
-        assert mbNot == phNot
+        ph42 = MB(XOR(left42, 'also a failure'))
+        phNot1: MB[XOR[int, str]] = MB(XOR(right=''))
+        phNot2 = MB(XOR[int, str](right=''))
+        assert phNot1 == phNot2
+
+    def test_XOR_No_Pot_Rt(self) -> None:
+        try:
+            dog1 = XOR('Lucy')
+        except ValueError as ve:
+            assert True
+            assert str(ve) == 'XOR: Exclusive OR must have a right or potential right value'
+        else:
+            assert False
+
+        try:
+            dog2 = XOR('Flash', 2)
+        except ValueError as ve:
+            assert False
+        else:
+            assert True
+
+        try:
+            dog3 = XOR[str, int](right=3)
+        except ValueError as ve:
+            assert False
+        else:
+            assert True
+            assert dog3 == XOR(MB[str](), 3)
+

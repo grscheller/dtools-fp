@@ -44,7 +44,7 @@ class Test_str:
     def test_XOR_str(self) -> None:
         assert str(XOR(10, '')) == '< 10 | >'
         assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
-        assert str(XOR(addLt42(10, 40), '')) == "< |  >"
+        assert str(XOR(addLt42(10, 40), 'too big')) == "< | too big >"
         assert str(XOR(MB(), 'Foofoo rules')) == "< | Foofoo rules >"
         assert str(XOR(42, '')) == "< 42 | >"
         assert str(XOR('13', 0)) == "< 13 | >"
