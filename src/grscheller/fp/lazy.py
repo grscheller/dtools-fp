@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.lazy - lazy function evaluations
+"""#### Module fp.lazy - lazy function evaluations
 
 Delayed function evaluations, if needed, usually in some inner scope. FP tools
 for "non-strict" function evaluations.
