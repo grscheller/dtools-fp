@@ -51,6 +51,7 @@ report_progress = true
 
 [tool.mypy]
 enable_incomplete_feature = ["NewGenericSyntax"]
+local_partial_types = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
