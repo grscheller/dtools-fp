@@ -40,7 +40,7 @@ class NoValue():
 
     """
     __slots__ = ()
-    _instance = None
+    _instance: NoValue|None = None
 
     def __new__(cls) -> NoValue:
         if cls._instance is None:
@@ -68,9 +68,9 @@ class Sentinel():
       * always equals itself (unlike `noValue`)
     * usage
       * import Sentinel and then either
-        * either use `Sentinel()` directly
-        * or define ``_sntinel: Final[Sentinel] = Sentinel()``
-          * do not to export it
+        * use `Sentinel()` directly
+        * or define `_sentinel: Final[Sentinel] = Sentinel()`
+          * do not export it
       * compare using either
         * `is` and `is not`
         * `==` and `!=`
@@ -79,7 +79,7 @@ class Sentinel():
 
     """
     __slots__ = ()
-    _instance = None
+    _instance: Sentinel|None = None
 
     def __new__(cls) -> Sentinel:
         if cls._instance is None:

@@ -50,8 +50,11 @@ strict = true
 report_progress = true
 
 [tool.mypy]
-enable_incomplete_feature = ["NewGenericSyntax"]
+implicit_reexport = false
 local_partial_types = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
