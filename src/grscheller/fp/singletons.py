@@ -16,19 +16,49 @@
 
 Classes permitting at most only one instantiation. Safer, but not as performant,
 than a non-exported module level global. Difficult, but not impossible, for
-a typical end-user to exploit. Tailored for different use cases.
+a typical end-user to exploit. Different versions tailored for different use
+cases.
 
 ##### Singleton types:
 
-**class NoValue:** instances represent a missing or non-existent value
-**Class Sentinel:** instances represent a "hidden" sentinel value
+**class NoValue:** singleton instance "containing" no value
+**Class Sentinel:** singleton instances used as a "hidden" sentinel value
+**class Nada:** singleton instance representing & propagating failure
+
+##### `NoValue` was designed as a `None` replacement
+
+While `None` represents "returned no values," `NoValue()` represents the absence
+of a value and represents "nothingness." End-users use both `None` and `()` as
+sentinel values which collide with the maintainers intention of using either to
+represent "nothingness." This way a == b is true only if both exist and compare
+as equal.
+
+##### Here is another implementation for Sentinel:
+
+* on GitHub: [taleinat/python-stdlib-sentinels](https://github.com/taleinat/python-stdlib-sentinels)
+* on PyPI: [Project: Sentinels](https://pypi.org/project/sentinels/)
+* see: [PEP 661](https://peps.python.org/pep-0661/)
+
+This one is quite close to mine, but enables different sentinels with different
+names, and can be pickled. These last two extra features make this
+implementation overly complicated. Also, I think it is a bad idea to send
+information or implementation down-the-wire in the form of either stringified
+source code or binary executables. Use a communication protocol for the
+former and a package manager for the later.
+
+##### Nada propagates failure
+
+Nada is a singleton representing & propagating failure. Failure just blissfully
+propagates down "the happy path." For almost everything you do with it, it just
+returns itself. The maintainer has not used this construct enough yet to
+determine if it is a brilliant idea or a horrible blunder.
 
 """
 from __future__ import annotations
 
 __all__ = [ 'NoValue', 'Sentinel' ]
 
-from typing import Final, final
+from typing import Any, Callable, Final, final, Iterator
 
 @final
 class NoValue():
@@ -60,7 +90,7 @@ class NoValue():
         return
 
     def __repr__(self) -> str:
-        return 'noValue'
+        return 'NoValue()'
 
     def __eq__(self, other: object) -> bool:
         return False
@@ -83,7 +113,7 @@ class Sentinel():
       * compare using either
         * `is` and `is not`
         * `==` and `!=`
-          * the sentinel value always equals itself
+          * the Sentinel() value always equals itself
           * and never equals anything else
 
     """
@@ -93,10 +123,14 @@ class Sentinel():
     def __new__(cls) -> Sentinel:
         if cls._instance is None:
             cls._instance = super(Sentinel, cls).__new__(cls)
+            cls._hash = hash(((cls._instance,), cls._instance))
         return cls._instance
 
     def __init__(self) -> None:
         return
+
+    def __hash__(self) -> int:
+        return self._hash
 
     def __repr__(self) -> str:
         return 'Sentinel()'
@@ -105,4 +139,120 @@ class Sentinel():
         if self is other:
             return True
         return False
+
+@final
+class Nada():
+    """Singleton representing & propagating failure. Failure just blissfully
+    propagates down "the happy path." Have not used this construct enough yet
+    to determine if it is a clever idea or a horrible blunder.
+
+    * singleton nada: nada = Nada() represents a non-existent value
+    * returns itself for arbitrary method calls
+    * returns itself if called as a Callable with arbitrary arguments
+    * interpreted as an empty container by standard Python functions
+    * warning: non-standard equality semantics
+      * comparison compares true only when 2 non-missing values compare true
+        * when compared to itself behaves somewhat like IEEE Float NAN's
+        * `nada is nada` is true
+        * `nada == nada` is false
+        * `nada != nada` is true
+      * thus a == b means two non-missing values compare as equal
+    * usage
+      * import Nada and then either
+        * use `Nada()` directly
+        * or define `_nada: Final[Nada] = Nada()`
+          * do not export it
+      * start propagating failure by setting a propagating value to Nada()
+        * works best when working with expression
+        * failure may fail to propagate
+          * out of a function/method with just side effects
+          * engineer Nada() to fail to trigger side effects
+      * test for failure by comparing a result to Nada() itself using
+        * `is` and `is not`
+      * propagate failure through a calculation using
+        * `==` and `!=`
+          * the Nada() value never equals itself
+          * and never equals anything else
+
+    """
+    __slots__ = ()
+    _instance: Nada|None = None
+
+    sentinel: Final[Sentinel] = Sentinel()
+
+    def __new__(cls) -> Nada:
+        if cls._instance is None:
+            cls._instance = super(Nada, cls).__new__(cls)
+            cls._hash = hash((cls._instance, (cls._instance,)))
+        return cls._instance
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(())
+
+    def __hash__(self) -> int:
+        return self._hash
+
+    def __repr__(self) -> str:
+        return 'Nada()'
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __len__(self) -> int:
+        return 0
+
+    def __add__(self, right: Any) -> Nada:
+        return Nada()
+
+    def __radd__(self, left: Any) -> Nada:
+        return Nada()
+
+    def __mul__(self, right: Any) -> Nada:
+        return Nada()
+
+    def __rmul__(self, left: Any) -> Nada:
+        return Nada()
+
+    def __eq__(self, right: Any) -> bool:
+        return False
+
+    def __ne__(self, right: Any) -> bool:
+        return True
+
+    def __ge__(self, right: Any) -> bool:
+        return False
+
+    def __gt__(self, right: Any) -> bool:
+        return False
+
+    def __le__(self, right: Any) -> bool:
+        return False
+
+    def __lt__(self, right: Any) -> bool:
+        return False
+
+    def __getitem__(self, index: int|slice) -> Any:
+        return Nada()
+
+    def __setitem__(self, index: int|slice, item: Any) -> None:
+        return
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return Nada()
+
+    def __getattr__(self, name: str) -> Callable[[Any], Any]:
+        """Comment out for doc generation, pdoc gags on this method."""
+        def method(*args: Any, **kwargs: Any) -> Any:
+            return Nada()
+        return method
+
+    def nada_get(self, alt: Any=sentinel) -> Any:
+        """
+        Get an alternate value, defaults to Nada().
+
+        """
+        if alt == Sentinel():
+            return Nada()
+        else:
+            return alt
 
