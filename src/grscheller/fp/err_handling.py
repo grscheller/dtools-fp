@@ -136,6 +136,20 @@ class MB[D]():
             return MB()
 
     @staticmethod
+    def call[U, V](f: Callable[[U], V], u: U) -> MB[V]:
+        """Return an function call wrapped in a MB"""
+        try:
+            return MB(f(u))
+        except Exception:
+            return MB()
+
+    @staticmethod
+    def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MB[V]]:
+        def ret() -> MB[V]:
+            return MB.call(f, u)
+        return ret
+
+    @staticmethod
     def idx[V](v: Sequence[V], ii: int) -> MB[V]:
         """Return an indexed value wrapped in a MB"""
         try:
@@ -144,12 +158,10 @@ class MB[D]():
             return MB()
 
     @staticmethod
-    def mk[U, V](f: Callable[[U], V], d: U) -> MB[V]:
-        """Return an function call wrapped in a MB"""
-        try:
-            return MB(f(d))
-        except Exception:
-            return MB()
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MB[V]]:
+        def ret() -> MB[V]:
+            return MB.idx(v, ii)
+        return ret
 
     @staticmethod
     def sequence[T](seq_mb_d: Sequence[MB[T]]) -> MB[Sequence[T]]:
@@ -373,11 +385,30 @@ class XOR[L, R]():
             return f(cast(L, self._left))
 
     @staticmethod
-    def mk[U, V, W](f: Callable[[U], V], left: U, right: W) -> XOR[V, W]:
+    def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, MB[Exception]]:
         try:
-            return XOR(f(left), right)
-        except Exception:
-            return XOR(right=right)
+            return XOR(f(left), MB())
+        except Exception as esc:
+            return XOR(right=MB(esc))
+
+    @staticmethod
+    def lz_call[U, V](f: Callable[[U], V], left: U) -> Callable[[], XOR[V, MB[Exception]]]:
+        def ret() -> XOR[V, MB[Exception]]:
+            return XOR.call(f, left)
+        return ret
+
+    @staticmethod
+    def idx[V](v: Sequence[V], ii: int) -> XOR[V, MB[Exception]]:
+        try:
+            return XOR(v[ii], MB())
+        except Exception as esc:
+            return XOR(right=MB(esc))
+
+    @staticmethod
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], XOR[V, MB[Exception]]]:
+        def ret() -> XOR[V, MB[Exception]]:
+            return XOR.idx(v, ii)
+        return ret
 
     @staticmethod
     def sequence(seq_xor_lr: Sequence[XOR[L,R]], potential_right: R) -> XOR[Sequence[L],R]:
