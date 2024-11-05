@@ -26,8 +26,7 @@ from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR' ]
 
-from typing import Callable, cast, Final, Iterator
-from typing import Never, overload, Sequence
+from typing import Callable, cast, Final, Iterator, Never, overload, Sequence
 from .singletons import Sentinel
 
 class MB[D]():
@@ -137,7 +136,23 @@ class MB[D]():
             return MB()
 
     @staticmethod
-    def sequence(seq_mb_d: Sequence[MB[D]]) -> MB[Sequence[D]]:
+    def idx[V](v: Sequence[V], ii: int) -> MB[V]:
+        """Return an indexed value wrapped in a MB"""
+        try:
+            return MB(v[ii])
+        except IndexError:
+            return MB()
+
+    @staticmethod
+    def mk[U, V](f: Callable[[U], V], d: U) -> MB[V]:
+        """Return an function call wrapped in a MB"""
+        try:
+            return MB(f(d))
+        except Exception:
+            return MB()
+
+    @staticmethod
+    def sequence[T](seq_mb_d: Sequence[MB[T]]) -> MB[Sequence[T]]:
         """Sequence an indexable container of `MB[~D]`
 
         * if all the contained `MB` values in the container are not empty,
@@ -145,7 +160,7 @@ class MB[D]():
           * otherwise return an empty `MB`
 
         """
-        l: list[D] = []
+        l: list[T] = []
 
         for mb_d in seq_mb_d:
             if mb_d:
@@ -153,7 +168,7 @@ class MB[D]():
             else:
                 return MB()
 
-        ds = cast(Sequence[D], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
+        ds = cast(Sequence[T], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
         return MB(ds)
 
 class XOR[L, R]():
@@ -356,6 +371,13 @@ class XOR[L, R]():
             return cast(XOR[U, R], self)
         else:
             return f(cast(L, self._left))
+
+    @staticmethod
+    def mk[U, V, W](f: Callable[[U], V], left: U, right: W) -> XOR[V, W]:
+        try:
+            return XOR(f(left), right)
+        except Exception:
+            return XOR(right=right)
 
     @staticmethod
     def sequence(seq_xor_lr: Sequence[XOR[L,R]], potential_right: R) -> XOR[Sequence[L],R]:
