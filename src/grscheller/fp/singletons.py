@@ -119,6 +119,7 @@ class Sentinel():
     """
     __slots__ = ()
     _instance: Sentinel|None = None
+    _hash: int = 0
 
     def __new__(cls) -> Sentinel:
         if cls._instance is None:
@@ -177,6 +178,7 @@ class Nada():
     """
     __slots__ = ()
     _instance: Nada|None = None
+    _hash: int = 0
 
     sentinel: Final[Sentinel] = Sentinel()
 
@@ -240,11 +242,11 @@ class Nada():
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return Nada()
 
-    def __getattr__(self, name: str) -> Callable[[Any], Any]:
-        """Comment out for doc generation, pdoc gags on this method."""
-        def method(*args: Any, **kwargs: Any) -> Any:
-            return Nada()
-        return method
+ #  def __getattr__(self, name: str) -> Callable[[Any], Any]:
+ #      """Comment out for doc generation, pdoc gags on this method."""
+ #      def method(*args: Any, **kwargs: Any) -> Any:
+ #          return Nada()
+ #      return method
 
     def nada_get(self, alt: Any=sentinel) -> Any:
         """
