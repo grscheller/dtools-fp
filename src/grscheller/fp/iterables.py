@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""#### Module fp.iterables - Iterator related tooling
+"""### Module fp.iterables - Iterator related tools
 
 Library of iterator related functions and enumerations.
 
@@ -21,20 +21,20 @@ Library of iterator related functions and enumerations.
   * all iterators are assumed to be iterable
   * for all iterators `foo` we assume `iter(foo) is foo`
 
-##### Concatenating and merging iterables:
+#### Concatenating and merging iterables:
 
 * **function concat:** sequentially chain iterables
 * **function exhaust:** shuffle together iterables until all are exhausted
 * **function merge:** shuffle together iterables until one is exhausted
 
-##### Dropping and taking values from an iterable:
+#### Dropping and taking values from an iterable:
 
 * **function drop:** drop first `n` values from iterable
 * **function dropWhile:** drop values from iterable while predicate holds
 * **function take:** take up to `n` initial values from iterable
 * **function takeWhile:** take values from iterable while predicate holds
 
-##### Reducing and accumulating an iterable:
+#### Reducing and accumulating an iterable:
 
 * **function accumulate:** take iterable & function, return iterator of accumulated values
 * **function foldL:** fold iterable from the left with a function
@@ -42,7 +42,7 @@ Library of iterator related functions and enumerations.
 * **function foldLsc:** fold iterable from left with function and a premature stop condition
 * **function foldRsc:** fold iterable from right with function and a premature start condition
 
-##### Iterator related utility functions
+#### Iterator related utility functions
 
 * **function itargs:** function reterning an iterator of its arguments
 
@@ -112,8 +112,10 @@ def merge[D](*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]
     """Shuffle together the `iterables` until one is exhausted.
 
     * iterator yields until one of the iterables is exhausted
-    * if `yield_partials` is true, yield any unmatched yielded values from other iterables
-      * prevents data lose if any of the iterables are iterators with external references
+    * if `yield_partials` is true,
+      * yield any unmatched yielded values from other iterables
+      * prevents data lose
+        * if any of the iterables are iterators with external references
 
     """
     iterList = list(map(lambda x: iter(x), iterables))
@@ -174,8 +176,8 @@ def take[D](iterable: Iterable[D], n: int) -> Iterator[D]:
 def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
-       * potential value loss if iterable is iterator with external references
-
+    **Warning**, potential value loss if iterable is iterator with multiple
+    references.
     """
     it = iter(iterable)
     while True:
@@ -192,8 +194,7 @@ def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D
 
 def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
                   initial: Optional[L]=None) -> Iterator[L]:
-    """
-    Returns an iterator of accumulated values.
+    """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's `itertools.accumulate`
     * function `f` does not default to addition (for typing flexibility)
@@ -227,8 +228,7 @@ def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
 def foldL[D,L](iterable: Iterable[D],
           f: Callable[[L, D], L],
           initial: Optional[L]=None) -> MB[L]:
-    """
-    Folds an iterable left with optional initial value.
+    """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
     * when an initial value is not given then `~L = ~D`
@@ -255,8 +255,7 @@ def foldL[D,L](iterable: Iterable[D],
 def foldR[D,R](iterable: Reversible[D],
           f: Callable[[D, R], R],
           initial: Optional[R]=None) -> MB[R]:
-    """
-    Folds a reversible `iterable` right with an optional `initial` value.
+    """Folds a reversible `iterable` right with an optional `initial` value.
 
     * `iterable` needs to be reversible
     * traditional FP type order given for function `f`
@@ -285,8 +284,7 @@ def foldLsc[D,L,S](iterable: Iterable[D],
             initial: Optional[L]=None,
             stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
             istate: Optional[S]=None) -> MB[L]:
-    """
-    Short circuit version of foldL.
+    """Short circuit version of foldL.
 
     * Callable `stopfold` purpose is to prematurely stop the fold before end
       * useful for infinite iterables
@@ -317,10 +315,9 @@ def foldRsc[D,R,S](iterable: Iterable[D],
             initial: Optional[R]=None,
             startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
             istate: Optional[S]=None) -> MB[R]:
-    """
-    Short circuit version of foldR.
+    """Short circuit version of foldR.
 
-    * Callable `startfold` purpose is to start fold before end
+    * Callable `startfold` purpose is to start fold before reaching the end
       * does NOT start fold at end and prematurely stop
       * useful for infinite and non-reversible iterables
 

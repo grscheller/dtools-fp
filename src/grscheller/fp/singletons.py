@@ -25,13 +25,12 @@ cases.
 * **Class Sentinel:** singleton instances used as a "hidden" sentinel value
 * **class Nada:** singleton instance representing & propagating failure
 
-##### `NoValue` was designed as a `None` replacement
+##### NoValue was designed as a None replacement
 
 While `None` represents "returned no values," `NoValue()` represents the absence
-of a value and represents "nothingness." End-users use both `None` and `()` as
-sentinel values which collide with the maintainers intention of using either to
-represent "nothingness." This way a == b is true only if both exist and compare
-as equal.
+of a value. End-users use both `None` and `()` as sentinel values which can
+collide with using either to represent "nothingness." Non-existing values should
+not be comparable to anything, even themselves.
 
 ##### Here is another implementation for Sentinel:
 
@@ -64,18 +63,17 @@ from typing import Any, Callable, Final, final, Iterator
 class NoValue():
     """Singleton class representing a missing value.
 
-    * similar to `None` but while
-      * `None` represents "returned no values"
+    * similar to `None` but
+      * while `None` represents "returned no values"
       * `NoValue()` represents the absence of a value
     * usage
-      * import `NoValue` and then either
-        * use `NoValue()` directly
-        * or define `noValue: Final[NoValue] = NoValue()`
-          * for typed code safest not to export it
+      * `import NoValue from grscheller.fp.err_handling` and then
+        * either use `NoValue()` directly
+        * or define `_noValue: Final[NoValue] = NoValue()` don't export it
       * compare using `is` and `is not`
-        * two non-existing values should not be comparable as equal
-          * `None` means returned no values, so `None == None` makes sense
-          * if one or both values are missing then what is there to compare?
+        * 
+        * `None` means returned no values, so `None == None` makes sense
+        * if one or both values are missing then what is there to compare?
 
     """
     __slots__ = ()
@@ -108,13 +106,11 @@ class Sentinel():
     * usage
       * import Sentinel and then either
         * use `Sentinel()` directly
-        * or define `_sentinel: Final[Sentinel] = Sentinel()`
-          * do not export it
+        * or define `_sentinel: Final[Sentinel] = Sentinel()` don't export it
       * compare using either
-        * `is` and `is not`
-        * `==` and `!=`
-          * the Sentinel() value always equals itself
-          * and never equals anything else
+        * `is` and `is not` or `==` and `!=`
+        * the `Sentinel()` value always equals itself
+        * and never equals anything else
 
     """
     __slots__ = ()
@@ -143,37 +139,30 @@ class Sentinel():
 
 @final
 class Nada():
-    """Singleton representing & propagating failure. Failure just blissfully
-    propagates down "the happy path." Have not used this construct enough yet
-    to determine if it is a clever idea or a horrible blunder.
+    """Singleton class representing & propagating failure.
 
-    * singleton nada: nada = Nada() represents a non-existent value
+    * singleton `_nada: nada = Nada()` represents a non-existent value
     * returns itself for arbitrary method calls
     * returns itself if called as a Callable with arbitrary arguments
     * interpreted as an empty container by standard Python functions
     * warning: non-standard equality semantics
       * comparison compares true only when 2 non-missing values compare true
-        * when compared to itself behaves somewhat like IEEE Float NAN's
-        * `nada is nada` is true
-        * `nada == nada` is false
-        * `nada != nada` is true
-      * thus a == b means two non-missing values compare as equal
+      * thus `a == b` means two non-missing values compare as equal
     * usage
-      * import Nada and then either
-        * use `Nada()` directly
-        * or define `_nada: Final[Nada] = Nada()`
-          * do not export it
+      * import `Nada` and then
+        * either use `Nada()` directly
+        * or define `_nada: Final[Nada] = Nada()` don't export it
       * start propagating failure by setting a propagating value to Nada()
         * works best when working with expression
         * failure may fail to propagate
-          * out of a function/method with just side effects
+          * for a function/method with just side effects
           * engineer Nada() to fail to trigger side effects
-      * test for failure by comparing a result to Nada() itself using
+      * test for failure by comparing a result to `Nada()` itself using
         * `is` and `is not`
       * propagate failure through a calculation using
         * `==` and `!=`
-          * the Nada() value never equals itself
-          * and never equals anything else
+        * the `Nada()` value never equals itself
+        * and never equals anything else
 
     """
     __slots__ = ()
@@ -249,10 +238,7 @@ class Nada():
         return method
 
     def nada_get(self, alt: Any=sentinel) -> Any:
-        """
-        Get an alternate value, defaults to Nada().
-
-        """
+        """Get an alternate value, defaults to `Nada()`."""
         if alt == Sentinel():
             return Nada()
         else:
