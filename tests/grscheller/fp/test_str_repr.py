@@ -18,7 +18,7 @@ from typing import Optional, Final
 from grscheller.fp.singletons import NoValue
 from grscheller.fp.err_handling import MB, XOR
 
-noValue: Final[NoValue] = NoValue()
+_noValue: Final[NoValue] = NoValue()
 
 def addLt42(x: int, y: int) -> MB[int]:
     sum = x + y
@@ -50,16 +50,16 @@ class Test_str:
         assert str(XOR('13', 0)) == "< 13 | >"
 
     def test_noValue_str(self) -> None:
-        assert str(noValue) == 'noValue'
+        assert str(_noValue) == 'NoValue()'
 
 class Test_repr:
     def test_mb_repr(self) -> None:
         mb1: MB[object] = MB()
         mb2: MB[object] = MB()
-        mb3: MB[object] = MB(noValue)
+        mb3: MB[object] = MB(NoValue())
         mb4: MB[object] = MB(42)
         assert mb1 == mb2 == MB()
-        assert mb3 == MB(noValue) != MB()
+        assert mb3 == MB(NoValue()) != MB()
         assert repr(mb2) == 'MB()'
         mb5 = eval(repr(mb3))
         mb6 = eval(repr(mb4))
@@ -79,7 +79,7 @@ class Test_repr:
         assert mb6 != mb7
         assert mb8 == mb9
 
-        assert repr(mb5) == repr(mb3) ==  'MB(noValue)'
+        assert repr(mb5) == repr(mb3) ==  'MB(NoValue())'
         assert repr(mb7) ==  'MB(3)'
         assert repr(mb8) == repr(mb9) ==  'MB()'
 
