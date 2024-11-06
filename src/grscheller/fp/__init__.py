@@ -17,6 +17,12 @@
 Tools to aid with functional programming in Python yet still endeavoring to
 remain Pythonic.
 
+#### Modules and sub-packages
+
+* module **err_handling:** monadic maybe and either
+* module **iterables:** tools for iterables
+* module **singletons:** useful types with but one instance
+
 """
 __version__ = "1.0.10.1"
 __author__ = "Geoffrey R. Scheller"
