@@ -242,11 +242,11 @@ class Nada():
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return Nada()
 
- #  def __getattr__(self, name: str) -> Callable[[Any], Any]:
- #      """Comment out for doc generation, pdoc gags on this method."""
- #      def method(*args: Any, **kwargs: Any) -> Any:
- #          return Nada()
- #      return method
+    def __getattr__(self, name: str) -> Callable[[Any], Any]:
+        """Comment out for doc generation, pdoc gags on this method."""
+        def method(*args: Any, **kwargs: Any) -> Any:
+            return Nada()
+        return method
 
     def nada_get(self, alt: Any=sentinel) -> Any:
         """
