@@ -46,7 +46,7 @@ class MB[D]():
 
     """
     __slots__ = '_value',
-    __match_args__ = ('_value',)
+    __match_args__ = '_value',
 
     @overload
     def __init__(self) -> None: ...
