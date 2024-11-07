@@ -101,7 +101,7 @@ class Test_repr:
         assert e5 is not e2
         assert e5 is not e3
 
-        def lt5_or_nothing(x: int) -> M[int]:
+        def lt5_or_nothing(x: int) -> MB[int]:
             if x < 5:
                 return MB(x)
             else:
