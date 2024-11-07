@@ -231,9 +231,9 @@ class Nada():
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return Nada()
 
-    def __getattr__(self, name: str) -> Callable[[Any], Any]:
+    def __getattr__(self, name: str) -> Callable[..., Any]:
         """Comment out for doc generation, pdoc gags on this method."""
-        def method(*args: Any, **kwargs: Any) -> Any:
+        def method(*args: tuple[Any], **kwargs: dict[str, Any]) -> Any:
             return Nada()
         return method
 
