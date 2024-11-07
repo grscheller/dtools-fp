@@ -24,7 +24,7 @@ remain Pythonic.
 * module **singletons:** useful types with but one instance
 
 """
-__version__ = "1.0.10.1"
+__version__ = "1.0.10.2"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"

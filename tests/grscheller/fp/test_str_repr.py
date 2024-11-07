@@ -89,13 +89,13 @@ class Test_repr:
         assert repr(foofoo) == "MB('foo')"
 
     def test_xor_repr(self) -> None:
-        e1: XOR[int, str] = XOR(right='Nobody home!')
-        e2: XOR[int, str] = XOR(right='Somebody not home!')
-        e3: XOR[int, str] = XOR(right='')
+        e1: XOR[int, str] = XOR(MB(), 'Nobody home!')
+        e2: XOR[int, str] = XOR(MB(), 'Somebody not home!')
+        e3: XOR[int, str] = XOR(MB(), '')
         assert e1 != e2
         e5 = eval(repr(e2))
-        assert e2 != XOR(right='Nobody home!')
-        assert e2 == XOR(right='Somebody not home!')
+        assert e2 != XOR(MB(), 'Nobody home!')
+        assert e2 == XOR(MB(), 'Somebody not home!')
         assert e5 == e2
         assert e5 != e3
         assert e5 is not e2
@@ -111,7 +111,7 @@ class Test_repr:
             if x < 5:
                 return XOR(x, 'None!')
             else:
-                return XOR(right = f'was to be {x}')
+                return XOR(MB(), f'was to be {x}')
 
         e1 = XOR(lt5_or_nothing(2), 'potential right value does not matter')
         e2 = lt5_or_none_XOR(2)
@@ -127,5 +127,5 @@ class Test_repr:
         assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
         assert repr(e2) ==  "XOR(2, 'None!')"
         assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(right='was to be 7')"
-        assert repr(e8) ==  "XOR(right='was to be 8')"
+        assert repr(e7) == "XOR(MB(), 'was to be 7')"
+        assert repr(e8) ==  "XOR(MB(), 'was to be 8')"

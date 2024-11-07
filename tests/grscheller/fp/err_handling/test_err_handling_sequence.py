@@ -73,19 +73,19 @@ class TestXOR_sequence:
         assert xor_dqueueInt_str == XOR(DoubleQueue(range(1, 2501)), 'none are wrong')
 
     def test_with_rights(self) -> None:
-        list_of_xor_int_str: list[XOR[int, str]] = [XOR(right='1'), XOR(2, '2'), XOR(3, '3'), XOR(4, '4')]
-        tuple_of_xor_int_str: tuple[XOR[int, str], ...] = XOR(1, '1'), XOR(right='2'), XOR(3, '3'), XOR(4, '4')
-        ftuple_of_xor_int_str = FT(XOR(1, '1'), XOR(2, '2'), XOR(right='3'), XOR(4, '4'))
-        dqueue_of_xor_int_str = DQ(XOR(1, '1'), XOR(2, '2'), XOR(3, '3'), XOR(right='4'))
+        list_of_xor_int_str: list[XOR[int, str]] = [XOR(MB(), '1'), XOR(2, '2'), XOR(3, '3'), XOR(4, '4')]
+        tuple_of_xor_int_str: tuple[XOR[int, str], ...] = XOR(1, '1'), XOR(MB(), '2'), XOR(3, '3'), XOR(4, '4')
+        ftuple_of_xor_int_str = FT(XOR(1, '1'), XOR(2, '2'), XOR(MB(), '3'), XOR(4, '4'))
+        dqueue_of_xor_int_str = DQ(XOR(1, '1'), XOR(2, '2'), XOR(3, '3'), XOR(MB(), '4'))
 
         xor_list_int = XOR.sequence(list_of_xor_int_str, 'OK')
         xor_tuple_int = XOR.sequence(tuple_of_xor_int_str, 'OK')
         xor_ftuple_int = XOR.sequence(ftuple_of_xor_int_str, 'OK')
         xor_dqueue_int = XOR.sequence(dqueue_of_xor_int_str, 'OK')
 
-        assert xor_list_int == XOR(right='1')
-        assert xor_tuple_int == XOR(right='2')
-        assert xor_ftuple_int == XOR(right='3')
-        assert xor_dqueue_int == XOR(right='4')
-        assert xor_dqueue_int != XOR(right='42')
+        assert xor_list_int == XOR(MB(), '1')
+        assert xor_tuple_int == XOR(MB(), '2')
+        assert xor_ftuple_int == XOR(MB(), '3')
+        assert xor_dqueue_int == XOR(MB(), '4')
+        assert xor_dqueue_int != XOR(MB(), '42')
 

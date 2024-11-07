@@ -189,8 +189,6 @@ class XOR[L, R]():
       * contains a value of type `~L`
       * and a potential right value of type `~R`
     * `XOR(right=right)` produces a right `XOR`
-    * throws `ValueError`
-      * when not given a right or potential right value
     * in a Boolean context
       * `True` if a left `XOR`
       * `False` if a right `XOR`
@@ -234,7 +232,7 @@ class XOR[L, R]():
         if self:
             return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
         else:
-            return 'XOR(MB(), right=' + repr(self._right) + ')'
+            return 'XOR(MB(), ' + repr(self._right) + ')'
 
     def __str__(self) -> str:
         if self:
@@ -376,7 +374,7 @@ class XOR[L, R]():
         try:
             return XOR(f(left), MB())
         except Exception as esc:
-            return XOR(right=MB(esc))
+            return XOR(MB(), MB(esc))
 
     @staticmethod
     def lz_call[U, V](f: Callable[[U], V], left: U) -> Callable[[], XOR[V, MB[Exception]]]:
