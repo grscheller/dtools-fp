@@ -51,22 +51,20 @@ class MB[D]():
     @overload
     def __init__(self) -> None: ...
     @overload
-    def __init__(self, value: D) -> None: ...
-    @overload
     def __init__(self, value: MB[D]) -> None: ...
+    @overload
+    def __init__(self, value: D) -> None: ...
 
     def __init__(self, value: D|MB[D]|Sentinel=Sentinel()) -> None:
-        self._value: D|Sentinel
-        if value is Sentinel():
-            self._value = cast(D|Sentinel, value)
-        else:
-            match value:
-                case MB(d):
-                    self._value = d
-                case MB():
-                    self._value = Sentinel()
-                case d:
-                    self._value = d
+        match value:
+            case MB(d):
+                self._value: D|Sentinel = d
+            case MB():
+                self._value = Sentinel()
+            case s if s is Sentinel():
+                self._value = s
+            case d:
+                self._value = d
 
     def __bool__(self) -> bool:
         return self._value is not Sentinel()

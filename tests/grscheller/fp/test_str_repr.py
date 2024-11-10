@@ -86,7 +86,11 @@ class Test_repr:
         foofoo = MB(MB('foo'))
         foofoo2 = eval(repr(foofoo))
         assert foofoo2 == foofoo
-        assert repr(foofoo) == "MB('foo')"
+        assert repr(foofoo2) == repr(foofoo) =="MB('foo')"
+        if foofoo:
+            assert True
+        else:
+            assert False
 
     def test_xor_repr(self) -> None:
         e1: XOR[int, str] = XOR(MB(), 'Nobody home!')

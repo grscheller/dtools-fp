@@ -349,6 +349,7 @@ def foldRsc[D,R,S](iterable: Iterable[D],
     return MB(acc)
 
 ## Iterator related utility functions
+# TODO: move to fp.experimental.args
 
 def itargs[A](*args: A) -> Iterator[A]:
     """Function returning an iterators of its arguments.
