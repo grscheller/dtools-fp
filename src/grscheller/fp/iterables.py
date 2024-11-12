@@ -27,12 +27,16 @@ Library of iterator related functions and enumerations.
 * **function exhaust:** shuffle together iterables until all are exhausted
 * **function merge:** shuffle together iterables until one is exhausted
 
+---
+
 #### Dropping and taking values from an iterable:
 
 * **function drop:** drop first `n` values from iterable
 * **function dropWhile:** drop values from iterable while predicate holds
 * **function take:** take up to `n` initial values from iterable
 * **function takeWhile:** take values from iterable while predicate holds
+
+---
 
 #### Reducing and accumulating an iterable:
 
@@ -42,9 +46,13 @@ Library of iterator related functions and enumerations.
 * **function foldLsc:** fold iterable from left with function and a premature stop condition
 * **function foldRsc:** fold iterable from right with function and a premature start condition
 
+---
+
 #### Iterator related utility functions
 
 * **function itargs:** function reterning an iterator of its arguments
+
+---
 
 """
 from __future__ import annotations

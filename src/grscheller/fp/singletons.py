@@ -32,6 +32,8 @@ of a value. End-users use both `None` and `()` as sentinel values which can
 collide with using either to represent "nothingness." Non-existing values should
 not be comparable to anything, even themselves.
 
+---
+
 ##### Here is another implementation for Sentinel:
 
 * on GitHub: [taleinat/python-stdlib-sentinels](https://github.com/taleinat/python-stdlib-sentinels)
@@ -45,12 +47,16 @@ information or implementation down-the-wire in the form of either stringified
 source code or binary executables. Use a communication protocol for the
 former and a package manager for the later.
 
+---
+
 ##### Nada propagates failure
 
 Nada is a singleton representing & propagating failure. Failure just blissfully
 propagates down "the happy path." For almost everything you do with it, it just
 returns itself. The maintainer has not used this construct enough yet to
 determine if it is a brilliant idea or a horrible blunder.
+
+---
 
 """
 from __future__ import annotations
