@@ -13,10 +13,10 @@ Functional programming tools which endeavor to be Pythonic.
 * grscheller.fp.iterables
   * iteration tools implemented in Python
 * grscheller.fp.nothingness
-  * singleton `noValue` representing a missing value.
-    * similar to `None` but while
-      * `None` represent "returned no values"
-      * `noValue: _NoValue = _NoValue()` represents the absence of a value
+  * singleton classes representing either a
+    * missing value
+    * sentinel value
+    * failed calculation
 * grscheller.fp.err\_handling
   * monadic tools for handling missing values & unexpected events
 
