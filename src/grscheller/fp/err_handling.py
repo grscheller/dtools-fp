@@ -26,7 +26,8 @@ from __future__ import annotations
 
 __all__ = [ 'MB', 'XOR' ]
 
-from typing import Callable, cast, Final, Iterator, Never, overload, Sequence
+from collections.abc import Callable, Iterator, Sequence
+from typing import cast, Final, Never, overload
 from .singletons import Sentinel
 
 class MB[D]():

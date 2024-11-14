@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, cast, Never
+from typing import cast, Never
 from grscheller.fp.iterables import foldLsc, foldRsc
 from grscheller.fp.err_handling import MB
 

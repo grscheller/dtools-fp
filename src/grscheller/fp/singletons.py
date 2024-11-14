@@ -55,17 +55,13 @@ Nada is a singleton representing & propagating failure. Failure just blissfully
 propagates down "the happy path." For almost everything you do with it, it just
 returns itself. The maintainer has not used this construct enough yet to
 determine if it is a brilliant idea or a horrible blunder.
-
----
-
 """
 from __future__ import annotations
 
 __all__ = [ 'NoValue', 'Sentinel', 'Nada' ]
 
-from typing import Any, Callable, Final, final, Iterator
-
-@final
+from collections.abc import Callable, Iterator
+from typing import Any, Final, final
 class NoValue():
     """Singleton class representing a missing value.
 

@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-from typing import Optional, Final
 from grscheller.datastructures.tuples import FTuple, FT
 from grscheller.fp.err_handling import MB, XOR
 

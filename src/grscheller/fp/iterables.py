@@ -56,8 +56,9 @@ Library of iterator related functions and enumerations.
 
 """
 from __future__ import annotations
+from collections.abc import Callable, Iterator, Iterable, Reversible
 from enum import auto, Enum
-from typing import Callable, cast, Iterator, Iterable, Optional, Reversible
+from typing import cast
 from .err_handling import MB
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
@@ -201,7 +202,7 @@ def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D
 ## reducing and accumulating
 
 def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
-                  initial: Optional[L]=None) -> Iterator[L]:
+                  initial: L|None=None) -> Iterator[L]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's `itertools.accumulate`
@@ -235,7 +236,7 @@ def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
 
 def foldL[D,L](iterable: Iterable[D],
           f: Callable[[L, D], L],
-          initial: Optional[L]=None) -> MB[L]:
+          initial: L|None=None) -> MB[L]:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -262,7 +263,7 @@ def foldL[D,L](iterable: Iterable[D],
 
 def foldR[D,R](iterable: Reversible[D],
           f: Callable[[D, R], R],
-          initial: Optional[R]=None) -> MB[R]:
+          initial: R|None=None) -> MB[R]:
     """Folds a reversible `iterable` right with an optional `initial` value.
 
     * `iterable` needs to be reversible
@@ -289,9 +290,9 @@ def foldR[D,R](iterable: Reversible[D],
 
 def foldLsc[D,L,S](iterable: Iterable[D],
             f: Callable[[L, D], L],
-            initial: Optional[L]=None,
+            initial: L|None=None,
             stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-            istate: Optional[S]=None) -> MB[L]:
+            istate: S|None=None) -> MB[L]:
     """Short circuit version of foldL.
 
     * Callable `stopfold` purpose is to prematurely stop the fold before end
@@ -320,9 +321,9 @@ def foldLsc[D,L,S](iterable: Iterable[D],
 
 def foldRsc[D,R,S](iterable: Iterable[D],
             f: Callable[[D, R], R],
-            initial: Optional[R]=None,
+            initial: R|None=None,
             startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-            istate: Optional[S]=None) -> MB[R]:
+            istate: S|None=None) -> MB[R]:
     """Short circuit version of foldR.
 
     * Callable `startfold` purpose is to start fold before reaching the end

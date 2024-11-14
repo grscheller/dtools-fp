@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-from typing import Any
 from grscheller.circular_array.ca import CA
 from grscheller.fp.singletons import Nada
 

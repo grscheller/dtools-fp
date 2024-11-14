@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Final
+from typing import Final
 from grscheller.fp.singletons import NoValue
 from grscheller.fp.err_handling import MB, XOR
 
