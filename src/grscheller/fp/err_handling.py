@@ -57,9 +57,10 @@ class MB[D]():
     def __init__(self, value: D) -> None: ...
 
     def __init__(self, value: D|MB[D]|Sentinel=Sentinel()) -> None:
+        self._value: D|Sentinel
         match value:
             case MB(d):
-                self._value: D|Sentinel = d
+                self._value = d
             case MB():
                 self._value = Sentinel()
             case s if s is Sentinel():
@@ -187,7 +188,7 @@ class XOR[L, R]():
     * `XOR(left: ~L, right: ~R)` produces a left `XOR` which
       * contains a value of type `~L`
       * and a potential right value of type `~R`
-    * `XOR(right=right)` produces a right `XOR`
+    * `XOR(MB(), right)` produces a right `XOR`
     * in a Boolean context
       * `True` if a left `XOR`
       * `False` if a right `XOR`

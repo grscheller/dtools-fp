@@ -21,31 +21,32 @@ cases.
 
 #### Singleton types:
 
-* **class NoValue:** singleton instance "containing" no value
+* **class NoValue:** singleton instance representing the absence of a value
 * **Class Sentinel:** singleton instances used as a "hidden" sentinel value
 * **class Nada:** singleton instance representing & propagating failure
 
 ##### NoValue was designed as a None replacement
 
 While `None` represents "returned no values," `NoValue()` represents the absence
-of a value. End-users use both `None` and `()` as sentinel values which can
-collide with using either to represent "nothingness." Non-existing values should
-not be comparable to anything, even themselves.
+of a value. Non-existing values should not be comparable to anything, even
+themselves. End-users may use both `None` and `()` as sentinel values which
+colliding with using either to represent "nothingness." 
 
 ---
 
-##### Here is another implementation for Sentinel:
+##### Sentinel value used as a hidden implementation detailed
 
-* on GitHub: [taleinat/python-stdlib-sentinels](https://github.com/taleinat/python-stdlib-sentinels)
-* on PyPI: [Project: Sentinels](https://pypi.org/project/sentinels/)
-* see: [PEP 661](https://peps.python.org/pep-0661/)
+* Here is another implementation for Sentinel:
+  * on GitHub: [taleinat/python-stdlib-sentinels](https://github.com/taleinat/python-stdlib-sentinels)
+  * on PyPI: [Project: Sentinels](https://pypi.org/project/sentinels/)
+  * see: [PEP 661](https://peps.python.org/pep-0661/)
 
 This one is quite close to mine, but enables different sentinels with different
-names, and can be pickled. These last two extra features make this
-implementation overly complicated. Also, I think it is a bad idea to send
-information or implementation down-the-wire in the form of either stringified
-source code or binary executables. Use a communication protocol for the
-former and a package manager for the later.
+names, and can be pickled. These last two extra features I feel make this
+implementation overly complicated. Mind is intended to be used as a "hidden"
+implementation detail. Hidden from both end users and other library modules.
+Sometimes cast or override may be needed when over zealous typing tools get
+confused.
 
 ---
 
@@ -73,9 +74,9 @@ class NoValue():
         * either use `NoValue()` directly
         * or define `_noValue: Final[NoValue] = NoValue()` don't export it
       * compare using `is` and `is not`
-        * 
+        * not `==` or `!=`
         * `None` means returned no values, so `None == None` makes sense
-        * if one or both values are missing then what is there to compare?
+        * if one or both values are missing, then what is there to compare?
 
     """
     __slots__ = ()

@@ -11,7 +11,13 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
-### Version 1.0.2.0 - PyPI release date 2024-10-20
+### Version 1.1.0 - PyPI release date 11-18-24
+
+* added fp.function module
+  * combine and partially apply functions as first class objects
+  * some tests may be lacking
+
+### Version 1.0.2.0 - Commit date 2024-10-20
 
 * breaking API changes, next PyPI release will be 1.1.0.
 * renamed module `nothingness` to `singletons`
