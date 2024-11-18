@@ -19,9 +19,10 @@ remain Pythonic.
 
 #### Modules and sub-packages
 
-* module **err_handling:** monadic maybe and either
-* module **iterables:** tools for iterables
-* module **singletons:** useful types with but one instance
+* module grscheller.fp.err_handling: monadic maybe and either
+* module grscheller.fp.functions: tools combine and partially apply functions
+* module grscheller.fp.iterables: tools for iterables
+* module grscheller.fp.singletons: useful types with but one instance
 
 """
 __version__ = "1.1.0"
