@@ -35,10 +35,9 @@ class MB[D]():
 
     * where `MB(value)` contains a possible value of type `~D`
     * `MB()` semantically represent a non-existent or missing value of type `~D`
-    * immutable, a `MB` does not change after being created
-      * immutable semantics, map & flatMap return new instances
-      * warning: contained values need not be immutable
-      * warning: not hashable if a mutable value is contained
+    * `MB` objects are self flattening, therefore a `MB` cannot contain a MB
+      * `MB(MB(d)) == MB(d)`
+      * `MB(MB()) == MB()`
     * raises `ValueError` if get method not given default value & one is needed
     * immutable, a `MB` does not change after being created
       * immutable semantics, map & flatMap return new instances
@@ -95,6 +94,13 @@ class MB[D]():
         else:
             return False
 
+    @overload
+    def get(self) -> D|Never: ...
+    @overload
+    def get(self, alt: D) -> D: ...
+    @overload
+    def get(self, alt: Sentinel) -> D|Never: ...
+
     def get(self, alt: D|Sentinel=Sentinel()) -> D|Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
@@ -105,11 +111,11 @@ class MB[D]():
         if self._value is not Sentinel():
             return cast(D, self._value)
         else:
-            if alt is not Sentinel():
-                return cast(D, alt)
-            else:
+            if alt is Sentinel():
                 msg = 'An alternate return type not provided.'
                 raise ValueError(msg)
+            else:
+                return cast(D, alt)
 
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
         """Map function `f` over the 0 or 1 elements of this data structure.
@@ -211,18 +217,18 @@ class XOR[L, R]():
     def __init__(self, left: MB[L], right: R) -> None: ...
 
     def __init__(self, left: L|MB[L], right: R) -> None:
-        self._left: L|Sentinel
+        self._left: L|MB[L]
         self._right: R
         match left:
             case MB(l):
-                self._left, self._right = l, right
+                self._left, self._right = cast(L, l), right
             case MB():
-                self._left, self._right = Sentinel(), right
+                self._left, self._right = MB(), right
             case l:
                 self._left, self._right = l, right
 
     def __bool__(self) -> bool:
-        return self._left is not Sentinel()
+        return self._left != MB()
 
     def __iter__(self) -> Iterator[L]:
         if self:
@@ -269,9 +275,11 @@ class XOR[L, R]():
     @overload
     def getLeft(self) -> L|Never: ...
     @overload
+    def getLeft(self, altLeft: MB[L]) -> L|Never: ...
+    @overload
     def getLeft(self, altLeft: L) -> L: ...
 
-    def getLeft(self, altLeft: L|Sentinel=Sentinel()) -> L|Never:
+    def getLeft(self, altLeft: L|MB[L]=MB()) -> L|Never:
         """Get value if a left.
 
         * if the `XOR` is a left, return its value
@@ -280,10 +288,10 @@ class XOR[L, R]():
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
-        if self._left is Sentinel():
-            if altLeft is Sentinel():
+        if self._left == MB():
+            if altLeft == MB():
                 msg1 = 'XOR: getLeft method called on a right XOR '
-                msg2 = 'without an alternate left return value.'
+                msg2 = 'without a valid alternate left return value.'
                 raise(ValueError(msg1+msg2))
             else:
                 return cast(L, altLeft)
@@ -306,17 +314,18 @@ class XOR[L, R]():
         * returns itself if already a right
 
         """
-        if self._left is Sentinel():
+        if self._left == MB():
             return self
         else:
-            return cast(XOR[L, R], XOR(Sentinel(), self._right))
+            return cast(XOR[L, R], XOR(MB(), self._right))
 
     def newRight(self, right: R) -> XOR[L, R]:
         """Swap in a right value. 
 
         * returns a new instance with a new right (or potential right) value.
+
         """
-        if self._left is Sentinel():
+        if self._left == MB():
             return cast(XOR[L, R], XOR(MB(), right))
         else:
             return cast(XOR[L, R], XOR(self._left, right))
@@ -333,7 +342,7 @@ class XOR[L, R]():
           * use method `mapRight` to adjust the returned value
 
         """
-        if self._left is Sentinel():
+        if self._left == MB():
             return cast(XOR[U, R], self)
         try:
             applied = f(cast(L, self._left))
@@ -364,7 +373,7 @@ class XOR[L, R]():
         * propagate right values
 
         """
-        if self._left is Sentinel():
+        if self._left == MB():
             return cast(XOR[U, R], self)
         else:
             return f(cast(L, self._left))
@@ -412,7 +421,7 @@ class XOR[L, R]():
             if xor_lr:
                 l.append(xor_lr.getLeft())
             else:
-                return cast(XOR[Sequence[L], R], XOR(Sentinel(), xor_lr.getRight()))
+                return cast(XOR[Sequence[L], R], XOR(MB(), xor_lr.getRight()))
 
         ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
         return XOR(ds, potential_right)
