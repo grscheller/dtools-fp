@@ -238,6 +238,7 @@ class TestXOR:
         s4 = s3.map(noMoreThan5).mapRight((lambda s: s + ' more than 5'), 'failed')
         assert s1.getLeft() == 3
         assert s2.getLeft() == 3
+        assert s4.getLeft(MB(42)) == 42
         assert s4.getLeft(42) == 42
         bar = 'barbell'
         bar = s1.getRight()

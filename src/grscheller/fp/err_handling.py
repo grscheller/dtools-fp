@@ -57,13 +57,12 @@ class MB[D]():
 
     def __init__(self, value: D|MB[D]|Sentinel=Sentinel()) -> None:
         self._value: D|Sentinel
+        _sentinel = Sentinel()
         match value:
-            case MB(d):
+            case MB(d) if d is not _sentinel:
                 self._value = d
-            case MB():
-                self._value = Sentinel()
-            case s if s is Sentinel():
-                self._value = s
+            case MB(s):
+                self._value = _sentinel
             case d:
                 self._value = d
 
@@ -220,15 +219,15 @@ class XOR[L, R]():
         self._left: L|MB[L]
         self._right: R
         match left:
-            case MB(l):
+            case MB(l) if l is not Sentinel():
                 self._left, self._right = cast(L, l), right
-            case MB():
+            case MB(s):
                 self._left, self._right = MB(), right
             case l:
                 self._left, self._right = l, right
 
     def __bool__(self) -> bool:
-        return self._left != MB()
+        return MB() != self._left
 
     def __iter__(self) -> Iterator[L]:
         if self:
@@ -275,28 +274,38 @@ class XOR[L, R]():
     @overload
     def getLeft(self) -> L|Never: ...
     @overload
-    def getLeft(self, altLeft: MB[L]) -> L|Never: ...
-    @overload
     def getLeft(self, altLeft: L) -> L: ...
+    @overload
+    def getLeft(self, altLeft: MB[L]) -> L|Never: ...
 
     def getLeft(self, altLeft: L|MB[L]=MB()) -> L|Never:
         """Get value if a left.
 
         * if the `XOR` is a left, return its value
-        * otherwise, return `alt: ~L` if it is provided
-        * alternate value must me of type `~L`
-        * raises `ValueError` if an alternate value is not provided but needed
+        * if a right, return an alternate value of type ~L` if it is provided
+          * alternate value provided directly
+          * or optionally provided with a MB
+        * raises `ValueError` if an alternate value is needed but not provided
 
         """
-        if self._left == MB():
-            if altLeft == MB():
-                msg1 = 'XOR: getLeft method called on a right XOR '
-                msg2 = 'without a valid alternate left return value.'
-                raise(ValueError(msg1+msg2))
-            else:
-                return cast(L, altLeft)
-        else:
-            return cast(L, self._left)
+        match altLeft:
+            case MB(l) if l is not Sentinel():
+                if self:
+                    return cast(L, self._left)
+                else:
+                    return cast(L, l)
+            case MB(s):
+                if self:
+                    return cast(L, self._left)
+                else:
+                    msg1 = 'XOR: getLeft method called on a right XOR '
+                    msg2 = 'without a valid alternate left return value.'
+                    raise(ValueError(msg1+msg2))
+            case l:
+                if self:
+                    return cast(L, self._left)
+                else:
+                    return l
 
     def getRight(self) -> R:
         """Get value of `XOR` if a right, potential right value if a left.
@@ -320,7 +329,7 @@ class XOR[L, R]():
             return cast(XOR[L, R], XOR(MB(), self._right))
 
     def newRight(self, right: R) -> XOR[L, R]:
-        """Swap in a right value. 
+        """Swap in a right value.
 
         * returns a new instance with a new right (or potential right) value.
 
@@ -421,7 +430,7 @@ class XOR[L, R]():
             if xor_lr:
                 l.append(xor_lr.getLeft())
             else:
-                return cast(XOR[Sequence[L], R], XOR(MB(), xor_lr.getRight()))
+                return XOR(MB(), xor_lr.getRight())
 
         ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
         return XOR(ds, potential_right)
