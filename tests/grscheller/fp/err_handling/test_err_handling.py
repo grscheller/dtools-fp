@@ -232,23 +232,23 @@ class TestXOR:
             else:
                 return MB()
 
-        s1 = XOR(3, right = 'foofoo rules')
+        s1 = XOR(3, 'foofoo rules')
         s2 = s1.map(noMoreThan5).mapRight((lambda _: 'more than 5'), 'failed')
         s3 = XOR(42, 'foofoo rules')
         s4 = s3.map(noMoreThan5).mapRight((lambda s: s + ' more than 5'), 'failed')
-        assert s1.getLeft() == 3
-        assert s2.getLeft() == 3
-        assert s4.getLeft(MB(42)) == 42
-        assert s4.getLeft(42) == 42
+        assert s1.getLeft() == MB(3)
+        assert s2.getLeft().get(42) == 3
+        assert s4.getLeft(MB(42)) == MB(42)
+        assert s4.getLeft(42) == MB(42)
         bar = 'barbell'
         bar = s1.getRight()
         assert bar == 'foofoo rules'
         assert s2.getRight() == 'more than 5'
         assert s3.getRight() == 'foofoo rules'
         assert s4.getRight() == 'foofoo rules more than 5'
-        assert s1.getLeft(0) == 3
-        assert s3.getLeft(0) == 42
-        assert s4.getLeft(0) == 0
+        assert s1.getLeft(0) == MB(3)
+        assert s3.getLeft(0) == MB(42)
+        assert s4.getLeft(0) == MB(0)
 
     def test_either_flatMaps(self) -> None:
         def lessThan2(x: int) -> XOR[int, str]:
@@ -315,11 +315,11 @@ class TestXOR:
         left42 = XOR(mb42, 'failed')
         right = XOR[int, str](mbNot, 'Nobody home')
         assert left42 == XOR(42, 'fail!')
-        assert right == XOR(left=MB(), right='Nobody home')
+        assert right == XOR(MB(), 'Nobody home')
 
         ph42 = MB(XOR(left42, 'also a failure'))
         phNot1: MB[XOR[int, str]] = MB(XOR(MB(), ''))
-        phNot2 = MB(XOR[int, str](MB(), right=''))
+        phNot2 = MB(XOR[int, str](MB(), ''))
         assert phNot1 == phNot2
 
     def test_XOR_No_Pot_Rt(self) -> None:

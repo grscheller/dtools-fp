@@ -38,7 +38,6 @@ class MB[D]():
     * `MB` objects are self flattening, therefore a `MB` cannot contain a MB
       * `MB(MB(d)) == MB(d)`
       * `MB(MB()) == MB()`
-    * raises `ValueError` if get method not given default value & one is needed
     * immutable, a `MB` does not change after being created
       * immutable semantics, map & flatMap return new instances
         * warning: contained values need not be immutable
@@ -103,7 +102,7 @@ class MB[D]():
     def get(self, alt: D|Sentinel=Sentinel()) -> D|Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
-        * alternate value must me of type `~D`
+        * alternate value must be of type `~D`
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
@@ -211,11 +210,11 @@ class XOR[L, R]():
     __match_args__ = ('_left', '_right')
 
     @overload
-    def __init__(self, left: L, right: R) -> None: ...
+    def __init__(self, left: L, right: R, /) -> None: ...
     @overload
-    def __init__(self, left: MB[L], right: R) -> None: ...
+    def __init__(self, left: MB[L], right: R, /) -> None: ...
 
-    def __init__(self, left: L|MB[L], right: R) -> None:
+    def __init__(self, left: L|MB[L], right: R, /) -> None:
         self._left: L|MB[L]
         self._right: R
         match left:
@@ -272,40 +271,39 @@ class XOR[L, R]():
         return False
 
     @overload
-    def getLeft(self) -> L|Never: ...
+    def getLeft(self) -> MB[L]: ...
     @overload
-    def getLeft(self, altLeft: L) -> L: ...
+    def getLeft(self, altLeft: L) -> MB[L]: ...
     @overload
-    def getLeft(self, altLeft: MB[L]) -> L|Never: ...
+    def getLeft(self, altLeft: MB[L]) -> MB[L]: ...
 
-    def getLeft(self, altLeft: L|MB[L]=MB()) -> L|Never:
+    def getLeft(self, altLeft: L|MB[L]=MB()) -> MB[L]:
         """Get value if a left.
 
         * if the `XOR` is a left, return its value
         * if a right, return an alternate value of type ~L` if it is provided
           * alternate value provided directly
           * or optionally provided with a MB
-        * raises `ValueError` if an alternate value is needed but not provided
+        * returns a `MB[L]` for when an altLeft value is needed but not provided
 
         """
+        _sentinel = Sentinel()
         match altLeft:
-            case MB(l) if l is not Sentinel():
+            case MB(l) if l is not _sentinel:
                 if self:
-                    return cast(L, self._left)
+                    return MB(self._left)
                 else:
-                    return cast(L, l)
+                    return MB(cast(L, l))
             case MB(s):
                 if self:
-                    return cast(L, self._left)
+                    return MB(self._left)
                 else:
-                    msg1 = 'XOR: getLeft method called on a right XOR '
-                    msg2 = 'without a valid alternate left return value.'
-                    raise(ValueError(msg1+msg2))
+                    return MB()
             case l:
                 if self:
-                    return cast(L, self._left)
+                    return MB(self._left)
                 else:
-                    return l
+                    return MB(l)
 
     def getRight(self) -> R:
         """Get value of `XOR` if a right, potential right value if a left.
@@ -428,7 +426,7 @@ class XOR[L, R]():
 
         for xor_lr in seq_xor_lr:
             if xor_lr:
-                l.append(xor_lr.getLeft())
+                l.append(xor_lr.getLeft().get())
             else:
                 return XOR(MB(), xor_lr.getRight())
 
