@@ -240,6 +240,12 @@ class TestXOR:
         assert s2.getLeft().get(42) == 3
         assert s4.getLeft(MB(42)) == MB(42)
         assert s4.getLeft(42) == MB(42)
+        try:
+            assert s4.getLeft(42).get().get() == 42
+        except AttributeError:
+            assert True
+        else:
+            assert False
         bar = 'barbell'
         bar = s1.getRight()
         assert bar == 'foofoo rules'
