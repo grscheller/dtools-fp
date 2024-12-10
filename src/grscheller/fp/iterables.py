@@ -150,7 +150,7 @@ def drop[D](iterable: Iterable[D], n: int) -> Iterator[D]:
     it = iter(iterable)
     for _ in range(n):
         try:
-            value = next(it)
+            next(it)
         except StopIteration:
             break
     return it
