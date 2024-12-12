@@ -23,36 +23,28 @@ Library of iterator related functions and enumerations.
 
 #### Concatenating and merging iterables:
 
-* **function concat:** sequentially chain iterables
-* **function exhaust:** shuffle together iterables until all are exhausted
-* **function merge:** shuffle together iterables until one is exhausted
+* function **concat:** sequentially chain iterables
+* function **exhaust:** shuffle together iterables until all are exhausted
+* function **merge:** shuffle together iterables until one is exhausted
 
 ---
 
 #### Dropping and taking values from an iterable:
 
-* **function drop:** drop first `n` values from iterable
-* **function dropWhile:** drop values from iterable while predicate holds
-* **function take:** take up to `n` initial values from iterable
-* **function takeWhile:** take values from iterable while predicate holds
+* function **drop:** drop first `n` values from iterable
+* function **dropWhile:** drop values from iterable while predicate holds
+* function **take:** take up to `n` initial values from iterable
+* function **takeWhile:** take values from iterable while predicate holds
 
 ---
 
 #### Reducing and accumulating an iterable:
 
-* **function accumulate:** take iterable & function, return iterator of accumulated values
-* **function foldL:** fold iterable from the left with a function
-* **function foldR:** fold reversible iterable from the right with a function
-* **function foldLsc:** fold iterable from left with function and a premature stop condition
-* **function foldRsc:** fold iterable from right with function and a premature start condition
-
----
-
-#### Iterator related utility functions
-
-* **function itargs:** function reterning an iterator of its arguments
-
----
+* function **accumulate:** take iterable & function, return iterator of accumulated values
+* function **foldL:** fold iterable from the left with a function
+* function **foldR:** fold reversible iterable from the right with a function
+* function **foldLsc:** fold iterable from left with function and a premature stop condition
+* function **foldRsc:** fold iterable from right with function and a premature start condition
 
 """
 from __future__ import annotations
@@ -63,8 +55,7 @@ from .err_handling import MB
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'dropWhile', 'take', 'takeWhile',
-            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc',
-            'itargs' ]
+            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc' ]
 
 ## Iterate over multiple Iterables
 
@@ -356,15 +347,4 @@ def foldRsc[D,R,S](iterable: Iterable[D],
         acc = f(ds.pop(), acc)
 
     return MB(acc)
-
-## Iterator related utility functions
-# TODO: move to fp.experimental.args
-
-def itargs[A](*args: A) -> Iterator[A]:
-    """Function returning an iterators of its arguments.
-
-    Useful when an API only provides a constructor taking a single iterable.
-    """
-    for arg in args:
-        yield arg
 

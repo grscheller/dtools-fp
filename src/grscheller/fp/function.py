@@ -23,19 +23,20 @@ and application.
 * function **swap:** swap the arguments of a 2 argument function
 * function **sequenced:** convert function to take a sequence of its arguments
 * function **partial:** returns a partially applied function
+* function **iter_args:** function returning an iterator of its arguments
 
 """
 from __future__ import annotations
 from collections.abc import Callable, Sequence
 from typing import Any
 
-__all__ = [ 'swap', 'sequenced', 'partial' ]
+__all__ = [ 'swap', 'sequenced', 'partial', 'iter_args' ]
 
 ## Functional Utilities
 
 def swap[U,V,R](f: Callable[[U,V],R]) -> Callable[[V,U],R]:
     """Swap arguments of a two argument function."""
-    return (lambda v,u: f(u,v))
+    return (lambda v, u: f(u,v))
 
 def sequenced[R](f: Callable[..., R]) -> Callable[..., R]:
     """Convert a function with arbitrary positional arguments to one taking
@@ -54,11 +55,17 @@ def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
       * otherwise cast the results when they are created
 
     """
-    def apply(fn_seq: Callable[..., R], vals: Sequence[Any]) -> Callable[..., R]:
-        return (lambda restT: fn_seq(vals + restT))
-
-    def wrap(*bs: Any) -> R:
-        return apply(sequenced(f), args)(bs)
+    def wrap(*rest: R) -> R:
+        return sequenced(f)(args + rest)
 
     return wrap
+
+def iter_args[A](*args: A) -> Iterator[A]:
+    """Function returning an iterators of its arguments.
+
+    * useful for API's with single iterable constructors
+
+    """
+    for arg in args:
+        yield arg
 

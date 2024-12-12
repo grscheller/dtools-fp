@@ -16,7 +16,6 @@ from grscheller.circular_array.ca import ca, CA
 from grscheller.fp.iterables import concat, merge, exhaust
 from grscheller.fp.iterables import accumulate
 from grscheller.fp.iterables import drop, take, dropWhile, takeWhile
-from grscheller.fp.iterables import itargs
 
 class Test_fp_iterables:
     def test_taking_dropping(self) -> None:
@@ -181,31 +180,4 @@ class Test_fp_iterables:
         empty: tuple[int, ...] = ()
         batPlus = list(accumulate(bat, lambda t,i: (i,) + t, empty))
         assert batPlus == [(), (5,), (4, 5), (3, 4, 5), (2, 3, 4, 5), (1, 2, 3, 4, 5)]
-
-    def test_itargs(self) -> None:
-        ref0: list[int] = []
-        trg0: list[int] = list(itargs())
-        assert ref0 == trg0
-
-        ref1 = [1, 2, 4, 8, 42]
-        trg1 = list(itargs(1, 2, 4, 8, 42))
-        assert ref1 == trg1
-
-        ref2 = [1, 2, 3]
-        trg2 = [*itargs(1,2,3)]
-        assert ref2 == trg2
-
-        caI = ca((1, 2))
-        caA = CA(1, 2)
-        assert caI == caA
-
-        ca0_ref: ca[int] = ca()
-        ca0_trg: list[int] = list(itargs())
-        assert ref0 == trg0
-
-        ca1_ref: ca[int] = ca((42, 7, 11, 100))
-        ca1_trg = ca(itargs(42, 7, 11, 100))
-        ca1_splat1 = CA(*itargs(42, 7, 11, 100))
-        ca1_splat2 = CA(*itargs(42, 7), *itargs(11, 100))
-        assert ca1_ref == ca1_trg == ca1_splat1 == ca1_splat2
 

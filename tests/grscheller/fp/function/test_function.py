@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions anddd
 # limitations under the License.
 
-from grscheller.fp.function import partial, sequenced, swap
+from grscheller.circular_array.ca import ca, CA
+from grscheller.fp.function import partial, sequenced, swap, iter_args
 from grscheller.fp.iterables import foldL, take
 
 class Test_function:
@@ -53,8 +54,35 @@ class Test_function:
         def compute(a: float, b: float, c: float, d: int) -> float:
             return ( (a + b)*c ) ** d
 
-        data = [3.1, 4.2, 2.7, 5]
+        data: tuple[float, float, float, int] = (3.1, 4.2, 2.7, 5)
         compute_seq = sequenced(compute)
 
         assert compute(*data) == compute_seq(data)
+
+    def test_iter_args(self) -> None:
+        ref0: list[int] = []
+        trg0: list[int] = list(iter_args())
+        assert ref0 == trg0
+
+        ref1 = [1, 2, 4, 8, 42]
+        trg1 = list(iter_args(1, 2, 4, 8, 42))
+        assert ref1 == trg1
+
+        ref2 = [1, 2, 3]
+        trg2 = [*iter_args(1,2,3)]
+        assert ref2 == trg2
+
+        caI = ca((1, 2))
+        caA = CA(1, 2)
+        assert caI == caA
+
+        ca0_ref: ca[int] = ca()
+        ca0_trg: list[int] = list(iter_args())
+        assert ref0 == trg0
+
+        ca1_ref: ca[int] = ca((42, 7, 11, 100))
+        ca1_trg = ca(iter_args(42, 7, 11, 100))
+        ca1_splat1 = CA(*iter_args(42, 7, 11, 100))
+        ca1_splat2 = CA(*iter_args(42, 7), *iter_args(11, 100))
+        assert ca1_ref == ca1_trg == ca1_splat1 == ca1_splat2
 
