@@ -14,7 +14,7 @@
 
 from grscheller.circular_array.ca import ca, CA
 from grscheller.fp.function import partial, sequenced, swap, iter_args
-from grscheller.fp.iterables import foldL, take
+from grscheller.fp.iterables import mbFoldL, take
 
 class Test_function:
     def test_same_type(self) -> None:
@@ -35,7 +35,7 @@ class Test_function:
 
     def test_different_types(self) -> None:
         def names(num: int, sep: str, names: list[str]) -> str:
-            return foldL(take(names, num),
+            return mbFoldL(take(names, num),
                          lambda names, name: names + sep + name,
                          "").get()[len(sep):]
 

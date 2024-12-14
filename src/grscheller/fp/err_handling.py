@@ -54,9 +54,9 @@ class MB[D]():
     @overload
     def __init__(self, value: D) -> None: ...
 
-    def __init__(self, value: D|MB[D]|Sentinel=Sentinel()) -> None:
+    def __init__(self, value: D|MB[D]|Sentinel=Sentinel('MB')) -> None:
         self._value: D|Sentinel
-        _sentinel = Sentinel()
+        _sentinel: Final[Sentinel] = Sentinel('MB')
         match value:
             case MB(d) if d is not _sentinel:
                 self._value = d
@@ -66,7 +66,7 @@ class MB[D]():
                 self._value = d
 
     def __bool__(self) -> bool:
-        return self._value is not Sentinel()
+        return self._value is not Sentinel('MB')
 
     def __iter__(self) -> Iterator[D]:
         if self:
@@ -99,18 +99,19 @@ class MB[D]():
     @overload
     def get(self, alt: Sentinel) -> D|Never: ...
 
-    def get(self, alt: D|Sentinel=Sentinel()) -> D|Never:
+    def get(self, alt: D|Sentinel=Sentinel('MB')) -> D|Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
         * alternate value must be of type `~D`
         * raises `ValueError` if an alternate value is not provided but needed
 
         """
-        if self._value is not Sentinel():
+        _sentinel: Final[Sentinel] = Sentinel('MB')
+        if self._value is not _sentinel:
             return cast(D, self._value)
         else:
-            if alt is Sentinel():
-                msg = 'An alternate return type not provided.'
+            if alt is _sentinel:
+                msg = 'MB: an alternate return type not provided'
                 raise ValueError(msg)
             else:
                 return cast(D, alt)
@@ -121,7 +122,7 @@ class MB[D]():
         * if `f` should fail, return a MB()
 
         """
-        if self._value is Sentinel():
+        if self._value is Sentinel('MB'):
             return cast(MB[U], self)
         else:
             try:
@@ -218,7 +219,7 @@ class XOR[L, R]():
         self._left: L|MB[L]
         self._right: R
         match left:
-            case MB(l) if l is not Sentinel():
+            case MB(l) if l is not Sentinel('MB'):
                 self._left, self._right = cast(L, l), right
             case MB(s):
                 self._left, self._right = MB(), right
@@ -287,7 +288,7 @@ class XOR[L, R]():
         * returns a `MB[L]` for when an altLeft value is needed but not provided
 
         """
-        _sentinel = Sentinel()
+        _sentinel = Sentinel('MB')
         match altLeft:
             case MB(l) if l is not _sentinel:
                 if self:

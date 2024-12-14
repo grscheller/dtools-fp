@@ -23,39 +23,46 @@ Library of iterator related functions and enumerations.
 
 #### Concatenating and merging iterables:
 
-* function **concat:** sequentially chain iterables
-* function **exhaust:** shuffle together iterables until all are exhausted
-* function **merge:** shuffle together iterables until one is exhausted
+* function **concat**: sequentially chain iterables
+* function **exhaust**: shuffle together iterables until all are exhausted
+* function **merge**: shuffle together iterables until one is exhausted
 
 ---
 
 #### Dropping and taking values from an iterable:
 
-* function **drop:** drop first `n` values from iterable
-* function **dropWhile:** drop values from iterable while predicate holds
-* function **take:** take up to `n` initial values from iterable
-* function **takeWhile:** take values from iterable while predicate holds
+* function **drop**: drop first `n` values from iterable
+* function **dropWhile**: drop values from iterable while predicate holds
+* function **take**: take up to `n` initial values from iterable
+* function **takeWhile**: take values from iterable while predicate holds
 
 ---
 
 #### Reducing and accumulating an iterable:
 
-* function **accumulate:** take iterable & function, return iterator of accumulated values
-* function **foldL:** fold iterable from the left with a function
-* function **foldR:** fold reversible iterable from the right with a function
-* function **foldLsc:** fold iterable from left with function and a premature stop condition
-* function **foldRsc:** fold iterable from right with function and a premature start condition
+* function **accumulate**: take iterable & function, return iterator of accumulated values
+* function **foldL0**: fold iterable from the left with a function
+  * raises `StopIteration` exception if iterable is empty
+* function **foldL1**: fold iterable from the left with a function and initial value
+* function **mbFoldL**: fold iterable left with an optional initial value
+  * wraps result in a `NB` monad
+* function **scfoldL**: fold iterable left with premature start and stop conditions
+  * wraps result in a `NB` monad
+* function **scfoldR**: fold iterable right with premature start and stop conditions
+  * wraps result in a `NB` monad
 
 """
 from __future__ import annotations
 from collections.abc import Callable, Iterator, Iterable, Reversible
 from enum import auto, Enum
-from typing import cast
+from typing import cast, Final, Never
 from .err_handling import MB
+from .singletons import NoValue, Sentinel
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'dropWhile', 'take', 'takeWhile',
-            'accumulate', 'foldL', 'foldR', 'foldLsc', 'foldRsc' ]
+            'accumulate', 'foldL0', 'foldL1',
+            'mbFoldL', 'scFoldL', 'scFoldR' ]
 
 ## Iterate over multiple Iterables
 
@@ -192,8 +199,9 @@ def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D
 
 ## reducing and accumulating
 
-def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
-                  initial: L|None=None) -> Iterator[L]:
+def accumulate[D,L](iterable: Iterable[D],
+                    f: Callable[[L, D], L],
+                    initial: L|NoValue=NoValue()) -> Iterator[L]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's `itertools.accumulate`
@@ -206,14 +214,15 @@ def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
     try:
         it0 = next(it)
     except StopIteration:
-        if initial is None:
+        if initial is NoValue():
             return
         else:
-            yield initial
+            yield cast(L, initial)
     else:
-        if initial is not None:
-            yield initial
-            acc = f(initial, it0)
+        if initial is not NoValue():
+            init = cast(L, initial)
+            yield init
+            acc = f(init, it0)
             for ii in it:
                 yield acc
                 acc = f(acc, ii)
@@ -225,9 +234,39 @@ def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L],
                 acc = f(acc, ii)
             yield acc
 
-def foldL[D,L](iterable: Iterable[D],
-          f: Callable[[L, D], L],
-          initial: L|None=None) -> MB[L]:
+def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Never:
+    """Folds an iterable left with optional initial value.
+
+    * traditional FP type order given for function `f`
+    * if iterable empty raises StopIteration exception
+    * never returns if `iterable` generates an infinite iterator
+
+    """
+    it = iter(iterable)
+    try:
+        acc = next(it)
+    except StopIteration:
+        msg = "Attemped to feft fold an empty iterable."
+        raise StopIteration(msg)
+    for v in it:
+        acc = f(acc, v)
+    return acc
+
+def foldL1[D, L](iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
+    """Folds an iterable left with optional initial value.
+
+    * traditional FP type order given for function `f`
+    * never returns if `iterable` generates an infinite iterator
+
+    """
+    acc = initial
+    for v in iterable:
+        acc = f(acc, v)
+    return acc
+
+def mbFoldL[L, D](iterable: Iterable[D],
+                  f: Callable[[L, D], L],
+                  initial: L|NoValue=NoValue()) -> MB[L]:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -238,91 +277,66 @@ def foldL[D,L](iterable: Iterable[D],
     """
     acc: L
     it = iter(iterable)
-
-    if initial is None:
+    if initial is NoValue():
         try:
             acc = cast(L, next(it))  # in this case L = D
         except StopIteration:
             return MB()
     else:
-        acc = initial
+        acc = cast(L, initial)
 
     for v in it:
         acc = f(acc, v)
-
     return MB(acc)
 
-def foldR[D,R](iterable: Reversible[D],
-          f: Callable[[D, R], R],
-          initial: R|None=None) -> MB[R]:
-    """Folds a reversible `iterable` right with an optional `initial` value.
+def scFoldL[D,L,S](iterable: Iterable[D],
+                   f: Callable[[L, D], L],
+                   initial: L|NoValue=NoValue(),
+                   istate: S|Sentinel=Sentinel('scFold'),
+                   startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
+                   stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s)) -> MB[L]:
+    """Short circuit version of a left fold.
 
-    * `iterable` needs to be reversible
-    * traditional FP type order given for function `f`
-    * when initial value is not given then `~R = ~D`
-    * if iterable empty and no `initial` value given, return an empty `MB()`
-
-    """
-    acc: R
-    it = reversed(iterable)
-
-    if initial is None:
-        try:
-            acc = cast(R, next(it))  # in this case R = D
-        except StopIteration:
-            return MB()
-    else:
-        acc = initial
-
-    for v in it:
-        acc = f(v, acc)
-
-    return MB(acc)
-
-def foldLsc[D,L,S](iterable: Iterable[D],
-            f: Callable[[L, D], L],
-            initial: L|None=None,
-            stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-            istate: S|None=None) -> MB[L]:
-    """Short circuit version of foldL.
-
-    * Callable `stopfold` purpose is to prematurely stop the fold before end
+    * Callable `startfold` is to delay starting the fold
+    * Callable `stopfold` is to prematurely stop the fold before end
       * useful for infinite iterables
 
     """
-    state = cast(MB[S], MB(istate))
+    stateMB = cast(MB[S], MB(istate))
 
     it = iter(iterable)
 
-    if initial is None:
+    if initial is NoValue():
         try:
             acc = cast(L, next(it))  # in this case L = D
         except StopIteration:
             return MB()
     else:
-        acc = initial
+        acc = cast(L, initial)
 
     for d in it:
-        if (state := stopfold(d, state.get())):
+        if (stateMB := stopfold(d, stateMB.get())):
             acc = f(acc, d)
         else:
             break
 
     return MB(acc)
 
-def foldRsc[D,R,S](iterable: Iterable[D],
-            f: Callable[[D, R], R],
-            initial: R|None=None,
-            startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-            istate: S|None=None) -> MB[R]:
-    """Short circuit version of foldR.
+def scFoldR[D,R,S](iterable: Iterable[D],
+                   f: Callable[[D, R], R],
+                   initial: R|NoValue=NoValue(),
+                   istate: S|Sentinel=Sentinel('scFold'),
+                   startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
+                   stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s)) -> MB[R]:
+    """Short circuit version of a right fold.
 
-    * Callable `startfold` purpose is to start fold before reaching the end
-      * does NOT start fold at end and prematurely stop
+    * Callable `startfold` is to prematurely start fold before reaching the end
+    * Callable `stopfold` is to prematurely stop the fold
+      * useful for infinite iterables
       * useful for infinite and non-reversible iterables
 
     """
-    state = cast(MB[S], MB(istate))
+    stateMB = cast(MB[S], MB(istate))
 
     it = iter(iterable)
 
@@ -330,18 +344,18 @@ def foldRsc[D,R,S](iterable: Iterable[D],
 
     ds: list[D] = []
     for d in it:
-        if (state := startfold(d, state.get())):
+        if (stateMB := startfold(d, stateMB.get())):
             ds.append(d)
         else:
             break
 
-    if initial is None:
+    if initial is NoValue():
         if len(ds) == 0:
             return MB()
         else:
             acc = cast(R, ds.pop())  # in this case R = D
     else:
-        acc = initial
+        acc = cast(R, initial)
 
     while ds:
         acc = f(ds.pop(), acc)

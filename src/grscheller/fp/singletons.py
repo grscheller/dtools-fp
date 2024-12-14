@@ -25,7 +25,7 @@ cases.
 * **Class Sentinel:** singleton instances used as a "hidden" sentinel value
 * **class Nada:** singleton instance representing & propagating failure
 
-##### NoValue was designed as a None replacement
+##### `NoValue` was designed as a None replacement
 
 While `None` represents "returned no values," `NoValue()` represents the absence
 of a value. Non-existing values should not be comparable to anything, even
@@ -34,23 +34,21 @@ colliding with using either to represent "nothingness."
 
 ---
 
-##### Sentinel value used as a hidden implementation detailed
+##### `Sentinel` values used as hidden implementation details
 
-* Here is another implementation for Sentinel:
+* Here is another implementation for Sentinel:``
   * on GitHub: [taleinat/python-stdlib-sentinels](https://github.com/taleinat/python-stdlib-sentinels)
   * on PyPI: [Project: Sentinels](https://pypi.org/project/sentinels/)
   * see: [PEP 661](https://peps.python.org/pep-0661/)
 
-This one is quite close to mine, but enables different sentinels with different
-names, and can be pickled. These last two extra features I feel make this
-implementation overly complicated. Mind is intended to be used as a "hidden"
-implementation detail. Hidden from both end users and other library modules.
-Sometimes cast or override may be needed when over zealous typing tools get
-confused.
+Initially this one was somewhat close to mine and also enabled pickling.
+Subsequently it was "enhanced" to allow sentinel values to be subclassed. My
+implementation is substantially more simple, python implementation independent,
+less Gang-of-Four OOP, and more Pythonic.
 
 ---
 
-##### Nada propagates failure
+##### `Nada` propagates failure
 
 Nada is a singleton representing & propagating failure. Failure just blissfully
 propagates down "the happy path." For almost everything you do with it, it just
@@ -63,6 +61,7 @@ __all__ = [ 'NoValue', 'Sentinel', 'Nada' ]
 
 from collections.abc import Callable, Iterator
 from typing import Any, Final, final
+
 class NoValue():
     """Singleton class representing a missing value.
 
@@ -98,7 +97,7 @@ class NoValue():
 
 @final
 class Sentinel():
-    """Singleton class representing a sentinel value.
+    """Singleton classes representing a sentinel values.
 
     * intended for library code, not to be exported/shared between modules
       * otherwise some of its intended typing guarantees may be lost
@@ -108,37 +107,28 @@ class Sentinel():
       * always equals itself (unlike `noValue`)
     * usage
       * import Sentinel and then either
-        * use `Sentinel()` directly
-        * or define `_sentinel: Final[Sentinel] = Sentinel()` don't export it
+        * define `_my_sentinel: Final[Sentinel] = Sentinel('my_sentinel')`
+        * or use `Sentinel('my_sentinel')` directly
       * compare using either
         * `is` and `is not` or `==` and `!=`
         * the `Sentinel()` value always equals itself
-        * and never equals anything else
+        * and never equals anything else, especially other sentinel values
 
     """
-    __slots__ = ()
-    _instance: Sentinel|None = None
-    _hash: int = 0
+    __slots__ = '_sentinel_name',
+    _instances: dict[str, Sentinel] = {}
 
-    def __new__(cls) -> Sentinel:
-        if cls._instance is None:
-            cls._instance = super(Sentinel, cls).__new__(cls)
-            cls._hash = hash(((cls._instance,), cls._instance))
-        return cls._instance
+    def __new__(cls, sentinel_name: str) -> Sentinel:
+        if sentinel_name not in cls._instances:
+            cls._instances[sentinel_name] = super(Sentinel, cls).__new__(cls)
+        return cls._instances[sentinel_name]
 
-    def __init__(self) -> None:
+    def __init__(self, sentinel_name: str) -> None:
+        self._sentinel_name = sentinel_name
         return
 
-    def __hash__(self) -> int:
-        return self._hash
-
     def __repr__(self) -> str:
-        return 'Sentinel()'
-
-    def __eq__(self, other: object) -> bool:
-        if self is other:
-            return True
-        return False
+        return "Sentinel('" + self._sentinel_name + "')"
 
 @final
 class Nada():
@@ -172,7 +162,7 @@ class Nada():
     _instance: Nada|None = None
     _hash: int = 0
 
-    sentinel: Final[Sentinel] = Sentinel()
+    sentinel: Final[Sentinel] = Sentinel('Nada')
 
     def __new__(cls) -> Nada:
         if cls._instance is None:
@@ -241,7 +231,7 @@ class Nada():
 
     def nada_get(self, alt: Any=sentinel) -> Any:
         """Get an alternate value, defaults to `Nada()`."""
-        if alt == Sentinel():
+        if alt == Sentinel('Nada'):
             return Nada()
         else:
             return alt
