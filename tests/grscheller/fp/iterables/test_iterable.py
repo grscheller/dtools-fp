@@ -159,11 +159,11 @@ class Test_fp_iterables:
         assert barMult == [1]
 
         woo: list[int] = [5,4,3,2,1]
-        wooPlus1 = list(accumulate(woo, add, initial=1))
-        wooMult1 = list(accumulate(woo, lambda a,b: a*b, initial=10))
+        wooPlus1 = list(accumulate(woo, add, 1))
+        wooMult1 = list(accumulate(woo, lambda a,b: a*b, 10))
         assert wooPlus1 == [1, 6, 10, 13, 15, 16]
         assert wooMult1 == [10, 50, 200, 600, 1200, 1200]
-        nowooPlus1 = list(accumulate([], add, initial=1))
+        nowooPlus1 = list(accumulate([], add, 1))
         nowooMult1 = list(accumulate([], lambda a,b: a*b, 10))
         assert nowooPlus1 == [1]
         assert nowooMult1 == [10]

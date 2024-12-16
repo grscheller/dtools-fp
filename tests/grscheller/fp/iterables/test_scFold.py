@@ -39,25 +39,25 @@ class Test_fp_no_sc_folds:
         data3: tuple[int, ...] = ()
         data4 = 42,
 
-        assert scFoldL(data1, add) == MB(5050)
-        assert scFoldR(data1, add) == MB(5050)
-        assert scFoldL(data1, add, 10) == MB(5060)
-        assert scFoldR(data1, add, 10) == MB(5060)
+        assert scFoldL(data1, add)[0] == MB(5050)
+        assert scFoldR(data1, add)[0] == MB(5050)
+        assert scFoldL(data1, add, 10)[0] == MB(5060)
+        assert scFoldR(data1, add, 10)[0] == MB(5060)
 
-        assert scFoldL(data2, add) == MB(5049)
-        assert scFoldR(data2, add) == MB(5049)
-        assert scFoldL(data2, add, 10) == MB(5059)
-        assert scFoldR(data2, add, 10) == MB(5059)
+        assert scFoldL(data2, add)[0] == MB(5049)
+        assert scFoldR(data2, add)[0] == MB(5049)
+        assert scFoldL(data2, add, 10)[0] == MB(5059)
+        assert scFoldR(data2, add, 10)[0] == MB(5059)
 
-        assert scFoldL(data3, add) == MB()
-        assert scFoldR(data3, add) == MB()
-        assert scFoldL(data3, add, 10) == MB(10)
-        assert scFoldR(data3, add, 10) == MB(10)
+        assert scFoldL(data3, add)[0] == MB()
+        assert scFoldR(data3, add)[0] == MB()
+        assert scFoldL(data3, add, 10)[0] == MB(10)
+        assert scFoldR(data3, add, 10)[0] == MB(10)
 
-        assert scFoldL(data4, add) == MB(42)
-        assert scFoldR(data4, add) == MB(42)
-        assert scFoldL(data4, add, 10) == MB(52)
-        assert scFoldR(data4, add, 10) == MB(52)
+        assert scFoldL(data4, add)[0] == MB(42)
+        assert scFoldR(data4, add)[0] == MB(42)
+        assert scFoldL(data4, add, 10)[0] == MB(52)
+        assert scFoldR(data4, add, 10)[0] == MB(52)
 
         stuff1 = (1, 2, 3, 4, 5)
         stuff2 = (2, 3, 4, 5)
@@ -66,33 +66,33 @@ class Test_fp_no_sc_folds:
         stuff5: list[int] = []
         stuff6: tuple[int] = 42,
 
-        assert scFoldL(stuff1, add) == MB(15)
-        assert scFoldL(stuff1, add, 10) == MB(25)
-        assert scFoldR(stuff1, add) == MB(15)
-        assert scFoldR(stuff1, add, 10) == MB(25)
-        assert scFoldL(stuff2, add) == MB(14)
-        assert scFoldR(stuff2, add) == MB(14)
-        assert scFoldL(stuff3, none_add) == MB()
-        assert scFoldR(stuff3, none_add).get(None) is None
-        assert scFoldL(stuff4, none_add).get(-2) == 42
-        assert scFoldR(stuff4, none_add).get(-2) == 42
-        assert scFoldL(stuff5, add).get(-2) == -2
-        assert scFoldR(stuff5, add).get(-2) == -2
-        assert scFoldL(stuff5, add) == MB()
-        assert scFoldR(stuff5, add) == MB()
-        assert scFoldL(stuff6, add) == MB(42)
-        assert scFoldR(stuff6, add) == MB(42)
+        assert scFoldL(stuff1, add)[0] == MB(15)
+        assert scFoldL(stuff1, add, 10)[0] == MB(25)
+        assert scFoldR(stuff1, add)[0] == MB(15)
+        assert scFoldR(stuff1, add, 10)[0] == MB(25)
+        assert scFoldL(stuff2, add)[0] == MB(14)
+        assert scFoldR(stuff2, add)[0] == MB(14)
+        assert scFoldL(stuff3, none_add)[0] == MB()
+        assert scFoldR(stuff3, none_add)[0].get(None) is None
+        assert scFoldL(stuff4, none_add)[0].get(-2) == 42
+        assert scFoldR(stuff4, none_add)[0].get(-2) == 42
+        assert scFoldL(stuff5, add)[0].get(-2) == -2
+        assert scFoldR(stuff5, add)[0].get(-2) == -2
+        assert scFoldL(stuff5, add)[0] == MB()
+        assert scFoldR(stuff5, add)[0] == MB()
+        assert scFoldL(stuff6, add)[0] == MB(42)
+        assert scFoldR(stuff6, add)[0] == MB(42)
 
-        assert scFoldL(stuff1, funcL) == MB(-156)
-        assert scFoldR(stuff1, funcR) == MB(0)
-        assert scFoldL(stuff2, funcL) == MB(84)
-        assert scFoldR(stuff2, funcR) == MB(39)
-        assert scFoldL(stuff5, funcL) == MB()
-        assert scFoldR(stuff5, funcR) == MB()
-        assert scFoldL(stuff6, funcL) == MB(42)
-        assert scFoldR(stuff6, funcR) == MB(42)
+        assert scFoldL(stuff1, funcL)[0] == MB(-156)
+        assert scFoldR(stuff1, funcR)[0] == MB(0)
+        assert scFoldL(stuff2, funcL)[0] == MB(84)
+        assert scFoldR(stuff2, funcR)[0] == MB(39)
+        assert scFoldL(stuff5, funcL)[0] == MB()
+        assert scFoldR(stuff5, funcR)[0] == MB()
+        assert scFoldL(stuff6, funcL)[0] == MB(42)
+        assert scFoldR(stuff6, funcR)[0] == MB(42)
 
-    def test_fold_sc(self) -> None:
+    def test_scfolds(self) -> None:
         def add(ii: int, jj: int) -> int:
             return ii + jj
 
@@ -136,32 +136,110 @@ class Test_fp_no_sc_folds:
         data6 = 10,
         data7 = 15, 20, 25, 30
 
-        assert scFoldL(data1, add_or_bail, stopfold=fold_is_lt42_stop_None, istate=0) == MB(15)
-        assert scFoldL(data2, add, stopfold=fold_is_lt42_stop_NegOne, istate=0) == MB(15)
-        assert scFoldL(data3, add, stopfold=fold_is_lt42, istate=0) == MB(36)
-        assert scFoldL(data4, add, stopfold=fold_is_lt42, istate=0) == MB(21)
-        assert scFoldL(data5, add, stopfold=fold_is_lt42, istate=0) == MB()
-        assert scFoldL(data6, add, stopfold=fold_is_lt42, istate=0) == MB(10)
-        assert scFoldL(data7, add, stopfold=fold_is_lt42, istate=0) == MB(35)
-        assert scFoldL(data1, add_or_bail, 10, stopfold=fold_is_lt42_stop_None, istate=10) == MB(25)
-        assert scFoldL(data2, add, 10, stopfold=fold_is_lt42_stop_NegOne, istate=10) == MB(25)
-        assert scFoldL(data3, add, 10, stopfold=fold_is_lt42, istate=10) == MB(38)
-        assert scFoldL(data4, add, 20, stopfold=fold_is_lt42, istate=20) == MB(41)
-        assert scFoldL(data5, add, 10, stopfold=fold_is_lt42, istate=10) == MB(10)
-        assert scFoldL(data6, add, 10, stopfold=fold_is_lt42, istate=10) == MB(20)
-        assert scFoldL(data7, add, 10, stopfold=fold_is_lt42, istate=10) == MB(25)
-
-        assert scFoldR(data1, add_or_bail, startfold=fold_is_lt42_stop_None, istate=0) == MB(15)
-        assert scFoldR(data2, add, startfold=fold_is_lt42_stop_NegOne, istate=0) == MB(15)
-        assert scFoldR(data3, add, startfold=fold_is_lt42, istate=0) == MB(36)
-        assert scFoldR(data4, add, startfold=fold_is_lt42, istate=0) == MB(21)
-        assert scFoldR(data5, add, startfold=fold_is_lt42, istate=0) == MB()
-        assert scFoldR(data6, add, startfold=fold_is_lt42, istate=0) == MB(10)
-        assert scFoldR(data7, add, startfold=fold_is_lt42, istate=0) == MB(35)
-        assert scFoldR(data1, add_or_bail, 10, startfold=fold_is_lt42_stop_None, istate=10) == MB(25)
-        assert scFoldR(data2, add, 10, startfold=fold_is_lt42_stop_NegOne, istate=10) == MB(25)
-        assert scFoldR(data3, add, 10, startfold=fold_is_lt42, istate=10) == MB(38)
-        assert scFoldR(data4, add, 20, startfold=fold_is_lt42, istate=20) == MB(41)
-        assert scFoldR(data5, add, 10, startfold=fold_is_lt42, istate=10) == MB(10)
-        assert scFoldR(data6, add, 10, startfold=fold_is_lt42, istate=10) == MB(20)
-        assert scFoldR(data7, add, 10, startfold=fold_is_lt42, istate=10) == MB(25)
+        assert scFoldL(data1, add_or_bail,
+                       stopfold=lambda d,s: MB() if d is None else MB(s),
+                       include_stop=False)[0] == MB(15)
+        assert scFoldL(data1, add_or_bail,
+                       istate_foldL=0,
+                       stopfold=fold_is_lt42_stop_None)[0] == MB()
+        assert scFoldL(data2, add,
+                       stopfold=fold_is_lt42_stop_NegOne,
+                       istate_foldL=0,
+                       include_stop=False)[0] == MB(15)
+        assert scFoldL(data3, add,
+                       stopfold=fold_is_lt42,
+                       istate_foldL=0,
+                       include_stop=False)[0] == MB(36)
+        assert scFoldL(data4, add,
+                       stopfold=fold_is_lt42,
+                       istate_foldL=0)[0] == MB(21)
+        assert scFoldL(data5, add,
+                       stopfold=fold_is_lt42,
+                       istate_foldL=0)[0] == MB()
+        assert scFoldL(data6, add,
+                       stopfold=fold_is_lt42,
+                       istate_foldL=0)[0] == MB(10)
+        assert scFoldL(data7, add,
+                       stopfold=fold_is_lt42,
+                       include_stop=False,
+                       istate_foldL=0)[0] == MB(35)
+        assert scFoldL(data1, add_or_bail, 10,
+                       stopfold=fold_is_lt42_stop_None,
+                       istate_foldL=10)[0] == MB()
+        assert scFoldL(data1, add_or_bail, 10,
+                       stopfold=fold_is_lt42_stop_None,
+                       include_stop=False,
+                       istate_foldL=10)[0] == MB(25)
+        assert scFoldL(data2, add, 10,
+                       stopfold=fold_is_lt42_stop_NegOne,
+                       include_stop=False,
+                       istate_foldL=10)[0] == MB(25)
+        assert scFoldL(data2, add, 10,
+                       stopfold=fold_is_lt42_stop_NegOne,
+                       include_stop=True,
+                       istate_foldL=10)[0] == MB(24)
+        assert scFoldL(data3, add, 10,
+                       stopfold=fold_is_lt42,
+                       include_stop=False,
+                       istate_foldL=10)[0] == MB(38)
+        assert scFoldL(data4, add, 20,
+                       stopfold=fold_is_lt42,
+                       include_stop=False,
+                       istate_foldL=20)[0] == MB(41)
+        assert scFoldL(data5, add, 10,
+                       stopfold=fold_is_lt42,
+                       include_stop=False,
+                       istate_foldL=10)[0] == MB(10)
+        assert scFoldL(data6, add, 10,
+                       stopfold=fold_is_lt42,
+                       include_stop=False,
+                       istate_foldL=10)[0] == MB(20)
+        assert scFoldL(data7, add, 10,
+                       stopfold=fold_is_lt42,
+                       include_stop=False,
+                       istate_foldL=10)[0] == MB(25)
+        assert scFoldR(data1, add_or_bail,
+                       startfold=fold_is_lt42_stop_None,
+                       include_stop=False,
+                       istate_foldR=0)[0] == MB(15)
+        assert scFoldR(data2, add,
+                       startfold=fold_is_lt42_stop_NegOne,
+                       include_stop=False,
+                       istate_foldR=0)[0] == MB(15)
+        assert scFoldR(data3, add,
+                       startfold=fold_is_lt42,
+                       istate_foldR=0,
+                       include_stop=False)[0] == MB(36)
+        assert scFoldR(data4, add,
+                       startfold=fold_is_lt42,
+                       istate_foldR=0)[0] == MB(21)
+        assert scFoldR(data5, add,
+                       startfold=fold_is_lt42,
+                       istate_foldR=0)[0] == MB()
+        assert scFoldR(data6, add,
+                       startfold=fold_is_lt42,
+                       istate_foldR=0)[0] == MB(10)
+        assert scFoldR(data7, add,
+                       startfold=fold_is_lt42,
+                       istate_foldR=0)[0] == MB(35)
+        assert scFoldR(data1, add_or_bail, 10,
+                       startfold=fold_is_lt42_stop_None,
+                       istate_foldR=10)[0] == MB(25)
+        assert scFoldR(data2, add, 10,
+                       startfold=fold_is_lt42_stop_NegOne,
+                       istate_foldR=10)[0] == MB(25)
+        assert scFoldR(data3, add, 10,
+                       startfold=fold_is_lt42,
+                       istate_foldR=10)[0] == MB(38)
+        assert scFoldR(data4, add, 20,
+                       startfold=fold_is_lt42,
+                       istate_foldR=20)[0] == MB(41)
+        assert scFoldR(data5, add, 10,
+                       startfold=fold_is_lt42,
+                       istate_foldR=10)[0] == MB(10)
+        assert scFoldR(data6, add, 10,
+                       startfold=fold_is_lt42,
+                       istate_foldR=10)[0] == MB(20)
+        assert scFoldR(data7, add, 10,
+                       startfold=fold_is_lt42,
+                       istate_foldR=10)[0] == MB(25)

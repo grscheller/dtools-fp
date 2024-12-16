@@ -143,7 +143,7 @@ def merge[D](*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]
 
 ## dropping and taking
 
-def drop[D](iterable: Iterable[D], n: int) -> Iterator[D]:
+def drop[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
     """Drop the next `n` values from `iterable`."""
     it = iter(iterable)
     for _ in range(n):
@@ -153,7 +153,7 @@ def drop[D](iterable: Iterable[D], n: int) -> Iterator[D]:
             break
     return it
 
-def dropWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
+def dropWhile[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
     """Drop initial values from `iterable` while predicate is true."""
     it = iter(iterable)
     try:
@@ -170,7 +170,7 @@ def dropWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D
             break
     return concat((value,), it)
 
-def take[D](iterable: Iterable[D], n: int) -> Iterator[D]:
+def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
     """Take up to `n` values from `iterable`."""
     it = iter(iterable)
     for _ in range(n):
@@ -180,7 +180,7 @@ def take[D](iterable: Iterable[D], n: int) -> Iterator[D]:
         except StopIteration:
             break
 
-def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D]:
+def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
     **Warning**, potential value loss if iterable is iterator with multiple
@@ -201,7 +201,7 @@ def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool]) -> Iterator[D
 
 def accumulate[D,L](iterable: Iterable[D],
                     f: Callable[[L, D], L],
-                    initial: L|NoValue=NoValue()) -> Iterator[L]:
+                    initial: L|NoValue=NoValue(), /) -> Iterator[L]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's `itertools.accumulate`
@@ -234,7 +234,7 @@ def accumulate[D,L](iterable: Iterable[D],
                 acc = f(acc, ii)
             yield acc
 
-def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Never:
+def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -252,7 +252,9 @@ def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D]) -> D|Never:
         acc = f(acc, v)
     return acc
 
-def foldL1[D, L](iterable: Iterable[D], f: Callable[[L, D], L], initial: L) -> L:
+def foldL1[D, L](iterable: Iterable[D],
+                 f: Callable[[L, D], L],
+                 initial: L, /) -> L:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -291,43 +293,77 @@ def mbFoldL[L, D](iterable: Iterable[D],
 
 def scFoldL[D,L,S](iterable: Iterable[D],
                    f: Callable[[L, D], L],
-                   initial: L|NoValue=NoValue(),
-                   istate: S|Sentinel=Sentinel('scFold'),
-                   startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-                   stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s)) -> MB[L]:
+                   initial: L|NoValue=NoValue(), /,
+                   istate_start: S|Sentinel=Sentinel('scFold'),
+                   istate_foldL: S|Sentinel=Sentinel('scFold'),
+                   startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(),
+                   stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
+                   include_stop: bool=True) -> tuple[MB[L], Iterable[D]]:
     """Short circuit version of a left fold.
-
+e
     * Callable `startfold` is to delay starting the fold
     * Callable `stopfold` is to prematurely stop the fold before end
       * useful for infinite iterables
 
     """
-    stateMB = cast(MB[S], MB(istate))
-
     it = iter(iterable)
+    acc: L
 
     if initial is NoValue():
         try:
-            acc = cast(L, next(it))  # in this case L = D
+            d1 = next(it)
         except StopIteration:
-            return MB()
+            return MB(), it
+        it = concat((d1,), it)
     else:
         acc = cast(L, initial)
 
+    stateMB = cast(MB[S], MB(istate_start))
     for d in it:
-        if (stateMB := stopfold(d, stateMB.get())):
-            acc = f(acc, d)
+        if (stateMB := startfold(d, stateMB.get())):
+            continue
         else:
+            it = concat((d,), it)
             break
+    else:
+        if initial is NoValue:
+            return MB(), it
+        else:
+            return MB(acc), it
 
-    return MB(acc)
+    stateMB = cast(MB[S], MB(istate_foldL))
+    if initial is NoValue():
+        try:
+            df = next(it)
+        except StopIteration:
+            return MB(), it
+        acc = cast(L, df)  # in this case L = D
+
+
+    for d in it:
+        try:
+            if (stateMB := stopfold(d, stateMB.get())):
+                acc = f(acc, d)
+            else:
+                if include_stop:
+                    acc = f(acc, d)
+                else:
+                    it = concat((d,), it)
+                break
+        except Exception:
+            return MB(), it
+
+    return MB(acc), it
 
 def scFoldR[D,R,S](iterable: Iterable[D],
                    f: Callable[[D, R], R],
-                   initial: R|NoValue=NoValue(),
-                   istate: S|Sentinel=Sentinel('scFold'),
+                   initial: R|NoValue=NoValue(), /,
+                   istate_start: S|Sentinel=Sentinel('scFold'),
+                   istate_foldR: S|Sentinel=Sentinel('scFold'),
                    startfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-                   stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s)) -> MB[R]:
+                   include_start: bool=True,
+                   stopfold: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
+                   include_stop: bool=True) -> tuple[MB[R], Iterable[D]]:
     """Short circuit version of a right fold.
 
     * Callable `startfold` is to prematurely start fold before reaching the end
@@ -336,29 +372,33 @@ def scFoldR[D,R,S](iterable: Iterable[D],
       * useful for infinite and non-reversible iterables
 
     """
-    stateMB = cast(MB[S], MB(istate))
-
     it = iter(iterable)
-
     acc: R
 
+    stateMB = cast(MB[S], MB(istate_start))
     ds: list[D] = []
     for d in it:
         if (stateMB := startfold(d, stateMB.get())):
             ds.append(d)
         else:
+            if include_start:
+                ds.append(d)
+            else:
+                it = concat((d,), it)
             break
 
     if initial is NoValue():
         if len(ds) == 0:
-            return MB()
+            return MB(), it
         else:
             acc = cast(R, ds.pop())  # in this case R = D
     else:
         acc = cast(R, initial)
 
+    stateMB = cast(MB[S], MB(istate_foldR))
     while ds:
-        acc = f(ds.pop(), acc)
+        if (stateMB := stopfold(d, stateMB.get())):
+            acc = f(ds.pop(), acc)
 
-    return MB(acc)
+    return MB(acc), it
 
