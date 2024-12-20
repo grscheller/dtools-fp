@@ -18,8 +18,8 @@ Functional data types to use in lieu of exceptions.
 
 #### Error handling types:
 
-* **class MB:** Maybe (Optional) monad
-* **class XOR:** Left biased Either monad
+* class **MB**: Maybe (Optional) monad
+* class **XOR**: Left biased Either monad
 
 """
 from __future__ import annotations

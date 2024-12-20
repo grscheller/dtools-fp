@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import cast, Never
+from grscheller.fp.function import swap
 from grscheller.fp.iterables import scFoldL, scFoldR
 from grscheller.fp.err_handling import MB
 
@@ -137,19 +138,16 @@ class Test_fp_no_sc_folds:
         data7 = 15, 20, 25, 30
 
         assert scFoldL(data1, add_or_bail,
-                       stopfold=lambda d,s: MB() if d is None else MB(s),
-                       include_stop=False)[0] == MB(15)
+                       stopfold=lambda d,s: MB() if d is None else MB(s))[0] == MB(15)
         assert scFoldL(data1, add_or_bail,
                        istate_foldL=0,
                        stopfold=fold_is_lt42_stop_None)[0] == MB()
         assert scFoldL(data2, add,
                        stopfold=fold_is_lt42_stop_NegOne,
-                       istate_foldL=0,
-                       include_stop=False)[0] == MB(15)
+                       istate_foldL=0)[0] == MB(15)
         assert scFoldL(data3, add,
                        stopfold=fold_is_lt42,
-                       istate_foldL=0,
-                       include_stop=False)[0] == MB(36)
+                       istate_foldL=0)[0] == MB(36)
         assert scFoldL(data4, add,
                        stopfold=fold_is_lt42,
                        istate_foldL=0)[0] == MB(21)
@@ -161,18 +159,15 @@ class Test_fp_no_sc_folds:
                        istate_foldL=0)[0] == MB(10)
         assert scFoldL(data7, add,
                        stopfold=fold_is_lt42,
-                       include_stop=False,
                        istate_foldL=0)[0] == MB(35)
         assert scFoldL(data1, add_or_bail, 10,
                        stopfold=fold_is_lt42_stop_None,
                        istate_foldL=10)[0] == MB()
         assert scFoldL(data1, add_or_bail, 10,
                        stopfold=fold_is_lt42_stop_None,
-                       include_stop=False,
                        istate_foldL=10)[0] == MB(25)
         assert scFoldL(data2, add, 10,
                        stopfold=fold_is_lt42_stop_NegOne,
-                       include_stop=False,
                        istate_foldL=10)[0] == MB(25)
         assert scFoldL(data2, add, 10,
                        stopfold=fold_is_lt42_stop_NegOne,
@@ -180,23 +175,18 @@ class Test_fp_no_sc_folds:
                        istate_foldL=10)[0] == MB(24)
         assert scFoldL(data3, add, 10,
                        stopfold=fold_is_lt42,
-                       include_stop=False,
                        istate_foldL=10)[0] == MB(38)
         assert scFoldL(data4, add, 20,
                        stopfold=fold_is_lt42,
-                       include_stop=False,
                        istate_foldL=20)[0] == MB(41)
         assert scFoldL(data5, add, 10,
                        stopfold=fold_is_lt42,
-                       include_stop=False,
                        istate_foldL=10)[0] == MB(10)
         assert scFoldL(data6, add, 10,
                        stopfold=fold_is_lt42,
-                       include_stop=False,
                        istate_foldL=10)[0] == MB(20)
         assert scFoldL(data7, add, 10,
                        stopfold=fold_is_lt42,
-                       include_stop=False,
                        istate_foldL=10)[0] == MB(25)
         assert scFoldR(data1, add_or_bail,
                        startfold=fold_is_lt42_stop_None,
