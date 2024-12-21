@@ -18,15 +18,18 @@ Implementing a
 
 #### Pure FP State handling type:
 
+* in a pure functional language you don't extract the value from a monad
+  * it would be unPythonic to force FP on the user of this package
+    * pushing an imperative algorithms to an intermost scope would be a use case
+    * not sure if I will ever get to "monad transformers" with this project
+    * therefore an "escape hatch" is needed at the end of a flatmap chain
 
 """
 from __future__ import annotations
 
 __all__ = [ 'State' ]
 
-from collections.abc import Callable, Sequence
-from typing import Final
-from fp.singletons import NoValue
+from collections.abc import Callable
 
 class State[S, A]():
     """State Monad - data structure to generate values while propagating changes
@@ -35,46 +38,51 @@ class State[S, A]():
     * class **State**: A pure FP immutable implementation of the State Monad
       * translated to Python from the book "Functional Programming in Scala"
         * authors Chiusana & Bjarnason
-      * the `run` method ...
-      * very multi-thread safe assuming contained state is not shared
+      * class `State` represents neither a state nor (value, state) pair
+        * it wraps a transformation old_state -> (value, new_state)
+        * the "private" `_run` method is this wrapped transformation
 
     """
-    __slots__ = '_run'
-    __match_args__ = '_run'
+    __slots__ = 'run'
 
     @staticmethod
     def unit[S1, B](b: B) -> State[S1, B]:
-        """Creat a State action from a value."""
+        """Create a State action from a value."""
         return State(lambda s: (b, s))
  
-    @staticmethod
-    def get[S1]() -> State[S1, S1]:
-        """Set run action to return the current state
-
-        * the run action will yield the current state
-        * the current state is propagated unchanged
-
-        """
-        return State[S1, S1](lambda s: (s, s))
+    # FP programming interface
 
     @staticmethod
     def set[S1](s: S1) -> State[S1, tuple[()]]:
         """Manually set a state.
 
-        * the run action ignores previous state
-        * the run action returns a canonically meaningless value
+        * the run action
+          * ignores previous state
+          * generates a canonically meaningless value and given state `s: S1`
 
         """
         return State(lambda _: ((), s))
 
+    @staticmethod
+    def get[S1]() -> State[S1, S1]:
+        """Set run action to return the current state
+
+        * the run action yields the current state
+        * the current state is propagated unchanged
+
+        """
+        return State[S1, S1](lambda s: (s, s))
+
+    # OOP programming interface
+
     def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
-        self._run = run
+        self.run = run
 
     def flatmap[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
-        def foo(s: S) -> tuple[B, S]:
-            a, s1 = self._run(s)
-            return g(a)._run(s1) 
-        return State(lambda s: foo(s))
+        def compose(s: S) -> tuple[B, S]:
+            a, s1 = self.run(s)
+            return g(a).run(s1) 
+        return State(lambda s: compose(s))
 
     def map[B](self, f: Callable[[A], B]) -> State[S, B]:
         return self.flatmap(lambda a: State.unit(f(a)))
@@ -83,4 +91,5 @@ class State[S, A]():
         return self.flatmap(lambda a: sb.map(lambda b: f(a, b)))
 
     def both[B](self, rb: State[S, B]) -> State[S, tuple[A, B]]:
-        return self.map2(rb, lambda u, v: (u, v))
+        return self.map2(rb, lambda a, b: (a, b))
+

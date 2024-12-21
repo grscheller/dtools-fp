@@ -59,6 +59,7 @@ from typing import cast, Final, Never
 from circular_array.ca import ca
 from .err_handling import MB
 from .singletons import NoValue, Sentinel
+from .state import State
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'dropWhile', 'take', 'takeWhile',
@@ -327,8 +328,9 @@ def scFoldL[D,L,S](
         try:
             init = cast(L, next(it))
         except StopIteration:
-            it = concat((d,), it)
             return MB(), it
+
+
 
     stateMB = cast(MB[S], MB(istate_find_start_of_fold))
     for d in it:
