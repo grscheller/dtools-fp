@@ -14,15 +14,13 @@
 
 """### Module fp.state - state monad
 
-Implementing a
+Handling state functionally.
 
 #### Pure FP State handling type:
 
-* in a pure functional language you don't extract the value from a monad
-  * it would be unPythonic to force FP on the user of this package
-    * pushing an imperative algorithms to an intermost scope would be a use case
-    * not sure if I will ever get to "monad transformers" with this project
-    * therefore an "escape hatch" is needed at the end of a flatmap chain
+* class **State**: A pure FP immutable implementation for the State Monad
+  * translated to Python from the book "Functional Programming in Scala"
+    * authors Chiusana & Bjarnason
 
 """
 from __future__ import annotations
@@ -32,15 +30,12 @@ __all__ = [ 'State' ]
 from collections.abc import Callable
 
 class State[S, A]():
-    """State Monad - data structure to generate values while propagating changes
-    of state.
+    """Data structure generating values while propagating changes of state.
 
-    * class **State**: A pure FP immutable implementation of the State Monad
-      * translated to Python from the book "Functional Programming in Scala"
-        * authors Chiusana & Bjarnason
-      * class `State` represents neither a state nor (value, state) pair
-        * it wraps a transformation old_state -> (value, new_state)
-        * the "private" `_run` method is this wrapped transformation
+    * class `State` represents neither a state nor (value, state) pair
+      * it wraps a transformation old_state -> (value, new_state)
+      * the `run` method is this wrapped transformation
+    * `flatmap` is just state propagating function composition
 
     """
     __slots__ = 'run'
@@ -50,15 +45,13 @@ class State[S, A]():
         """Create a State action from a value."""
         return State(lambda s: (b, s))
  
-    # FP programming interface
-
     @staticmethod
     def set[S1](s: S1) -> State[S1, tuple[()]]:
         """Manually set a state.
 
         * the run action
-          * ignores previous state
-          * generates a canonically meaningless value and given state `s: S1`
+          * ignores previous state and swaps in a new state
+          * assigns a canonically meaningless value to current value
 
         """
         return State(lambda _: ((), s))
@@ -67,13 +60,11 @@ class State[S, A]():
     def get[S1]() -> State[S1, S1]:
         """Set run action to return the current state
 
-        * the run action yields the current state
         * the current state is propagated unchanged
+        * current value now set to current state
 
         """
         return State[S1, S1](lambda s: (s, s))
-
-    # OOP programming interface
 
     def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
         self.run = run

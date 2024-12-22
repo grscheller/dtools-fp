@@ -56,7 +56,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator, Iterable, Reversible
 from enum import auto, Enum
 from typing import cast, Final, Never
-from circular_array.ca import ca
+from grscheller.circular_array.ca import ca
 from .err_handling import MB
 from .singletons import NoValue, Sentinel
 from .state import State
@@ -64,7 +64,7 @@ from .state import State
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'dropWhile', 'take', 'takeWhile',
             'accumulate', 'foldL0', 'foldL1',
-            'mbFoldL', 'scFoldL', 'scFoldR' ]
+            'mbFoldL' ] # , 'scFoldL', 'scFoldR' ]
 
 ## Iterate over multiple Iterables
 
@@ -293,129 +293,129 @@ def mbFoldL[L, D](iterable: Iterable[D],
         acc = f(acc, v)
     return MB(acc)
 
-def scFoldL[D,L,S](
-        iterable: Iterable[D],
-        f: Callable[[L, D], L],
-        initial: L|NoValue=NoValue(), /,
-        istate_find_start_of_fold: S|Sentinel=Sentinel('fp_iter_scFold'),
-        istate_start_of_folding: S|Sentinel=Sentinel('fp_iter_scFold'),
-        start_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(),
-        stop_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-        include_start_of_fold: bool=True,
-        include_end_of_fold: bool=True,
-        push_end_back_on_iter: bool=False
-    ) -> tuple[MB[L], Iterable[D]]:
-    """Short circuit version of a left fold. Useful for infinite or
-    non-reversible iterables.
-
-    * Behavior for default arguments will
-      * left fold finite iterable
-      * start folding immediately
-      * continue folding until end (of a possibly infinite iterable)
-    * Callable `start_folding` delays starting a left fold
-    * Callable `stop_folding` is to prematurely stop the folding left
-    * Returns a tuple containing
-      * an XOR of either the folded value or error string
-      * an iterator values beyond the fold
-
-    """
-    it = iter(iterable)
-    acc: L
-
-    if initial is not NoValue():
-        init = cast(L, initial)
-    else:
-        try:
-            init = cast(L, next(it))
-        except StopIteration:
-            return MB(), it
-
-
-
-    stateMB = cast(MB[S], MB(istate_find_start_of_fold))
-    for d in it:
-        if (stateMB := startfold(d, stateMB.get())):
-            continue
-        else:
-            if include_start_of_fold:
-                it = concat((d,), it)
-            break
-
-    stateMB = cast(MB[S], MB(istate_start_of_folding))
-    acc = cast(L, df)  # in this case L = D
-
-    for d in it:
-        try:
-            if (stateMB := stopfold(d, stateMB.get())):
-                acc = f(acc, d)
-            else:
-                if include_stop:
-                    acc = f(acc, d)
-                else:
-                    it = concat((d,), it)
-                break
-        except Exception:
-            return MB(), it
-
-    return MB(acc), it
-
-def scFoldR[D,R,S](iterable: Iterable[D],
-        iterable: Iterable[D],
-        f: Callable[[D, R], R],
-        initial: R|NoValue=NoValue(), /,
-        istate_find_start_of_fold: S|Sentinel=Sentinel('fp_iter_scFold'),
-        istate_start_of_folding: S|Sentinel=Sentinel('fp_iter_scFold'),
-        start_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(),
-        stop_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-        include_start_of_fold: bool=True,
-        include_end_of_fold: bool=True,
-        push_start_back_on_iter: bool=False
-    ) -> tuple[MB[R], Iterable[D]]:
-    """Short circuit version of a right fold. Useful for infinite or
-    non-reversible iterables.
-
-    * Behavior for default arguments will
-      * right fold finite iterable
-      * start folding at end (of a possibly infinite iterable)
-      * continue folding right until beginning
-    * Callable `start_folding` prematurely starts a right fold
-    * Callable `stop_folding` is to prematurely stop folding right
-    * Returns a tuple containing
-      * an XOR of either the folded value or error string
-      * an iterator values beyond the fold
-
-    """
-    it = iter(iterable)
-    acc: R
-
-    stateMB = cast(MB[S], MB(istate_find_start_of_fold))
-    ds: list[D] = []
-    for d in it:
-        if (stateMB := startfold(d, stateMB.get())):
-            ds.append(d)
-        else:
-            if include_start:
-                ds.append(d)
-            else:
-                it = concat((d,), it)
-            break
-
-    if initial is NoValue():
-        if len(ds) == 0:
-            return MB(), it
-        else:
-            acc = cast(R, ds.pop())  # in this case R = D
-    else:
-        acc = cast(R, initial)
-
-    stateMB = cast(MB[S], MB(istate_foldR))
-    while ds:
-        if (stateMB := stopfold(d, stateMB.get())):
-            acc = f(ds.pop(), acc)
-        else:
-            if include_stop:
-                acc = f(d, acc)
-            break
-
-    return MB(acc), it
+#   def scFoldL[D,L,S](
+#           iterable: Iterable[D],
+#           f: Callable[[L, D], L],
+#           initial: L|NoValue=NoValue(), /,
+#           istate_find_start_of_fold: S|Sentinel=Sentinel('fp_iter_scFold'),
+#           istate_start_of_folding: S|Sentinel=Sentinel('fp_iter_scFold'),
+#           start_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(),
+#           stop_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
+#           include_start_of_fold: bool=True,
+#           include_end_of_fold: bool=True,
+#           push_end_back_on_iter: bool=False
+#       ) -> tuple[MB[L], Iterable[D]]:
+#       """Short circuit version of a left fold. Useful for infinite or
+#       non-reversible iterables.
+#   
+#       * Behavior for default arguments will
+#         * left fold finite iterable
+#         * start folding immediately
+#         * continue folding until end (of a possibly infinite iterable)
+#       * Callable `start_folding` delays starting a left fold
+#       * Callable `stop_folding` is to prematurely stop the folding left
+#       * Returns a tuple containing
+#         * an XOR of either the folded value or error string
+#         * an iterator values beyond the fold
+#   
+#       """
+#       it = iter(iterable)
+#       acc: L
+#   
+#       if initial is not NoValue():
+#           init = cast(L, initial)
+#       else:
+#           try:
+#               init = cast(L, next(it))
+#           except StopIteration:
+#               return MB(), it
+#   
+#   
+#   
+#       stateMB = cast(MB[S], MB(istate_find_start_of_fold))
+#       for d in it:
+#           if (stateMB := startfold(d, stateMB.get())):
+#               continue
+#           else:
+#               if include_start_of_fold:
+#                   it = concat((d,), it)
+#               break
+#   
+#       stateMB = cast(MB[S], MB(istate_start_of_folding))
+#       acc = cast(L, df)  # in this case L = D
+#   
+#       for d in it:
+#           try:
+#               if (stateMB := stopfold(d, stateMB.get())):
+#                   acc = f(acc, d)
+#               else:
+#                   if include_stop:
+#                       acc = f(acc, d)
+#                   else:
+#                       it = concat((d,), it)
+#                   break
+#           except Exception:
+#               return MB(), it
+#   
+#       return MB(acc), it
+#   
+#   def scFoldR[D,R,S](iterable: Iterable[D],
+#           iterable: Iterable[D],
+#           f: Callable[[D, R], R],
+#           initial: R|NoValue=NoValue(), /,
+#           istate_find_start_of_fold: S|Sentinel=Sentinel('fp_iter_scFold'),
+#           istate_start_of_folding: S|Sentinel=Sentinel('fp_iter_scFold'),
+#           start_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(),
+#           stop_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
+#           include_start_of_fold: bool=True,
+#           include_end_of_fold: bool=True,
+#           push_start_back_on_iter: bool=False
+#       ) -> tuple[MB[R], Iterable[D]]:
+#       """Short circuit version of a right fold. Useful for infinite or
+#       non-reversible iterables.
+#   
+#       * Behavior for default arguments will
+#         * right fold finite iterable
+#         * start folding at end (of a possibly infinite iterable)
+#         * continue folding right until beginning
+#       * Callable `start_folding` prematurely starts a right fold
+#       * Callable `stop_folding` is to prematurely stop folding right
+#       * Returns a tuple containing
+#         * an XOR of either the folded value or error string
+#         * an iterator values beyond the fold
+#   
+#       """
+#       it = iter(iterable)
+#       acc: R
+#   
+#       stateMB = cast(MB[S], MB(istate_find_start_of_fold))
+#       ds: list[D] = []
+#       for d in it:
+#           if (stateMB := startfold(d, stateMB.get())):
+#               ds.append(d)
+#           else:
+#               if include_start:
+#                   ds.append(d)
+#               else:
+#                   it = concat((d,), it)
+#               break
+#   
+#       if initial is NoValue():
+#           if len(ds) == 0:
+#               return MB(), it
+#           else:
+#               acc = cast(R, ds.pop())  # in this case R = D
+#       else:
+#           acc = cast(R, initial)
+#   
+#       stateMB = cast(MB[S], MB(istate_foldR))
+#       while ds:
+#           if (stateMB := stopfold(d, stateMB.get())):
+#               acc = f(ds.pop(), acc)
+#           else:
+#               if include_stop:
+#                   acc = f(d, acc)
+#               break
+#   
+#       return MB(acc), it
 

@@ -15,30 +15,78 @@
 from grscheller.fp.state import State
 
 class Test_simple:
-    def test_counter(self) -> None:
-        sc = State(lambda s: (s+1, s+1)) 
+    def test_simple_counter(self) -> None:
+        sc = State(lambda s: (s+1, s+1))
 
         aa, ss = sc.run(0)
-        assert aa == 1
-        assert ss == 1
+        assert (aa, ss) == (1, 1)
 
         aa, ss = sc.run(42)
-        assert aa == 43
-        assert ss == 43
+        assert (aa, ss) == (43, 43)
 
         sc1 = sc.flatmap(lambda a: sc)
         aa, ss = sc1.run(0)
-        assert aa == 2
-        assert ss == 2
+        assert (aa, ss) == (2, 2)
 
-        start: State[int, int] = State.set(0).get()
-        sc2 = start.flatmap(lambda a: sc)
-        aa, ss = sc2.run(0)
-        assert aa == 1
-        assert ss == 1
+        sc2 = sc.flatmap(lambda a: sc)
+        aa, ss = sc2.run(40)
+        assert (aa, ss) == (42, 42)
 
-        sc3 = start.flatmap(lambda a: sc).flatmap(lambda a: sc)
-        aa, ss = sc1.run(0)
-        assert aa == 2
-        assert ss == 2
+        start = State.set(0)
+        sc3 = start.flatmap(lambda a: sc)
+        aa, ss = sc3.run(40)
+        assert (aa, ss) == (1, 1)
+
+        sc4 = sc.flatmap(lambda a: sc).flatmap(lambda a: sc)
+        aa, ss = sc4.run(0)
+        assert (aa, ss) == (3, 3)
+        aa, ss = sc4.run(0)
+        assert (aa, ss) == (3, 3)
+
+        sc4 = sc4.flatmap(lambda a: sc1)
+        aa, ss = sc4.run(5)
+        assert aa == 10
+        assert ss == 10
+
+        a1, s1 = sc.run(5)
+        a2, s2 = sc.run(s1)
+        assert (a1, s1) == (6, 6)
+        assert (a2, s2) == (7, 7)
+
+    def test_mod3_count(self) -> None:
+        m3 = State(lambda s: (s, (s+1)%3))
+
+        a, s = m3.run(1)
+        assert a == 1
+        a, s = m3.run(s)
+        assert a == 2
+        a, s = m3.run(s)
+        assert a == 0
+        a, s = m3.run(s)
+        assert a == 1
+        a, s = m3.run(s)
+        assert a == 2
+
+    def test_blast_off(self) -> None:
+        countdown = State(lambda s: (s, s-1))
+        blastoff = countdown.flatmap(
+            lambda a: State(lambda a: ('Blastoff!', 5) if a == -1 else (a+1, a))
+        )
+
+        a, s = blastoff.run(11)
+        assert (a, s) == (11, 10)
+
+        for cnt in range(10, 0, -1):
+            a, s = blastoff.run(s)
+            assert cnt == a
+
+        a, s = blastoff.run(s)
+        assert (a, s) == ('Blastoff!', 5)
+
+        for cnt in range(5, 0, -1):
+            a, s = blastoff.run(s)
+            assert cnt == a
+
+        a, s = blastoff.run(s)
+        assert (a, s) == ('Blastoff!', 5)
 
