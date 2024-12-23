@@ -25,26 +25,26 @@ class Test_simple:
         aa, ss = sc.run(42)
         assert (aa, ss) == (43, 43)
 
-        sc1 = sc.flatmap(lambda a: sc)
+        sc1 = sc.bind(lambda a: sc)
         aa, ss = sc1.run(0)
         assert (aa, ss) == (2, 2)
 
-        sc2 = sc.flatmap(lambda a: sc)
+        sc2 = sc.bind(lambda a: sc)
         aa, ss = sc2.run(40)
         assert (aa, ss) == (42, 42)
 
         start = State.setState(0)
-        sc3 = start.flatmap(lambda a: sc)
+        sc3 = start.bind(lambda a: sc)
         aa, ss = sc3.run(40)
         assert (aa, ss) == (1, 1)
 
-        sc4 = sc.flatmap(lambda a: sc).flatmap(lambda a: sc)
+        sc4 = sc.bind(lambda a: sc).bind(lambda a: sc)
         aa, ss = sc4.run(0)
         assert (aa, ss) == (3, 3)
         aa, ss = sc4.run(0)
         assert (aa, ss) == (3, 3)
 
-        sc4 = sc4.flatmap(lambda a: sc1)
+        sc4 = sc4.bind(lambda a: sc1)
         aa, ss = sc4.run(5)
         assert aa == 10
         assert ss == 10
@@ -70,7 +70,7 @@ class Test_simple:
 
     def test_blast_off(self) -> None:
         countdown = State(lambda s: (s, s-1))
-        blastoff = countdown.flatmap(
+        blastoff = countdown.bind(
             lambda a: State(lambda a: ('Blastoff!', 5) if a == -1 else (a+1, a))
         )
 
@@ -101,7 +101,7 @@ class Test_simple:
         def sqr_st(a: int) -> State[int, tuple[()]]:
             return square_state
 
-        do_it = count.flatmap(cnt).flatmap(cnt).flatmap(sqr_st)
-        do_it = do_it.flatmap(cnt).flatmap(sqr_st).flatmap(cnt)
+        do_it = count.bind(cnt).bind(cnt).bind(sqr_st)
+        do_it = do_it.bind(cnt).bind(sqr_st).bind(cnt)
         a, s = do_it.run(0)
         assert (a, s) == (100, 101)

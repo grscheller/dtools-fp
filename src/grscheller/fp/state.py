@@ -21,6 +21,13 @@ Handling state functionally.
 * class **State**: A pure FP immutable implementation for the State Monad
   * translated to Python from the book "Functional Programming in Scala"
     * authors Chiusana & Bjarnason
+  * using `bind` instead of `flatmap`
+    * I feel `flatmap` is misleading for non-container-like monads
+    * flatmap name too long
+      * without do-notation code tends to march to the right
+      * `bind` for state monad is part of the user API
+        * shorter to type
+        * less of just an implementation detail
 
 """
 from __future__ import annotations
@@ -36,7 +43,8 @@ class State[S, A]():
     * class `State` represents neither a state nor (value, state) pair
       * it wraps a transformation old_state -> (value, new_state)
       * the `run` method is this wrapped transformation
-    * `flatmap` is just state propagating function composition
+    * `bind` is just state propagating function composition
+      * `bind` is sometimes called "flatmap"
 
     """
     __slots__ = 'run'
@@ -44,17 +52,17 @@ class State[S, A]():
     def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
         self.run = run
 
-    def flatmap[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
+    def bind[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
         def compose(s: S) -> tuple[B, S]:
             a, s1 = self.run(s)
             return g(a).run(s1) 
         return State(lambda s: compose(s))
 
     def map[B](self, f: Callable[[A], B]) -> State[S, B]:
-        return self.flatmap(lambda a: State.unit(f(a)))
+        return self.bind(lambda a: State.unit(f(a)))
 
     def map2[B, C](self, sb: State[S, B], f: Callable[[A, B], C]) -> State[S, C]:
-        return self.flatmap(lambda a: sb.map(lambda b: f(a, b)))
+        return self.bind(lambda a: sb.map(lambda b: f(a, b)))
 
     def both[B](self, rb: State[S, B]) -> State[S, tuple[A, B]]:
         return self.map2(rb, lambda a, b: (a, b))
@@ -87,5 +95,5 @@ class State[S, A]():
 
     @staticmethod
     def modifyState[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
-        return State.getState().flatmap(lambda a: State.setState(f(a)))
+        return State.getState().bind(lambda a: State.setState(f(a)))
 
