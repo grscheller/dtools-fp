@@ -28,6 +28,7 @@ from __future__ import annotations
 __all__ = [ 'State' ]
 
 from collections.abc import Callable
+from typing import Any, Never
 
 class State[S, A]():
     """Data structure generating values while propagating changes of state.
@@ -39,32 +40,6 @@ class State[S, A]():
 
     """
     __slots__ = 'run'
-
-    @staticmethod
-    def unit[S1, B](b: B) -> State[S1, B]:
-        """Create a State action from a value."""
-        return State(lambda s: (b, s))
- 
-    @staticmethod
-    def set[S1](s: S1) -> State[S1, tuple[()]]:
-        """Manually set a state.
-
-        * the run action
-          * ignores previous state and swaps in a new state
-          * assigns a canonically meaningless value to current value
-
-        """
-        return State(lambda _: ((), s))
-
-    @staticmethod
-    def get[S1]() -> State[S1, S1]:
-        """Set run action to return the current state
-
-        * the current state is propagated unchanged
-        * current value now set to current state
-
-        """
-        return State[S1, S1](lambda s: (s, s))
 
     def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
         self.run = run
@@ -83,4 +58,34 @@ class State[S, A]():
 
     def both[B](self, rb: State[S, B]) -> State[S, tuple[A, B]]:
         return self.map2(rb, lambda a, b: (a, b))
+
+    @staticmethod
+    def unit[S1, B](b: B) -> State[S1, B]:
+        """Create a State action from a value."""
+        return State(lambda s: (b, s))
+ 
+    @staticmethod
+    def getState[S1]() -> State[S1, S1]:
+        """Set run action to return the current state
+
+        * the current state is propagated unchanged
+        * current value now set to current state
+
+        """
+        return State[S1, S1](lambda s: (s, s))
+
+    @staticmethod
+    def setState[S1](s: S1) -> State[S1, tuple[()]]:
+        """Manually set a state.
+
+        * the run action
+          * ignores previous state and swaps in a new state
+          * assigns a canonically meaningless value to current value
+
+        """
+        return State(lambda _: ((), s))
+
+    @staticmethod
+    def modifyState[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
+        return State.getState().flatmap(lambda a: State.setState(f(a)))
 

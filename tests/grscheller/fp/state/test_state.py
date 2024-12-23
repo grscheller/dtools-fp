@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Final, Never
 from grscheller.fp.state import State
 
 class Test_simple:
@@ -32,7 +33,7 @@ class Test_simple:
         aa, ss = sc2.run(40)
         assert (aa, ss) == (42, 42)
 
-        start = State.set(0)
+        start = State.setState(0)
         sc3 = start.flatmap(lambda a: sc)
         aa, ss = sc3.run(40)
         assert (aa, ss) == (1, 1)
@@ -90,3 +91,17 @@ class Test_simple:
         a, s = blastoff.run(s)
         assert (a, s) == ('Blastoff!', 5)
 
+    def test_modify(self) -> None:
+        count: Final[State[int, int]] = State(lambda s: (s, s+1))
+        square_state = State.modifyState(lambda n: n*n)
+
+        def cnt(a: int) -> State[int, int]:
+            return count
+
+        def sqr_st(a: int) -> State[int, tuple[()]]:
+            return square_state
+
+        do_it = count.flatmap(cnt).flatmap(cnt).flatmap(sqr_st)
+        do_it = do_it.flatmap(cnt).flatmap(sqr_st).flatmap(cnt)
+        a, s = do_it.run(0)
+        assert (a, s) == (100, 101)
