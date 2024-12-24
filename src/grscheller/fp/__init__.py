@@ -22,10 +22,11 @@ remain Pythonic.
 * module grscheller.fp.err_handling: monadic maybe and either
 * module grscheller.fp.functions: tools combine and partially apply functions
 * module grscheller.fp.iterables: tools for iterables
+* module grscheller.fp.lazy: lazy (non-strict) function evaluation
 * module grscheller.fp.singletons: useful types with but one instance
 
 """
-__version__ = "1.1.2.0"
+__version__ = "1.1.2.1"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2024 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
