@@ -36,6 +36,7 @@ __all__ = [ 'State' ]
 
 from collections.abc import Callable
 from typing import Any, Never
+from grscheller.circular_array.ca import ca
 
 class State[S, A]():
     """Data structure generating values while propagating changes of state.
@@ -55,7 +56,7 @@ class State[S, A]():
     def bind[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
         def compose(s: S) -> tuple[B, S]:
             a, s1 = self.run(s)
-            return g(a).run(s1) 
+            return g(a).run(s1)
         return State(lambda s: compose(s))
 
     def map[B](self, f: Callable[[A], B]) -> State[S, B]:
@@ -71,7 +72,7 @@ class State[S, A]():
     def unit[S1, B](b: B) -> State[S1, B]:
         """Create a State action from a value."""
         return State(lambda s: (b, s))
- 
+
     @staticmethod
     def getState[S1]() -> State[S1, S1]:
         """Set run action to return the current state
@@ -96,4 +97,12 @@ class State[S, A]():
     @staticmethod
     def modifyState[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
         return State.getState().bind(lambda a: State.setState(f(a)))
+
+ #   @staticmethod
+ #   def sequence[S1, A1](sas: list[State[S1, A1]])
+ #       """Combine a list of state actions into a state action of a list.
+
+ #       * all state actions must be of the same type
+
+ #       """
 
