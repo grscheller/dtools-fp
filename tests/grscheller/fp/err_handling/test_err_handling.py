@@ -124,11 +124,11 @@ class TestXOR:
 
         xor_42 = xor42.mapRight(lambda _: 'none', 'mapRight failed')
         thing1: XOR[int, str] = xor_42.mapRight((lambda s: s + '?'), 'Not sure if I need this.').makeRight()
-        thing2: XOR[int, str] = xor_42.flatMap(lambda _: XOR(MB(), 'none?'))
+        thing2: XOR[int, str] = xor_42.bind(lambda _: XOR(MB(), 'none?'))
         assert thing1 == thing2
 
         ft_xor_int_str = FT(xor41, xor42, xor43)
-        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.flatMap(lt42))
+        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42))
 
         assert ft_xor_bool_str[0] == XOR(True, '41')
         assert ft_xor_bool_str[1] == XOR(False, 'does not matter what we put here')
@@ -256,7 +256,7 @@ class TestXOR:
         assert s3.getLeft(0) == MB(42)
         assert s4.getLeft(0) == MB(0)
 
-    def test_either_flatMaps(self) -> None:
+    def test_either_bind(self) -> None:
         def lessThan2(x: int) -> XOR[int, str]:
             if x < 2:
                 return XOR(x, 'fail!')
@@ -274,42 +274,42 @@ class TestXOR:
         left7 = XOR(7, 'foobar')
         right: XOR[int, str] = XOR(MB(), 'Nobody home')
 
-        nobody = right.flatMap(lessThan2)
+        nobody = right.bind(lessThan2)
         assert nobody == XOR(MB(), 'Nobody home')
 
-        lt2 = left1.flatMap(lessThan2)
-        lt5 = left1.flatMap(lessThan5)
+        lt2 = left1.bind(lessThan2)
+        lt5 = left1.bind(lessThan5)
         assert lt2 == XOR(1, 'foofoo rules')
         assert lt5 == XOR(1, '')
 
-        lt2 = left4.flatMap(lessThan2)
-        lt5 = left4.flatMap(lessThan5)
+        lt2 = left4.bind(lessThan2)
+        lt5 = left4.bind(lessThan5)
         assert lt2 == XOR(MB(), '>=2')
         assert lt5 == XOR(4, '>=5')
 
-        lt2 = left7.flatMap(lessThan2)
-        lt5 = left7.flatMap(lessThan5)
+        lt2 = left7.bind(lessThan2)
+        lt5 = left7.bind(lessThan5)
         assert lt2 == XOR(MB(), '>=2')
         assert lt5 == XOR(MB(), '>=5')
 
-        nobody = right.flatMap(lessThan5)
+        nobody = right.bind(lessThan5)
         assert nobody == XOR(MB(), 'Nobody home')
 
-        lt2 = left1.flatMap(lessThan2)
-        lt5 = left1.flatMap(lessThan5)
+        lt2 = left1.bind(lessThan2)
+        lt5 = left1.bind(lessThan5)
         assert lt2 == XOR(1,'not me')
         assert lt5 == XOR(1, 'not me too')
 
-        lt2 = left4.flatMap(lessThan2)
-        lt5 = left4.flatMap(lessThan5)
+        lt2 = left4.bind(lessThan2)
+        lt5 = left4.bind(lessThan5)
         assert lt2 == XOR(MB(), '>=2')
         assert lt2 != XOR(42, '>=42')
         assert lt5 == XOR(4, 'boo')
         assert lt5 != XOR(42, 'boohoo')
 
-        lt2 = left7.flatMap(lessThan2).mapRight(lambda _: 'greater than or equal 2',
+        lt2 = left7.bind(lessThan2).mapRight(lambda _: 'greater than or equal 2',
                                                 altRight='failed')
-        lt5 = left7.flatMap(lessThan5).mapRight(lambda s: s + ', greater than or equal 5',
+        lt5 = left7.bind(lessThan5).mapRight(lambda s: s + ', greater than or equal 5',
                                                 altRight='failed')
         assert lt2 == XOR(MB(), 'greater than or equal 2')
         assert lt5 == XOR(MB(), '>=5, greater than or equal 5')

@@ -39,7 +39,7 @@ class MB[D]():
       * `MB(MB(d)) == MB(d)`
       * `MB(MB()) == MB()`
     * immutable, a `MB` does not change after being created
-      * immutable semantics, map & flatMap return new instances
+      * immutable semantics, map & bind return new instances
         * warning: contained values need not be immutable
         * warning: not hashable if contained value is mutable
 
@@ -130,7 +130,7 @@ class MB[D]():
             except Exception:
                 return MB()
 
-    def flatmap[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
+    def bind[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map `MB` with function `f` and flatten."""
         try:
             return (f(cast(D, self._value)) if self else MB())
@@ -202,7 +202,7 @@ class XOR[L, R]():
         * are the same object
         * compare as equal
     * immutable, an `XOR` does not change after being created
-      * immutable semantics, map & flatMap return new instances
+      * immutable semantics, map & bind return new instances
         * warning: contained values need not be immutable
         * warning: not hashable if value or potential right value mutable
 
@@ -374,7 +374,7 @@ class XOR[L, R]():
 
         return XOR(left, right)
 
-    def flatMap[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
+    def bind[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
         """Flatmap - bind
 
         * map over then flatten left values

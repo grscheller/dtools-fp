@@ -121,7 +121,7 @@ class Test_repr:
         e2 = lt5_or_none_XOR(2)
         e3 = lt5_or_none_XOR(3)
         e7: XOR[int, str] = XOR(lt5_or_nothing(7), 'was to be 7')
-        e8 = XOR(8, 'no go for 8').flatMap(lt5_or_none_XOR)
+        e8 = XOR(8, 'no go for 8').bind(lt5_or_none_XOR)
 
         assert e1 == e2
         assert e2 != e3
