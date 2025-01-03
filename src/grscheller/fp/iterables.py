@@ -61,7 +61,7 @@ from .singletons import NoValue
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'drop_while',
             'take', 'take_while',
-            'take_pass', 'take_while_pass',
+            'take_split', 'take_while_split',
             'accumulate', 'foldL0', 'foldL1', 'mbFoldL' ] #,
             # 'scFoldL', 'scFoldR' ]
 
@@ -144,7 +144,10 @@ def merge[D](*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]
 
 ## dropping and taking
 
-def drop[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
+def drop[D](
+        iterable: Iterable[D],
+        n: int, /
+    ) -> Iterator[D]:
     """Drop the next `n` values from `iterable`."""
     it = iter(iterable)
     for _ in range(n):
@@ -154,7 +157,10 @@ def drop[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
             break
     return it
 
-def drop_while[D](iterable: Iterable[D], predicate: Callable[[D], bool], /) -> Iterator[D]:
+def drop_while[D](
+        iterable: Iterable[D],
+        predicate: Callable[[D], bool], /
+    ) -> Iterator[D]:
     """Drop initial values from `iterable` while predicate is true."""
     it = iter(iterable)
     while True:
@@ -167,7 +173,10 @@ def drop_while[D](iterable: Iterable[D], predicate: Callable[[D], bool], /) -> I
             break
     return it
 
-def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
+def take[D](
+        iterable: Iterable[D],
+        n: int, /
+    ) -> Iterator[D]:
     """Return an iterator of up to `n` initial values of an iterable"""
     it = iter(iterable)
     for _ in range(n):
@@ -177,7 +186,10 @@ def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
         except StopIteration:
             break
 
-def take_split[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterator[D]]:
+def take_split[D](
+        iterable: Iterable[D],
+        n: int, /
+    ) -> tuple[Iterator[D], Iterator[D]]:
     """Same as take except also return an iterator of the remaining values.
 
        * return a tuple of
@@ -191,7 +203,10 @@ def take_split[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterat
 
     return itn, it
 
-def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
+def take_while[D](
+        iterable: Iterable[D],
+        pred: Callable[[D], bool], /
+    ) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
     **Warning:** risk of potential value loss if iterable is iterator with
@@ -208,9 +223,10 @@ def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterat
         except StopIteration:
             break
 
-def take_while_split[D](iterable: Iterable[D],
-                        predicate: Callable[[D], bool],
-                        /) -> tuple[Iterator[D], Iterator[D]]:
+def take_while_split[D](
+        iterable: Iterable[D],
+        predicate: Callable[[D], bool], /
+    ) -> tuple[Iterator[D], Iterator[D]]:
     """Yield values from `iterable` while `predicate` is true.
 
        * return a tuple of two iterators
@@ -242,9 +258,11 @@ def take_while_split[D](iterable: Iterable[D],
 
 ## reducing and accumulating
 
-def accumulate[D,L](iterable: Iterable[D],
-                    f: Callable[[L, D], L],
-                    initial: L|NoValue=NoValue(), /) -> Iterator[L]:
+def accumulate[D,L](
+        iterable: Iterable[D],
+        f: Callable[[L, D], L],
+        initial: L|NoValue=NoValue(), /
+    ) -> Iterator[L]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's `itertools.accumulate`
@@ -276,7 +294,10 @@ def accumulate[D,L](iterable: Iterable[D],
                 acc = f(acc, ii)
             yield acc
 
-def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
+def foldL0[D](
+        iterable: Iterable[D],
+        f: Callable[[D, D], D], /
+    ) -> D|Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -297,9 +318,11 @@ def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
 
     return acc
 
-def foldL1[D, L](iterable: Iterable[D],
-                 f: Callable[[L, D], L],
-                 initial: L, /) -> L|Never:
+def foldL1[D, L](
+        iterable: Iterable[D],
+        f: Callable[[L, D], L],
+        initial: L, /
+    ) -> L|Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -312,9 +335,11 @@ def foldL1[D, L](iterable: Iterable[D],
         acc = f(acc, v)
     return acc
 
-def mbFoldL[L, D](iterable: Iterable[D],
-                  f: Callable[[L, D], L],
-                  initial: L|NoValue=NoValue()) -> MB[L]:
+def mbFoldL[L, D](
+        iterable: Iterable[D],
+        f: Callable[[L, D], L],
+        initial: L|NoValue=NoValue()
+    ) -> MB[L]:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
