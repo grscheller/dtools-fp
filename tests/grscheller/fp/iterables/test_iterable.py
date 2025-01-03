@@ -1,4 +1,4 @@
-# Copyright 2023-2024 Geoffrey R. Scheller
+# Copyright 2023-2025 Geoffrey R. Scheller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 from grscheller.circular_array.ca import ca, CA
 from grscheller.fp.iterables import concat, merge, exhaust
 from grscheller.fp.iterables import accumulate
-from grscheller.fp.iterables import drop, take, dropWhile, takeWhile
+from grscheller.fp.iterables import drop, take, drop_while, take_while
 
 class Test_fp_iterables:
     def test_taking_dropping(self) -> None:
@@ -23,14 +23,14 @@ class Test_fp_iterables:
         assert list(foo) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         assert list(take(foo, 5)) == [0, 1, 2, 3, 4]
         assert list(drop(foo, 5)) == [5, 6, 7, 8, 9]
-        assert list(takeWhile(foo, lambda x: x <= 4)) == [0, 1, 2, 3, 4]
-        assert list(dropWhile(foo, lambda x: x <= 4 )) == [5, 6, 7, 8, 9]
+        assert list(take_while(foo, lambda x: x <= 4)) == [0, 1, 2, 3, 4]
+        assert list(drop_while(foo, lambda x: x <= 4 )) == [5, 6, 7, 8, 9]
 
         empty: list[int] = []
         assert list(take(empty, 5)) == []
         assert list(drop(empty, 5)) == []
-        assert list(takeWhile(empty, lambda x: x <= 4)) == []
-        assert list(dropWhile(empty, lambda x: x <= 4 )) == []
+        assert list(take_while(empty, lambda x: x <= 4)) == []
+        assert list(drop_while(empty, lambda x: x <= 4 )) == []
 
     def test_iterable_composition(self) -> None:
         ones = (1, 2, 3, 4, 5, 6, 7, 8, 9)

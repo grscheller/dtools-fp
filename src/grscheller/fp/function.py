@@ -1,4 +1,4 @@
-# Copyright 2024 Geoffrey R. Scheller
+# Copyright 2024-2025 Geoffrey R. Scheller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,14 +27,14 @@ and application.
 
 """
 from __future__ import annotations
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from typing import Any
 
 __all__ = [ 'swap', 'sequenced', 'partial', 'iter_args' ]
 
 ## Functional Utilities
 
-def swap[U,V,R](f: Callable[[U,V],R]) -> Callable[[V,U],R]:
+def swap[U,V,R](f: Callable[[U, V], R]) -> Callable[[V, U], R]:
     """Swap arguments of a two argument function."""
     return (lambda v, u: f(u,v))
 

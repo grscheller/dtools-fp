@@ -1,4 +1,4 @@
-# Copyright 2023-2024 Geoffrey R. Scheller
+# Copyright 2023-2025 Geoffrey R. Scheller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,13 +58,14 @@ from enum import auto, Enum
 from typing import cast, Final, Never
 from grscheller.circular_array.ca import ca
 from .err_handling import MB
-from .singletons import NoValue, Sentinel
-from .state import State
+from .function import swap
+from .singletons import NoValue
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
-            'drop', 'dropWhile', 'take', 'takeWhile',
-            'accumulate', 'foldL0', 'foldL1',
-            'mbFoldL' ] # , 'scFoldL', 'scFoldR' ]
+            'drop', 'drop_while', 'take', 'take_while',
+            'take_pass', 'take_while_pass',
+            'accumulate', 'foldL0', 'foldL1', 'mbFoldL' ] #,
+            # 'scFoldL', 'scFoldR' ]
 
 ## Iterate over multiple Iterables
 
@@ -155,25 +156,21 @@ def drop[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
             break
     return it
 
-def dropWhile[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
+def drop_while[D](iterable: Iterable[D], predicate: Callable[[D], bool], /) -> Iterator[D]:
     """Drop initial values from `iterable` while predicate is true."""
     it = iter(iterable)
-    try:
-        value = next(it)
-    except:
-        return it
-
     while True:
         try:
-            if not pred(value):
-                break
             value = next(it)
+            if not predicate(value):
+                it = concat((value,), it)
+                break
         except StopIteration:
             break
-    return concat((value,), it)
+    return it
 
 def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
-    """Take up to `n` values from `iterable`."""
+    """Return an iterator of up to `n` initial values of an iterable"""
     it = iter(iterable)
     for _ in range(n):
         try:
@@ -182,11 +179,25 @@ def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
         except StopIteration:
             break
 
-def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
+def take_pass[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterator[D]]:
+    """Same as take except also return an iterator of the remaining values.
+
+       * return a tuple of
+         * an iterator of up to `n` initial values
+         * an iterator of the remaining vales of the `iterable`
+       * best practice is not to access second iterator until first is exhausted
+
+    """
+    it = iter(iterable)
+    itn = take(it, n)
+
+    return itn, it
+
+def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
-    **Warning**, potential value loss if iterable is iterator with multiple
-    references.
+    **Warning:** risk of potential value loss if iterable is iterator with
+    multiple references.
     """
     it = iter(iterable)
     while True:
@@ -199,6 +210,22 @@ def takeWhile[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterato
         except StopIteration:
             break
 
+def take_while_pass[D](iterable: Iterable[D],
+                       predicate: Callable[[D], bool],
+                       /) -> tuple[Iterator[D], Iterator[D]]:
+    """Yield values from `iterable` while `predicate` is true.
+
+       * return a tuple of two iterators
+         * first of initial values where predicate is true, followed by first to fail
+         * second of the remaining values of the iterable after first failed value
+       * best practice is not to access second iterator until first is exhausted
+
+    """
+    it = iter(iterable)
+    it_pred = take_while(it, predicate)
+
+    return it_pred, it
+
 ## reducing and accumulating
 
 def accumulate[D,L](iterable: Iterable[D],
@@ -209,7 +236,6 @@ def accumulate[D,L](iterable: Iterable[D],
     * pure Python version of standard library's `itertools.accumulate`
     * function `f` does not default to addition (for typing flexibility)
     * begins accumulation with an optional `initial` value
-    * `itertools.accumulate` had mypy issues
 
     """
     it = iter(iterable)
@@ -241,6 +267,7 @@ def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
 
     * traditional FP type order given for function `f`
     * if iterable empty raises StopIteration exception
+    * does not catch any exception `f` raises
     * never returns if `iterable` generates an infinite iterator
 
     """
@@ -248,18 +275,21 @@ def foldL0[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
     try:
         acc = next(it)
     except StopIteration:
-        msg = "Attemped to feft fold an empty iterable."
+        msg = "Attemped to left fold an empty iterable."
         raise StopIteration(msg)
+
     for v in it:
         acc = f(acc, v)
+
     return acc
 
 def foldL1[D, L](iterable: Iterable[D],
                  f: Callable[[L, D], L],
-                 initial: L, /) -> L:
+                 initial: L, /) -> L|Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
+    * does not catch any exception `f` raises
     * never returns if `iterable` generates an infinite iterator
 
     """
@@ -275,8 +305,8 @@ def mbFoldL[L, D](iterable: Iterable[D],
 
     * traditional FP type order given for function `f`
     * when an initial value is not given then `~L = ~D`
-    * if iterable empty and no `initial` value given, return empty `MB()`
-    * never returns if `iterable` generates an infinite iterator
+    * if iterable empty and no `initial` value given, return `MB()`
+    * never returns if iterable generates an infinite iterator
 
     """
     acc: L
@@ -290,132 +320,97 @@ def mbFoldL[L, D](iterable: Iterable[D],
         acc = cast(L, initial)
 
     for v in it:
-        acc = f(acc, v)
+        try:
+            acc = f(acc, v)
+        except Exception:
+            return MB()
+
     return MB(acc)
 
-#   def scFoldL[D,L,S](
-#           iterable: Iterable[D],
-#           f: Callable[[L, D], L],
-#           initial: L|NoValue=NoValue(), /,
-#           istate_find_start_of_fold: S|Sentinel=Sentinel('fp_iter_scFold'),
-#           istate_start_of_folding: S|Sentinel=Sentinel('fp_iter_scFold'),
-#           start_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(),
-#           stop_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-#           include_start_of_fold: bool=True,
-#           include_end_of_fold: bool=True,
-#           push_end_back_on_iter: bool=False
-#       ) -> tuple[MB[L], Iterable[D]]:
-#       """Short circuit version of a left fold. Useful for infinite or
-#       non-reversible iterables.
-#   
-#       * Behavior for default arguments will
-#         * left fold finite iterable
-#         * start folding immediately
-#         * continue folding until end (of a possibly infinite iterable)
-#       * Callable `start_folding` delays starting a left fold
-#       * Callable `stop_folding` is to prematurely stop the folding left
-#       * Returns a tuple containing
-#         * an XOR of either the folded value or error string
-#         * an iterator values beyond the fold
-#   
-#       """
-#       it = iter(iterable)
-#       acc: L
-#   
-#       if initial is not NoValue():
-#           init = cast(L, initial)
-#       else:
-#           try:
-#               init = cast(L, next(it))
-#           except StopIteration:
-#               return MB(), it
-#   
-#   
-#   
-#       stateMB = cast(MB[S], MB(istate_find_start_of_fold))
-#       for d in it:
-#           if (stateMB := startfold(d, stateMB.get())):
-#               continue
-#           else:
-#               if include_start_of_fold:
-#                   it = concat((d,), it)
-#               break
-#   
-#       stateMB = cast(MB[S], MB(istate_start_of_folding))
-#       acc = cast(L, df)  # in this case L = D
-#   
-#       for d in it:
-#           try:
-#               if (stateMB := stopfold(d, stateMB.get())):
-#                   acc = f(acc, d)
-#               else:
-#                   if include_stop:
-#                       acc = f(acc, d)
-#                   else:
-#                       it = concat((d,), it)
-#                   break
-#           except Exception:
-#               return MB(), it
-#   
-#       return MB(acc), it
-#   
-#   def scFoldR[D,R,S](iterable: Iterable[D],
-#           iterable: Iterable[D],
-#           f: Callable[[D, R], R],
-#           initial: R|NoValue=NoValue(), /,
-#           istate_find_start_of_fold: S|Sentinel=Sentinel('fp_iter_scFold'),
-#           istate_start_of_folding: S|Sentinel=Sentinel('fp_iter_scFold'),
-#           start_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(),
-#           stop_folding: Callable[[D, S], MB[S]]=lambda d, s: MB(s),
-#           include_start_of_fold: bool=True,
-#           include_end_of_fold: bool=True,
-#           push_start_back_on_iter: bool=False
-#       ) -> tuple[MB[R], Iterable[D]]:
-#       """Short circuit version of a right fold. Useful for infinite or
-#       non-reversible iterables.
-#   
-#       * Behavior for default arguments will
-#         * right fold finite iterable
-#         * start folding at end (of a possibly infinite iterable)
-#         * continue folding right until beginning
-#       * Callable `start_folding` prematurely starts a right fold
-#       * Callable `stop_folding` is to prematurely stop folding right
-#       * Returns a tuple containing
-#         * an XOR of either the folded value or error string
-#         * an iterator values beyond the fold
-#   
-#       """
-#       it = iter(iterable)
-#       acc: R
-#   
-#       stateMB = cast(MB[S], MB(istate_find_start_of_fold))
-#       ds: list[D] = []
-#       for d in it:
-#           if (stateMB := startfold(d, stateMB.get())):
-#               ds.append(d)
-#           else:
-#               if include_start:
-#                   ds.append(d)
-#               else:
-#                   it = concat((d,), it)
-#               break
-#   
-#       if initial is NoValue():
-#           if len(ds) == 0:
-#               return MB(), it
-#           else:
-#               acc = cast(R, ds.pop())  # in this case R = D
-#       else:
-#           acc = cast(R, initial)
-#   
-#       stateMB = cast(MB[S], MB(istate_foldR))
-#       while ds:
-#           if (stateMB := stopfold(d, stateMB.get())):
-#               acc = f(ds.pop(), acc)
-#           else:
-#               if include_stop:
-#                   acc = f(d, acc)
-#               break
-#   
-#       return MB(acc), it
-
+#def scFoldL[D, L](iterable: Iterable[D],
+#                  f: Callable[[L, D], L],
+#                  initial: L|NoValue=NoValue(), /,
+#                  start_folding: Callable[[D], bool]=lambda d: True,
+#                  stop_folding: Callable[[D], bool]=lambda d: False,
+#                  include_start: bool=True,
+#                  propagate_failed: bool=True) -> tuple[MB[L], Iterable[D]]:
+#    """Short circuit version of a left fold. Useful for infinite or
+#    non-reversible iterables.
+#
+#    * Behavior for default arguments will
+#      * left fold finite iterable
+#      * start folding immediately
+#      * continue folding until end (of a possibly infinite iterable)
+#    * Callable `start_folding` delays starting a left fold
+#    * Callable `stop_folding` is to prematurely stop the folding left
+#    * Returns an XOR of either the folded value or error string
+#
+#    """
+#    it = dropWhile(iter(iterable), lambda d: not start_folding(d))
+#    if not include_start:
+#        it = drop(it, 1)
+#    taken2, rest = takeWhile2(it, lambda d: not stop_folding(d))
+#    data: ca[D] = ca(taken2)
+#    failMB: MB[D] = MB()
+#    if data:
+#        failMB = MB(data.popR())
+#        if propagate_failed:
+#            rest = concat((failMB.get()), rest)
+#
+#
+#
+#
+#    data2 = ca(taken2)
+#    data: ca[D] = ca()
+#    failMB: MB[D] = MB()
+#    for d in data2:
+#        if stop_folding(d):
+#            if not include_start:
+#                failMB = MB(data.popL())
+#            if include_stop:
+#                data.pushR(d)
+#            break
+#        else:
+#            data.pushL(d)
+#
+#    return (mbFoldL(taken, f, initial), rest)
+#
+#def scFoldR[D, R](iterable: Iterable[D],
+#                  f: Callable[[D, R], R],
+#                  initial: R|NoValue=NoValue(), /,
+#                  start_folding: Callable[[D], bool]=lambda d: False,
+#                  stop_folding: Callable[[D], bool]=lambda d: False,
+#                  include_start: bool=True,
+#                  include_stop: bool=True) -> tuple[MB[R], Iterable[D]]:
+#    """Short circuit version of a right fold. Useful for infinite or
+#    non-reversible iterables.
+#
+#    * Behavior for default arguments will
+#      * right fold finite iterable
+#      * start folding at end (of a possibly infinite iterable)
+#      * continue folding right until beginning
+#    * Callable `start_folding` prematurely starts a right fold
+#    * Callable `stop_folding` is to prematurely stops a right fold
+#    * Returns an XOR of either the folded value or error string
+#    * best practice is not to access second iterator until first is exhausted
+#
+#    """
+#    taken2, rest = takeWhile2(iter(iterable), lambda d: not start_folding(d))
+#    data2 = ca(taken2)
+#    data: ca[D] = ca()
+#    failMB: MB[D] = MB()
+#    for d in reversed(data2):
+#        if stop_folding(d):
+#            if not include_start:
+#                failMB = MB(data.popL())
+#            if include_stop:
+#                data.pushR(d)
+#            break
+#        else:
+#            data.pushL(d)
+#
+#    if failMB:
+#        return (mbFoldL(data, swap(f), initial), concat((failMB.get(),), rest))
+#    else:
+#        return (mbFoldL(data, swap(f), initial), rest)
+#

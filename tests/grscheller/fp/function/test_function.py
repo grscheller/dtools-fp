@@ -1,4 +1,4 @@
-# Copyright 2023-2024 Geoffrey R. Scheller
+# Copyright 2023-2025 Geoffrey R. Scheller
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ class Test_function:
                          lambda names, name: names + sep + name,
                          "").get()[len(sep):]
 
-        cast = ['Moe', 'Larry', 'Curlie', 'Shemp', 'Curlie Joe']
-        stooges = names(3, ', ', cast)
+        charactors = ['Moe', 'Larry', 'Curlie', 'Shemp', 'Curlie Joe']
+        stooges = names(3, ', ', charactors)
         assert stooges == 'Moe, Larry, Curlie'
-        stooges = names(1, ', ', cast)
+        stooges = names(1, ', ', charactors)
         assert stooges == 'Moe'
-        stooges = names(0, ', ', cast)
+        stooges = names(0, ', ', charactors)
         assert stooges == ''
 
         stooges3 = partial(names, 3, ' and ')
-        assert stooges3(cast) == 'Moe and Larry and Curlie'
+        assert stooges3(charactors) == 'Moe and Larry and Curlie'
 
     def test_sequenced(self) -> None:
         def compute(a: float, b: float, c: float, d: int) -> float:
