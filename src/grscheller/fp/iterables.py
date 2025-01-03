@@ -32,9 +32,10 @@ Library of iterator related functions and enumerations.
 #### Dropping and taking values from an iterable:
 
 * function **drop**: drop first `n` values from iterable
-* function **dropWhile**: drop values from iterable while predicate holds
+* function **drop_while**: drop values from iterable while predicate holds
 * function **take**: take up to `n` initial values from iterable
-* function **takeWhile**: take values from iterable while predicate holds
+* function **take_split**: splitting out initial `n` initial values of iterable * function **take_while**: take values from iterable while predicate holds
+* function **take_while_split**: splitting an iterable while predicate holds
 
 ---
 
@@ -46,23 +47,20 @@ Library of iterator related functions and enumerations.
 * function **foldL1**: fold iterable left with a function and initial value
 * function **mbFoldL**: fold iterable left with an optional initial value
   * wraps result in a `MB` monad
-* function **scfoldL**: fold iterable left with premature start and stop conditions
-  * wraps result in an `XOR[acc: L, error: str]` monad
-* function **scfoldR**: fold iterable right with premature start and stop conditions
-  * wraps result in an `XOR[acc: R, error: str]` monad
 
 """
 from __future__ import annotations
 from collections.abc import Callable, Iterator, Iterable, Reversible
 from enum import auto, Enum
-from typing import cast, Final, Never
+from typing import cast, Never
 from grscheller.circular_array.ca import ca
 from .err_handling import MB
 from .function import swap
 from .singletons import NoValue
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
-            'drop', 'drop_while', 'take', 'take_while',
+            'drop', 'drop_while',
+            'take', 'take_while',
             'take_pass', 'take_while_pass',
             'accumulate', 'foldL0', 'foldL1', 'mbFoldL' ] #,
             # 'scFoldL', 'scFoldR' ]
@@ -179,7 +177,7 @@ def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
         except StopIteration:
             break
 
-def take_pass[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterator[D]]:
+def take_split[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterator[D]]:
     """Same as take except also return an iterator of the remaining values.
 
        * return a tuple of
@@ -210,9 +208,9 @@ def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterat
         except StopIteration:
             break
 
-def take_while_pass[D](iterable: Iterable[D],
-                       predicate: Callable[[D], bool],
-                       /) -> tuple[Iterator[D], Iterator[D]]:
+def take_while_split[D](iterable: Iterable[D],
+                        predicate: Callable[[D], bool],
+                        /) -> tuple[Iterator[D], Iterator[D]]:
     """Yield values from `iterable` while `predicate` is true.
 
        * return a tuple of two iterators
@@ -221,10 +219,26 @@ def take_while_pass[D](iterable: Iterable[D],
        * best practice is not to access second iterator until first is exhausted
 
     """
-    it = iter(iterable)
-    it_pred = take_while(it, predicate)
+    def _take_while(it: Iterator[D], pred: Callable[[D], bool], val: list[D]) -> Iterator[D]:
+        while True:
+            try:
+                if val:
+                    val[0] = next(it)
+                else:
+                    val.append(next(it))
+                if pred(val[0]):
+                    yield val[0]
+                    val.pop()
+                else:
+                    break
+            except StopIteration:
+                break
 
-    return it_pred, it
+    it = iter(iterable)
+    value: list[D] = []
+    it_pred = _take_while(it, predicate, value)
+
+    return (it_pred, concat(cast(list[D], value), it))
 
 ## reducing and accumulating
 

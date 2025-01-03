@@ -15,7 +15,9 @@
 from grscheller.circular_array.ca import ca, CA
 from grscheller.fp.iterables import concat, merge, exhaust
 from grscheller.fp.iterables import accumulate
-from grscheller.fp.iterables import drop, take, drop_while, take_while
+from grscheller.fp.iterables import drop, drop_while
+from grscheller.fp.iterables import take, take_while
+from grscheller.fp.iterables import take_split, take_while_split
 
 class Test_fp_iterables:
     def test_taking_dropping(self) -> None:
@@ -180,4 +182,22 @@ class Test_fp_iterables:
         empty: tuple[int, ...] = ()
         batPlus = list(accumulate(bat, lambda t,i: (i,) + t, empty))
         assert batPlus == [(), (5,), (4, 5), (3, 4, 5), (2, 3, 4, 5), (1, 2, 3, 4, 5)]
+
+    def test_take_split(self) -> None:
+        foo = tuple(range(1000))
+        foo1, rest = take_split(foo, 100)
+        assert list(foo1) == list(range(100))
+        drop(rest, 100)
+        foo2, rest = take_split(rest, 100)
+        assert tuple(foo2) == tuple(range(200, 300))
+        assert tuple(foo2) == tuple()
+        foo3, rest = take_while_split(rest, lambda x: x<600)
+        assert list(foo3) == list(range(300, 600))
+        foo4, _ = take_split(rest, 100)
+        assert list(foo4) == list(range(600, 700))
+        drop(rest, 100)
+        assert list(rest) == list(range(800, 1000))
+        assert list(rest) == list()
+        foo5, rest = take_while_split(rest, lambda x: x<2000)
+        assert list(rest) == list()
 
