@@ -11,6 +11,13 @@ PyPI grscheller.fp project.
 
 ## Releases and Important Milestones
 
+### Version 1.2.0 - PyPI release date 01-04-25
+
+* added modules lazy and state
+* simplifications done to fp.iterables module
+* renamed flatmap methods to bind
+* minor MB and XOR updates/corrections
+
 ### Version 1.1.0 - PyPI release date 11-18-24
 
 * added fp.function module

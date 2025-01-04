@@ -53,7 +53,6 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator, Iterable, Reversible
 from enum import auto, Enum
 from typing import cast, Never
-from grscheller.circular_array.ca import ca
 from .err_handling import MB
 from .function import swap
 from .singletons import NoValue
@@ -385,34 +384,6 @@ def mbFoldL[L, D](
 #    * Returns an XOR of either the folded value or error string
 #
 #    """
-#    it = dropWhile(iter(iterable), lambda d: not start_folding(d))
-#    if not include_start:
-#        it = drop(it, 1)
-#    taken2, rest = takeWhile2(it, lambda d: not stop_folding(d))
-#    data: ca[D] = ca(taken2)
-#    failMB: MB[D] = MB()
-#    if data:
-#        failMB = MB(data.popR())
-#        if propagate_failed:
-#            rest = concat((failMB.get()), rest)
-#
-#
-#
-#
-#    data2 = ca(taken2)
-#    data: ca[D] = ca()
-#    failMB: MB[D] = MB()
-#    for d in data2:
-#        if stop_folding(d):
-#            if not include_start:
-#                failMB = MB(data.popL())
-#            if include_stop:
-#                data.pushR(d)
-#            break
-#        else:
-#            data.pushL(d)
-#
-#    return (mbFoldL(taken, f, initial), rest)
 #
 #def scFoldR[D, R](iterable: Iterable[D],
 #                  f: Callable[[D, R], R],
@@ -434,22 +405,5 @@ def mbFoldL[L, D](
 #    * best practice is not to access second iterator until first is exhausted
 #
 #    """
-#    taken2, rest = takeWhile2(iter(iterable), lambda d: not start_folding(d))
-#    data2 = ca(taken2)
-#    data: ca[D] = ca()
-#    failMB: MB[D] = MB()
-#    for d in reversed(data2):
-#        if stop_folding(d):
-#            if not include_start:
-#                failMB = MB(data.popL())
-#            if include_stop:
-#                data.pushR(d)
-#            break
-#        else:
-#            data.pushL(d)
 #
-#    if failMB:
-#        return (mbFoldL(data, swap(f), initial), concat((failMB.get(),), rest))
-#    else:
-#        return (mbFoldL(data, swap(f), initial), rest)
-#
+

@@ -36,7 +36,6 @@ __all__ = [ 'State' ]
 
 from collections.abc import Callable
 from typing import Any, Never
-from grscheller.circular_array.ca import ca
 
 class State[S, A]():
     """Data structure generating values while propagating changes of state.
