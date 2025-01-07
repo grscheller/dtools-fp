@@ -52,7 +52,7 @@ Library of iterator related functions and enumerations.
 from __future__ import annotations
 from collections.abc import Callable, Iterator, Iterable, Reversible
 from enum import auto, Enum
-from typing import cast, Never
+from typing import cast, Never, Protocol
 from .err_handling import MB
 from .function import swap
 from .singletons import NoValue
@@ -253,7 +253,7 @@ def take_while_split[D](
     value: list[D] = []
     it_pred = _take_while(it, predicate, value)
 
-    return (it_pred, concat(cast(list[D], value), it))
+    return (it_pred, concat(value, it))
 
 ## reducing and accumulating
 
@@ -325,7 +325,11 @@ def foldL1[D, L](
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
-    * does not catch any exception `f` raises
+    * does not catch any exception `f` may raise
+    * like builtin `sum` for Python >=3.8 except
+      - not restricted to __add__ for the folding function
+      - initial value required, does not default to `0` for initial value
+      - handles non-numeric data just find
     * never returns if `iterable` generates an infinite iterator
 
     """
@@ -364,6 +368,7 @@ def mbFoldL[L, D](
             return MB()
 
     return MB(acc)
+
 
 #def scFoldL[D, L](iterable: Iterable[D],
 #                  f: Callable[[L, D], L],
@@ -405,5 +410,4 @@ def mbFoldL[L, D](
 #    * best practice is not to access second iterator until first is exhausted
 #
 #    """
-#
 

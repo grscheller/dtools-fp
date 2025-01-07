@@ -69,7 +69,7 @@ class TestXOR_sequence:
 
         assert xor_listInt_str == XOR(list(range(1, 2501)), 'does not matter')
         assert xor_tupleInt_str == XOR(tuple(range(1, 2501)), 'for this test')
-        assert xor_ftupleInt_str == XOR(FTuple(range(1, 2501)), 'all are right')
+        assert xor_ftupleInt_str == XOR(FTuple(range(1, 2501)), 'all are lefts')
         assert xor_dqueueInt_str == XOR(DoubleQueue(range(1, 2501)), 'none are wrong')
 
     def test_with_rights(self) -> None:
