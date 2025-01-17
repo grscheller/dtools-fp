@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from grscheller.circular_array.ca import ca, CA
-from grscheller.fp.iterables import concat, merge, exhaust
-from grscheller.fp.iterables import accumulate
-from grscheller.fp.iterables import drop, drop_while
-from grscheller.fp.iterables import take, take_while
-from grscheller.fp.iterables import take_split, take_while_split
+from dtools.circular_array.ca import ca, CA
+from dtools.fp.iterables import concat, merge, exhaust
+from dtools.fp.iterables import accumulate
+from dtools.fp.iterables import drop, drop_while
+from dtools.fp.iterables import take, take_while
+from dtools.fp.iterables import take_split, take_while_split
 
 class Test_fp_iterables:
     def test_taking_dropping(self) -> None:

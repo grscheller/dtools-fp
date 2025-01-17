@@ -3,9 +3,9 @@
 Functional programming tools which endeavor to be Pythonic.
 
 * **Repositories**
-  * [grscheller.fp][1] project on *PyPI*
+  * [dtools.fp][1] project on *PyPI*
   * [Source code][2] on *GitHub*
-* Detailed documentation for grscheller.datastructures
+* Detailed documentation for dtools.fp
   * [Detailed API documentation][3] on *GH-Pages*
 
 ### Modules
@@ -28,6 +28,6 @@ Functional programming tools which endeavor to be Pythonic.
 
 ---
 
-[1]: https://pypi.org/project/grscheller.fp/
-[2]: https://github.com/grscheller/fp/
-[3]: https://grscheller.github.io/grscheller-pypi-namespace-docs/fp/
+[1]: https://pypi.org/project/dtools.fp/
+[2]: https://github.com/grscheller/dtools-fp/
+[3]: https://grscheller.github.io/dtools-docs/fp/

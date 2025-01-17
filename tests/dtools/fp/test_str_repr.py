@@ -15,8 +15,8 @@
 from __future__ import annotations
 
 from typing import Final
-from grscheller.fp.singletons import NoValue
-from grscheller.fp.err_handling import MB, XOR
+from dtools.fp.singletons import NoValue
+from dtools.fp.err_handling import MB, XOR
 
 _noValue: Final[NoValue] = NoValue()
 

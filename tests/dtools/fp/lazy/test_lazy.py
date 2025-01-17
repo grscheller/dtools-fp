@@ -15,8 +15,8 @@
 from __future__ import annotations
 
 from typing import Any, Final, Never
-from grscheller.fp.err_handling import MB, XOR
-from grscheller.fp.lazy import Lazy, lazy
+from dtools.fp.err_handling import MB, XOR
+from dtools.fp.lazy import Lazy, lazy
 
 def add2_if_pos(x: int) -> int:
     if x < 1:

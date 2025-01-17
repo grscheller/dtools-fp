@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions anddd
 # limitations under the License.
 
-from grscheller.circular_array.ca import ca, CA
-from grscheller.fp.function import partial, sequenced, swap, iter_args
-from grscheller.fp.iterables import mbFoldL, take
+from dtools.circular_array.ca import ca, CA
+from dtools.fp.function import partial, sequenced, swap, iter_args
+from dtools.fp.iterables import mbFoldL, take
 
 class Test_function:
     def test_same_type(self) -> None:

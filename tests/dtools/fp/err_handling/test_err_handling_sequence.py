@@ -14,9 +14,9 @@
 
 from __future__ import annotations
 
-from grscheller.datastructures.tuples import FTuple, FT
-from grscheller.datastructures.queues import DoubleQueue, DQ
-from grscheller.fp.err_handling import MB, XOR
+from dtools.datastructures.tuples import FTuple, FT
+from dtools.datastructures.queues import DoubleQueue, DQ
+from dtools.fp.err_handling import MB, XOR
 
 class TestMB_sequence:
     def test_no_empties(self) -> None:

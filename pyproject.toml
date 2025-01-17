@@ -3,7 +3,7 @@ requires = ["flit_core>=3.4,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "grscheller.fp"
+name = "dtools.fp"
 authors = [
     { name = "Geoffrey R. Scheller", email = "geoffrey@scheller.com" },
 ]
@@ -31,14 +31,14 @@ keywords = [
 [project.optional-dependencies]
 test = [
     "pytest >=8.3",
-    "grscheller.circular-array >=3.8.1, < 3.9",
-    "grscheller.datastructures >=0.24.0, < 0.25"
+    "dtools.circular-array >=3.8.1, < 3.9",
+    "dtools.datastructures >=0.24.0, < 0.25"
 ]
 
 [project.urls]
-Source = "https://github.com/grscheller/fp"
-Changelog = "https://github.com/grscheller/fp/blob/main/CHANGELOG.md"
-Documentation = "https://grscheller.github.io/grscheller-pypi-namespace-docs/fp"
+Source = "https://github.com/grscheller/dtools-fp"
+Changelog = "https://github.com/grscheller/dtools-fp/blob/main/CHANGELOG.md"
+Documentation = "https://grscheller.github.io/dtools-docs/fp"
 
 [tool.flit.sdist]
 exclude = ["dist", "docs", ".gitignore", ".mypy_cache"]

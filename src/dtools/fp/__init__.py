@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Package grscheller.fp - Pythonic Functional Programming
+"""### Package dtools.fp - Pythonic Functional Programming
 
 Tools to aid with functional programming in Python yet still endeavoring to
 remain Pythonic.
 
 #### Modules and sub-packages
 
-* module grscheller.fp.err_handling: monadic maybe and either
-* module grscheller.fp.functions: tools combine and partially apply functions
-* module grscheller.fp.iterables: tools for iterables
-* module grscheller.fp.lazy: lazy (non-strict) function evaluation
-* module grscheller.fp.singletons: useful types with but one instance
-* module grscheller.fp.state: handle state monadically
+* module dtools.fp.err_handling: monadic maybe and either
+* module dtools.fp.functions: tools combine and partially apply functions
+* module dtools.fp.iterables: tools for iterables
+* module dtools.fp.lazy: lazy (non-strict) function evaluation
+* module dtools.fp.singletons: useful types with but one instance
+* module dtools.fp.state: handle state monadically
 
 """
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2025 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"

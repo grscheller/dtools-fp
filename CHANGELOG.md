@@ -1,6 +1,6 @@
 # CHANGELOG
 
-PyPI grscheller.fp project.
+PyPI dtools.fp project.
 
 #### Semantic versioning
 

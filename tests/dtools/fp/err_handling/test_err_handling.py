@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 
-from grscheller.datastructures.tuples import FTuple, FT
-from grscheller.fp.err_handling import MB, XOR
+from dtools.datastructures.tuples import FTuple, FT
+from dtools.fp.err_handling import MB, XOR
 
 def add2(x: int) -> int:
     return x + 2

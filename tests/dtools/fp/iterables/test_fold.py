@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from grscheller.fp.iterables import foldL0, foldL1, mbFoldL
-from grscheller.fp.err_handling import MB
+from dtools.fp.iterables import foldL0, foldL1, mbFoldL
+from dtools.fp.err_handling import MB
 
 class Test_fp_folds:
     def test_fold(self) -> None:

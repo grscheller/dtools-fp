@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from typing import cast, Never
-from grscheller.fp.function import swap
-from grscheller.fp.iterables import scFoldL, scFoldR
-from grscheller.fp.err_handling import MB
+from dtools.fp.function import swap
+from dtools.fp.iterables import scFoldL, scFoldR
+from dtools.fp.err_handling import MB
 
 class Test_fp_do_not_sc_folds:
     def test_fold(self) -> None:

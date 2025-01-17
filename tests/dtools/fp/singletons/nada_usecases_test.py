@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 
-from grscheller.circular_array.ca import CA
-from grscheller.fp.singletons import Nada
+from dtools.circular_array.ca import CA
+from dtools.fp.singletons import Nada
 
 nada = Nada()
 
@@ -73,7 +73,7 @@ class Test_Builtin_Containers:
         dict1 = {None:'0', ():'1', nada:'2', 42:'42'}
         assert dict1[None] == str(0)
         assert dict1[()] == str(1)
-        assert dict1[nada] == str(2)   # comment out for grscheller.untyped
+        assert dict1[nada] == str(2)
         assert dict1[Nada()] == str(2) # PyPI version < 0.1.2
         assert dict1[42] == str(42)
 
