@@ -31,3 +31,4 @@ Functional programming tools which endeavor to be Pythonic.
 [1]: https://pypi.org/project/dtools.fp/
 [2]: https://github.com/grscheller/dtools-fp/
 [3]: https://grscheller.github.io/dtools-docs/fp/
+
