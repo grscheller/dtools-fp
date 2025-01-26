@@ -8,6 +8,9 @@ Functional programming tools which endeavor to be Pythonic.
 * Detailed documentation for dtools.fp
   * [Detailed API documentation][3] on *GH-Pages*
 
+This project is part of the
+[Developer Tools for Python][4] **dtools.** namespace project.
+
 ### Modules
 
 * grscheller.fp.iterables
@@ -31,4 +34,5 @@ Functional programming tools which endeavor to be Pythonic.
 [1]: https://pypi.org/project/dtools.fp/
 [2]: https://github.com/grscheller/dtools-fp/
 [3]: https://grscheller.github.io/dtools-docs/fp/
+[4]: https://github.com/grscheller/dtools-docs/
 
