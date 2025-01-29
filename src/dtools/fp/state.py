@@ -103,11 +103,12 @@ class State[S, A]():
         """Combine a list of state actions into a state action of a list.
 
         * all state actions must be of the same type
+        * run method evaluates list front to back
 
         """
         def append_ret(l: list[A1], a: A1) -> list[A1]:
             l.append(a)
             return l
 
-        return ca(sas).foldR(lambda sa, s1: s1.map2(sa, lambda l, s: append_ret(l, s)), State.unit(list[A1]([])))
+        return ca(sas).foldL(lambda sa, s1: s1.map2(sa, lambda l, s: append_ret(l, s)), State.unit(list[A1]([])))
 
