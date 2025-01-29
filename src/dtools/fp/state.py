@@ -36,6 +36,7 @@ __all__ = [ 'State' ]
 
 from collections.abc import Callable
 from typing import Any, Never
+from dtools.circular_array.ca import ca
 
 class State[S, A]():
     """Data structure generating values while propagating changes of state.
@@ -97,11 +98,16 @@ class State[S, A]():
     def modifyState[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
         return State.getState().bind(lambda a: State.setState(f(a)))  #type: ignore
 
- #   @staticmethod
- #   def sequence[S1, A1](sas: list[State[S1, A1]])
- #       """Combine a list of state actions into a state action of a list.
+    @staticmethod
+    def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:
+        """Combine a list of state actions into a state action of a list.
 
- #       * all state actions must be of the same type
+        * all state actions must be of the same type
 
- #       """
+        """
+        def append_ret(l: list[A1], a: A1) -> list[A1]:
+            l.append(a)
+            return l
+
+        return ca(sas).foldR(lambda sa, s1: s1.map2(sa, lambda l, s: append_ret(l, s)), State.unit(list[A1]([])))
 

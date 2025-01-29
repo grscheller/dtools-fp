@@ -11,14 +11,24 @@ PyPI dtools.fp project.
 
 ## Releases and Important Milestones
 
-### Version 1.2.0 - PyPI release date 01-04-25
+### Version 1.3.1 - PyPI release date 2025-01-??
+
+* added sequence class method to State
+
+### Version 1.3.0 - PyPI release date 2025-01-17
+
+* Repo name changes
+  * GitHub: fp -> dtools-fp
+  * PyPI:   grscheller.fp -> dtools.fp
+
+### Version 1.2.0 - PyPI release date 2025-01-04
 
 * added modules lazy and state
 * simplifications done to fp.iterables module
 * renamed flatmap methods to bind
 * minor MB and XOR updates/corrections
 
-### Version 1.1.0 - PyPI release date 11-18-24
+### Version 1.1.0 - PyPI release date 2024-11-18
 
 * added fp.function module
   * combine and partially apply functions as first class objects
