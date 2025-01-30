@@ -74,7 +74,7 @@ class State[S, A]():
         return State(lambda s: (b, s))
 
     @staticmethod
-    def getState[S1]() -> State[S1, S1]:
+    def get[S1]() -> State[S1, S1]:
         """Set run action to return the current state
 
         * the current state is propagated unchanged
@@ -84,7 +84,7 @@ class State[S, A]():
         return State[S1, S1](lambda s: (s, s))
 
     @staticmethod
-    def setState[S1](s: S1) -> State[S1, tuple[()]]:
+    def set[S1](s: S1) -> State[S1, tuple[()]]:
         """Manually set a state.
 
         * the run action
@@ -95,8 +95,8 @@ class State[S, A]():
         return State(lambda _: ((), s))
 
     @staticmethod
-    def modifyState[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
-        return State.getState().bind(lambda a: State.setState(f(a)))
+    def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
+        return State.get().bind(lambda a: State.set(f(a)))
 
     @staticmethod
     def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:

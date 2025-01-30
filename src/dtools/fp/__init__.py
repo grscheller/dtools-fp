@@ -27,7 +27,7 @@ remain Pythonic.
 * module dtools.fp.state: handle state monadically
 
 """
-__version__ = "1.3.0.2"
+__version__ = "1.3.0.3"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2025 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"

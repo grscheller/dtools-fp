@@ -33,7 +33,7 @@ class Test_simple:
         aa, ss = sc2.run(40)
         assert (aa, ss) == (42, 42)
 
-        start = State.setState(0)
+        start = State.set(0)
         sc3 = start.bind(lambda a: sc)
         aa, ss = sc3.run(40)
         assert (aa, ss) == (1, 1)
@@ -93,7 +93,7 @@ class Test_simple:
 
     def test_modify(self) -> None:
         count: Final[State[int, int]] = State(lambda s: (s, s+1))
-        square_state = State.modifyState(lambda n: n*n)
+        square_state = State.modify(lambda n: n*n)
 
         def cnt(a: int) -> State[int, int]:
             return count
