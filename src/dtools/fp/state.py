@@ -57,7 +57,7 @@ class State[S, A]():
         def compose(s: S) -> tuple[B, S]:
             a, s1 = self.run(s)
             return g(a).run(s1)
-        return State(lambda s: compose(s))
+        return State(compose)
 
     def map[B](self, f: Callable[[A], B]) -> State[S, B]:
         return self.bind(lambda a: State.unit(f(a)))
@@ -96,7 +96,7 @@ class State[S, A]():
 
     @staticmethod
     def modifyState[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
-        return State.getState().bind(lambda a: State.setState(f(a)))  #type: ignore
+        return State.getState().bind(lambda a: State.setState(f(a)))
 
     @staticmethod
     def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:
@@ -106,9 +106,9 @@ class State[S, A]():
         * run method evaluates list front to back
 
         """
-        def append_ret(l: list[A1], a: A1) -> list[A1]:
+        def append_ret(a: A1, l: list[A1]) -> list[A1]:
             l.append(a)
             return l
 
-        return ca(sas).foldL(lambda sa, s1: s1.map2(sa, lambda l, s: append_ret(l, s)), State.unit(list[A1]([])))
+        return ca(sas).foldL(lambda sa, s1: s1.map2(sa, append_ret), State.unit(list[A1]([])))
 
