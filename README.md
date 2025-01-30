@@ -13,15 +13,21 @@ This project is part of the
 
 ### Modules
 
-* grscheller.fp.iterables
+* dtools.fp.err\_handling
+  * monadic tools for handling missing values & unexpected events
+* dtools.fp.function
+  * utilities to manipulate and partially apply functions
+* dtools.fp.iterables
   * iteration tools implemented in Python
-* grscheller.fp.nothingness
+* dtools.fp.lazy
+  * lazy (non-strict) function evaluation
+* dtools.fp.nothingness
   * singleton classes representing either a
     * missing value
     * sentinel value
     * failed calculation
-* grscheller.fp.err\_handling
-  * monadic tools for handling missing values & unexpected events
+* dtools.fp.state
+  * pure FP handling of state (the state monad)
 
 ### Benefits of FP
 

@@ -18,7 +18,7 @@ Not a replacement for the std library's `functools` which is more about
 modifying function behavior through decorators than functional composition
 and application.
 
-#### FP utilities to manipulate function arguments return values:
+#### FP utilities to manipulate and partially apply functions:
 
 * function **swap:** swap the arguments of a 2 argument function
 * function **sequenced:** convert function to take a sequence of its arguments
