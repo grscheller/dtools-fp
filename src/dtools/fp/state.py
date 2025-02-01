@@ -21,13 +21,18 @@ Handling state functionally.
 * class **State**: A pure FP immutable implementation for the State Monad
   * translated to Python from the book "Functional Programming in Scala"
     * authors Chiusana & Bjarnason
-  * using `bind` instead of `flatmap`
-    * I feel `flatmap` is misleading for non-container-like monads
-    * flatmap name too long
-      * without do-notation code tends to march to the right
-      * `bind` for state monad is part of the user API
-        * shorter to type
-        * less of just an implementation detail
+    * run "action" returns a tuple `(s, a)` instead of book's `(a, s)`
+      * keeps types in the tuple in same order as the type parameters of `State`
+        * the order is just a convention anyway
+        * one less "factoid" to remember
+  * choose the name `bind` instead of `flatmap`
+    * the `flatmap` name is misleading for non-container-like monads
+    * `flatmap` name too long, `bind` shorter to type
+      * without "do-notation", code tends to march to the right
+  * typing of the `modify` class method may be a bit suspect
+    * both these types for `modify` class method make mypy complain
+      * def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]
+      * def modify[S1, S2](f: Callable[[S1], S2]) -> State[S2, tuple[()]]
 
 """
 from __future__ import annotations
@@ -45,17 +50,16 @@ class State[S, A]():
       * it wraps a transformation old_state -> (value, new_state)
       * the `run` method is this wrapped transformation
     * `bind` is just state propagating function composition
-      * `bind` is sometimes called "flatmap"
 
     """
     __slots__ = 'run'
 
-    def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
+    def __init__(self, run: Callable[[S], tuple[S, A]]) -> None:
         self.run = run
 
     def bind[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
-        def compose(s: S) -> tuple[B, S]:
-            a, s1 = self.run(s)
+        def compose(s: S) -> tuple[S, B]:
+            s1, a = self.run(s)
             return g(a).run(s1)
         return State(compose)
 
@@ -71,7 +75,7 @@ class State[S, A]():
     @staticmethod
     def unit[S1, B](b: B) -> State[S1, B]:
         """Create a State action from a value."""
-        return State(lambda s: (b, s))
+        return State(lambda s: (s, b))
 
     @staticmethod
     def get[S1]() -> State[S1, S1]:
@@ -84,7 +88,7 @@ class State[S, A]():
         return State[S1, S1](lambda s: (s, s))
 
     @staticmethod
-    def set[S1](s: S1) -> State[S1, tuple[()]]:
+    def put[S1](s: S1) -> State[S1, tuple[()]]:
         """Manually set a state.
 
         * the run action
@@ -92,11 +96,11 @@ class State[S, A]():
           * assigns a canonically meaningless value to current value
 
         """
-        return State(lambda _: ((), s))
+        return State(lambda _: (s, ()))
 
     @staticmethod
-    def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
-        return State.get().bind(lambda a: State.set(f(a)))
+    def modify[S1](f: Callable[[S1], Never]) -> State[Never, tuple[()]]:
+        return State.get().bind(lambda a: State.put(f(a)))
 
     @staticmethod
     def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:
