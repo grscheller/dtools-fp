@@ -31,8 +31,8 @@ Handling state functionally.
       * without "do-notation", code tends to march to the right
   * typing of the `modify` class method may be a bit suspect
     * both these types for `modify` class method make mypy complain
-      * def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]
-      * def modify[S1, S2](f: Callable[[S1], S2]) -> State[S2, tuple[()]]
+      * `def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]`
+      * `def modify[S1, S2](f: Callable[[S1], S2]) -> State[S2, tuple[()]]`
 
 """
 from __future__ import annotations
@@ -40,7 +40,6 @@ from __future__ import annotations
 __all__ = [ 'State' ]
 
 from collections.abc import Callable
-from typing import Any, Never
 from dtools.circular_array.ca import ca
 
 class State[S, A]():
@@ -54,28 +53,37 @@ class State[S, A]():
     """
     __slots__ = 'run'
 
-    def __init__(self, run: Callable[[S], tuple[S, A]]) -> None:
+    def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
         self.run = run
 
     def bind[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
-        def compose(s: S) -> tuple[S, B]:
-            s1, a = self.run(s)
-            return g(a).run(s1)
+        """Perform function composition while propagating state."""
+        def compose(s: S) -> tuple[B, S]:
+            a, s = self.run(s)
+            return g(a).run(s)
         return State(compose)
 
+    def eval(self, init: S) -> A:
+        """Evaluate the Monad via passing an initial state."""
+        a, _ = self.run(init)
+        return a
+
     def map[B](self, f: Callable[[A], B]) -> State[S, B]:
+        """Map a function over a run action."""
         return self.bind(lambda a: State.unit(f(a)))
 
     def map2[B, C](self, sb: State[S, B], f: Callable[[A, B], C]) -> State[S, C]:
+        """Map a function of two variables over two state actions."""
         return self.bind(lambda a: sb.map(lambda b: f(a, b)))
 
     def both[B](self, rb: State[S, B]) -> State[S, tuple[A, B]]:
+        """Return a tuple of two state actions."""
         return self.map2(rb, lambda a, b: (a, b))
 
     @staticmethod
     def unit[S1, B](b: B) -> State[S1, B]:
         """Create a State action from a value."""
-        return State(lambda s: (s, b))
+        return State(lambda s: (b, s))
 
     @staticmethod
     def get[S1]() -> State[S1, S1]:
@@ -83,24 +91,32 @@ class State[S, A]():
 
         * the current state is propagated unchanged
         * current value now set to current state
+        * will need type annotation
 
         """
         return State[S1, S1](lambda s: (s, s))
 
     @staticmethod
     def put[S1](s: S1) -> State[S1, tuple[()]]:
-        """Manually set a state.
+        """Manually insert a state.
 
         * the run action
           * ignores previous state and swaps in a new state
           * assigns a canonically meaningless value to current value
 
         """
-        return State(lambda _: (s, ()))
+        return State(lambda _: ((), s))
 
     @staticmethod
-    def modify[S1](f: Callable[[S1], Never]) -> State[Never, tuple[()]]:
-        return State.get().bind(lambda a: State.put(f(a)))
+    def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
+        """Modify previous state.
+
+        * like put, but modify previous state via `f`
+        * will need type annotation
+          * type: ignore - since mypy has no "a priori" way to know S1.
+
+        """
+        return State.get().bind(lambda a: State.put(f(a)))  #type: ignore
 
     @staticmethod
     def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:
@@ -110,9 +126,9 @@ class State[S, A]():
         * run method evaluates list front to back
 
         """
-        def append_ret(a: A1, l: list[A1]) -> list[A1]:
+        def append_ret(l: list[A1], a: A1) -> list[A1]:
             l.append(a)
             return l
 
-        return ca(sas).foldL(lambda sa, s1: s1.map2(sa, append_ret), State.unit(list[A1]([])))
+        return ca(sas).foldL(lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[A1]([])))
 
