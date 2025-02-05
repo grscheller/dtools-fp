@@ -13,7 +13,7 @@ PyPI dtools.fp project.
 
 ### Version 1.3.1 - PyPI release date 2025-01-??
 
-* added sequence class method to State
+* added class method sequence to class State
 
 ### Version 1.3.0 - PyPI release date 2025-01-17
 
