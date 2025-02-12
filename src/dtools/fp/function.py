@@ -28,9 +28,9 @@ and application.
 """
 from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
-from typing import Any
+from typing import Any, cast
 
-__all__ = [ 'swap', 'sequenced', 'partial', 'iter_args' ]
+__all__ = [ 'swap', 'sequenced', 'partial', 'iter_args', 'negate']
 
 ## Functional Utilities
 
@@ -57,7 +57,6 @@ def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
     """
     def wrap(*rest: R) -> R:
         return sequenced(f)(args + rest)
-
     return wrap
 
 def iter_args[A](*args: A) -> Iterator[A]:
@@ -68,4 +67,9 @@ def iter_args[A](*args: A) -> Iterator[A]:
     """
     for arg in args:
         yield arg
+
+def negate[**P](f: Callable[P, bool]) -> Callable[P, bool]:
+    def F(*args: Any) -> bool:
+        return not sequenced(f)(args)
+    return cast(Callable[P, bool], F)
 

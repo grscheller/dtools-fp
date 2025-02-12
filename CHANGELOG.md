@@ -11,9 +11,15 @@ PyPI dtools.fp project.
 
 ## Releases and Important Milestones
 
-### Version 1.3.1 - PyPI release date 2025-01-??
+### Version 1.3.1 - PyPI release date 2025-02-??
 
 * added class method sequence to class State
+* added put method to err_handling.MB class
+  * if MB is empty, injects a value into it
+  * otherwise, do nothing
+* added pop method to err_handling.MB class
+  * if MB is not empty, remove the value and return it
+  * otherwise, raise ValueError
 
 ### Version 1.3.0 - PyPI release date 2025-01-17
 

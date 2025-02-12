@@ -50,19 +50,18 @@ Library of iterator related functions and enumerations.
 
 """
 from __future__ import annotations
-from collections.abc import Callable, Iterator, Iterable, Reversible
+from collections.abc import Callable, Iterator, Iterable
 from enum import auto, Enum
 from typing import cast, Never, Protocol
 from .err_handling import MB
-from .function import swap
+from .function import negate
 from .singletons import NoValue
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'drop_while',
             'take', 'take_while',
             'take_split', 'take_while_split',
-            'accumulate', 'foldL0', 'foldL1', 'mbFoldL' ] #,
-            # 'scFoldL', 'scFoldR' ]
+            'accumulate', 'foldL0', 'foldL1', 'mbFoldL', 'scFoldL', 'scFoldR' ]
 
 ## Iterate over multiple Iterables
 
@@ -234,23 +233,21 @@ def take_while_split[D](
        * best practice is not to access second iterator until first is exhausted
 
     """
-    def _take_while(it: Iterator[D], pred: Callable[[D], bool], val: list[D]) -> Iterator[D]:
+    def _take_while(it: Iterator[D],
+                    pred: Callable[[D], bool],
+                    val: MB[D]) -> Iterator[D]:
         while True:
             try:
-                if val:
-                    val[0] = next(it)
-                else:
-                    val.append(next(it))
-                if pred(val[0]):
-                    yield val[0]
-                    val.pop()
+                val.put(next(it))
+                if pred(val.get()):
+                    yield val.pop()
                 else:
                     break
             except StopIteration:
                 break
 
     it = iter(iterable)
-    value: list[D] = []
+    value: MB[D] = MB()
     it_pred = _take_while(it, predicate, value)
 
     return (it_pred, concat(value, it))
@@ -293,7 +290,7 @@ def accumulate[D,L](
                 acc = f(acc, ii)
             yield acc
 
-def foldL0[D](
+def reduceL[D](
         iterable: Iterable[D],
         f: Callable[[D, D], D], /
     ) -> D|Never:
@@ -317,7 +314,7 @@ def foldL0[D](
 
     return acc
 
-def foldL1[D, L](
+def foldL[D, L](
         iterable: Iterable[D],
         f: Callable[[L, D], L],
         initial: L, /
@@ -370,44 +367,67 @@ def mbFoldL[L, D](
     return MB(acc)
 
 
-#def scFoldL[D, L](iterable: Iterable[D],
-#                  f: Callable[[L, D], L],
-#                  initial: L|NoValue=NoValue(), /,
-#                  start_folding: Callable[[D], bool]=lambda d: True,
-#                  stop_folding: Callable[[D], bool]=lambda d: False,
-#                  include_start: bool=True,
-#                  propagate_failed: bool=True) -> tuple[MB[L], Iterable[D]]:
-#    """Short circuit version of a left fold. Useful for infinite or
-#    non-reversible iterables.
-#
-#    * Behavior for default arguments will
-#      * left fold finite iterable
-#      * start folding immediately
-#      * continue folding until end (of a possibly infinite iterable)
-#    * Callable `start_folding` delays starting a left fold
-#    * Callable `stop_folding` is to prematurely stop the folding left
-#    * Returns an XOR of either the folded value or error string
-#
-#    """
-#
-#def scFoldR[D, R](iterable: Iterable[D],
-#                  f: Callable[[D, R], R],
-#                  initial: R|NoValue=NoValue(), /,
-#                  start_folding: Callable[[D], bool]=lambda d: False,
-#                  stop_folding: Callable[[D], bool]=lambda d: False,
-#                  include_start: bool=True,
-#                  include_stop: bool=True) -> tuple[MB[R], Iterable[D]]:
-#    """Short circuit version of a right fold. Useful for infinite or
-#    non-reversible iterables.
-#
-#    * Behavior for default arguments will
-#      * right fold finite iterable
-#      * start folding at end (of a possibly infinite iterable)
-#      * continue folding right until beginning
-#    * Callable `start_folding` prematurely starts a right fold
-#    * Callable `stop_folding` is to prematurely stops a right fold
-#    * Returns an XOR of either the folded value or error string
-#    * best practice is not to access second iterator until first is exhausted
-#
-#    """
+def scReduceL[D](
+        iterable: Iterable[D],
+        f: Callable[[D, D], D], /,
+        start: Callable[[D], bool]=(lambda d: True),
+        stop: Callable[[D], bool]=(lambda d: False)
+    ) -> tuple[D, Iterable[D]]:
+    """Short circuit version of a left reduce. Useful for infinite or
+     non-reversible iterables.
+
+    * Behavior for default arguments will
+      * left fold finite iterable
+      * start folding immediately
+      * continue folding until end (of a possibly infinite iterable)
+    * Callable `start` delays starting the left fold
+    * Callable `stop` prematurely stop the left
+
+    """
+    it1 = drop_while(iterable, negate(start))
+    it2, it3 = take_while_split(it1, negate(stop))
+
+    return (reduceL(it2, f), it3)
+
+def scReduceR[D](
+        iterable: Iterable[D],
+        f: Callable[[D, D], D], /,
+        start: Callable[[D], bool]=(lambda d: False),
+        stop: Callable[[D], bool]=(lambda d: False),
+        include_start: bool=True,
+        include_stop: bool=True
+    ) -> tuple[D, Iterable[D]]:
+    """Short circuit version of a right fold. Useful for infinite or
+    non-reversible iterables.
+
+    * Behavior for default arguments will
+      * right fold finite iterable
+      * start folding at end (of a possibly infinite iterable)
+      * continue folding right until beginning
+    * Callable `start` prematurely starts the right fold
+    * Callable `stop` prematurely stops the right fold
+    * best practice is not to access second iterator until first is exhausted
+
+    """
+    it1, it2 = take_while_split(iterable, negate(start))
+    l1 = list(it1)
+    if include_start:
+        try:
+            begin = next(it2)
+        except StopIteration:
+            pass
+        else:
+            l1.append(begin)
+
+    l1.reverse()
+    it3, it4 = take_while_split(l1, negate(stop))
+    if include_stop:
+        try:
+            end = next(it4)
+        except StopIteration:
+            pass
+        else:
+            it3 = concat(it3, (end,))
+
+    return (reduceL(it3, f), it4)
 

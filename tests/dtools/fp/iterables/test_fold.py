@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dtools.fp.iterables import foldL0, foldL1, mbFoldL
+from collections.abc import Callable
+from dtools.fp.iterables import reduceL, foldL, mbFoldL, scReduceL, scReduceR
 from dtools.fp.err_handling import MB
 
 class Test_fp_folds:
@@ -31,39 +32,39 @@ class Test_fp_folds:
         data3: tuple[int, ...] = ()
         data4 = 42,
 
-        assert foldL0(data1, add2) == 5050
-        assert foldL1(data1, add2, 10) == 5060
+        assert reduceL(data1, add2) == 5050
+        assert foldL(data1, add2, 10) == 5060
 
-        assert foldL0(data2, add2) == 5049
-        assert foldL1(data2, add2, 10) == 5059
+        assert reduceL(data2, add2) == 5049
+        assert foldL(data2, add2, 10) == 5059
 
-        assert foldL1(data3, add2, 0) == 0
-        assert foldL1(data3, add2, 10) == 10
+        assert foldL(data3, add2, 0) == 0
+        assert foldL(data3, add2, 10) == 10
 
-        assert foldL0(data4, add2) == 42
-        assert foldL1(data4, add2, 10) == 52
+        assert reduceL(data4, add2) == 42
+        assert foldL(data4, add2, 10) == 52
 
         stuff1 = (1, 2, 3, 4, 5)
         stuff2 = (2, 3, 4, 5)
         stuff3: list[int] = []
         stuff4 = 42,
 
-        assert foldL0(stuff1, add2) == 15
-        assert foldL1(stuff1, add2, 10) == 25
-        assert foldL0(stuff2, add2) == 14
-        assert foldL1(stuff3, add2, 0) == 0
-        assert foldL1(stuff3, add2, -42) == -42
-        assert foldL0(stuff4, add2) == 42
-        assert foldL0(stuff4, add2) == 42
+        assert reduceL(stuff1, add2) == 15
+        assert foldL(stuff1, add2, 10) == 25
+        assert reduceL(stuff2, add2) == 14
+        assert foldL(stuff3, add2, 0) == 0
+        assert foldL(stuff3, add2, -42) == -42
+        assert reduceL(stuff4, add2) == 42
+        assert reduceL(stuff4, add2) == 42
 
-        assert foldL0(stuff1, funcL) == -156
-        assert foldL0(stuff2, funcL) == 84
-        assert foldL1(stuff3, funcL, 0) == 0
-        assert foldL1(stuff3, funcL, -1) == -1
-        assert foldL0(stuff4, funcL) == 42
-        assert foldL0(stuff1, funcL) == -156
-        assert foldL0(stuff2, funcL) == 84
-        assert foldL0(stuff2, funcL) == 84
+        assert reduceL(stuff1, funcL) == -156
+        assert reduceL(stuff2, funcL) == 84
+        assert foldL(stuff3, funcL, 0) == 0
+        assert foldL(stuff3, funcL, -1) == -1
+        assert reduceL(stuff4, funcL) == 42
+        assert reduceL(stuff1, funcL) == -156
+        assert reduceL(stuff2, funcL) == 84
+        assert reduceL(stuff2, funcL) == 84
 
 class Test_fp_mbFolds:
     def test_mbFold(self) -> None:
@@ -114,4 +115,76 @@ class Test_fp_mbFolds:
         assert mbFoldL(stuff1, funcL) == MB(-156)
         assert mbFoldL(stuff2, funcL) == MB(84)
         assert mbFoldL(stuff2, funcL).get() == 84
+
+class Test_fp_scReduceL:
+
+    def test_defaults(self) -> None:
+        add2: Callable[[int, int], int] = lambda a, b: a+b
+
+        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        sum55, it = scReduceL(stuff, add2)
+        assert sum55 == 55
+        try:
+            nono = next(it)
+        except StopIteration:
+            assert True
+        else:
+            assert False
+
+    def test_start_stop(self) -> None:
+        add2: Callable[[int, int], int] = lambda a, b: a+b
+
+        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        def ge2(a: int) -> bool:
+            return a >= 2
+
+        def ge8(a: int) -> bool:
+            return a >= 9
+
+        sum35, it = scReduceL(stuff, add2, start=ge2, stop=ge8)
+        assert sum35 == 35
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert int9 == 9
+
+class Test_fp_scReduceR:
+
+    def test_defaults(self) -> None:
+        add2: Callable[[int, int], int] = lambda a, b: a+b
+
+        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        sum55, it = scReduceR(stuff, add2)
+        assert sum55 == 55
+        try:
+            nono = next(it)
+        except StopIteration:
+            assert True
+        else:
+            assert False
+
+    def test_start_stop(self) -> None:
+        add2: Callable[[int, int], int] = lambda a, b: a+b
+
+        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        def ge2(a: int) -> bool:
+            return a >= 2
+
+        def ge8(a: int) -> bool:
+            return a >= 9
+
+        sum35, it = scReduceR(stuff, add2, start=ge8, stop=ge2)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert int9 == 9
+        assert sum35 == 35
 

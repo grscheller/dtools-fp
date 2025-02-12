@@ -38,10 +38,9 @@ class MB[D]():
     * `MB` objects are self flattening, therefore a `MB` cannot contain a MB
       * `MB(MB(d)) == MB(d)`
       * `MB(MB()) == MB()`
-    * immutable, a `MB` does not change after being created
-      * immutable semantics, map & bind return new instances
-        * warning: contained values need not be immutable
-        * warning: not hashable if contained value is mutable
+    * immutable semantics, map & bind return new instances
+      * warning: hashed values invalidated if contained value is mutated
+      * warning: hashed values invalidated if put or pop methods are called
 
     """
     __slots__ = '_value',
@@ -115,6 +114,22 @@ class MB[D]():
                 raise ValueError(msg)
             else:
                 return cast(D, alt)
+
+    def put(self, value: D) -> None:
+        """Put a value in the MB if empty, if not empty do nothing."""
+        if self._value is Sentinel('MB'):
+            self._value = value
+
+    def pop(self) -> D|Never:
+        """Pop the value if the MB is not empty, otherwise fail."""
+        _sentinel: Final[Sentinel] = Sentinel('MB')
+        if self._value is _sentinel:
+            msg = 'MB: Popping from an empty MB'
+            raise ValueError(msg)
+        else:
+            popped = cast(D, self._value)
+            self._value = _sentinel
+            return popped
 
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
         """Map function `f` over the 0 or 1 elements of this data structure.
