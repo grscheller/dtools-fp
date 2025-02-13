@@ -429,5 +429,5 @@ def scReduceR[D](
         else:
             it3 = concat(it3, (end,))
 
-    return (reduceL(it3, f), it4)
+    return (reduceL(it3, f), it2)
 

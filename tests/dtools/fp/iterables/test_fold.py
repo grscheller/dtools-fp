@@ -144,13 +144,12 @@ class Test_fp_scReduceL:
             return a >= 9
 
         sum35, it = scReduceL(stuff, add2, start=ge2, stop=ge8)
-        assert sum35 == 35
         try:
             int9 = next(it)
         except StopIteration:
             assert False
         else:
-            assert int9 == 9
+            assert (int9, sum35) == (9, 35)
 
 class Test_fp_scReduceR:
 
@@ -173,18 +172,17 @@ class Test_fp_scReduceR:
 
         stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
-        def ge2(a: int) -> bool:
-            return a >= 2
+        def lt3(a: int) -> bool:
+            return a < 4
 
-        def ge8(a: int) -> bool:
-            return a >= 9
+        def ge7(a: int) -> bool:
+            return a >= 7
 
-        sum35, it = scReduceR(stuff, add2, start=ge8, stop=ge2)
+        sum30, it = scReduceR(stuff, add2, start=ge7, stop=lt3)
         try:
-            int9 = next(it)
+            int8 = next(it)
         except StopIteration:
             assert False
         else:
-            assert int9 == 9
-        assert sum35 == 35
+            assert (int8, sum30) == (8, 22)
 
