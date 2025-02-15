@@ -15,6 +15,7 @@
 from collections.abc import Callable
 from dtools.fp.iterables import reduceL, foldL, mbFoldL, scReduceL, scReduceR
 from dtools.fp.err_handling import MB
+from dtools.fp.function import swap, partial
 
 class Test_fp_folds:
     def test_fold(self) -> None:
@@ -124,11 +125,10 @@ class Test_fp_scReduceL:
         stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
         sum55, it = scReduceL(stuff, add2)
-        assert sum55 == 55
         try:
             nono = next(it)
         except StopIteration:
-            assert True
+            assert sum55 == 55
         else:
             assert False
 
@@ -141,7 +141,7 @@ class Test_fp_scReduceL:
             return a >= 2
 
         def ge8(a: int) -> bool:
-            return a >= 9
+            return a >= 8
 
         sum35, it = scReduceL(stuff, add2, start=ge2, stop=ge8)
         try:
@@ -150,6 +150,24 @@ class Test_fp_scReduceL:
             assert False
         else:
             assert (int9, sum35) == (9, 35)
+
+        sum33, it = scReduceL(stuff, add2, start=ge2, stop=ge8,
+                              include_start=False)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int9, sum33) == (9, 33)
+
+        sum27, it = scReduceL(stuff, add2, start=ge2, stop=ge8,
+                              include_stop=False)
+        try:
+            int8 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int8, sum27) == (8, 27)
 
 class Test_fp_scReduceR:
 
@@ -172,17 +190,47 @@ class Test_fp_scReduceR:
 
         stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
-        def lt3(a: int) -> bool:
-            return a < 4
+        def ge_n(a: int, n: int) -> bool:
+            return a >= n
 
-        def ge7(a: int) -> bool:
-            return a >= 7
+        def le_n(a: int, n: int) -> bool:
+            return a <= n
 
-        sum30, it = scReduceR(stuff, add2, start=ge7, stop=lt3)
+        ge7 = partial(swap(ge_n), 7)
+        le4 = partial(swap(le_n), 4)
+
+        sum22, it = scReduceR(stuff, add2, start=ge7, stop=le4)
         try:
             int8 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int8, sum30) == (8, 22)
+            assert (int8, sum22) == (8, 22)
+
+        sum15, it = scReduceR(stuff, add2, start=ge7, stop=le4,
+                              include_start=False)
+        try:
+            int7 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int7, sum15) == (7, 15)
+
+        sum18, it = scReduceR(stuff, add2, start=ge7, stop=le4,
+                              include_stop=False)
+        try:
+            int8 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int8, sum18) == (8, 18)
+
+        sum11, it = scReduceR(stuff, add2, start=ge7, stop=le4,
+                              include_start=False, include_stop=False)
+        try:
+            int7 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int7, sum11) == (7, 11)
 

@@ -50,11 +50,11 @@ Library of iterator related functions and enumerations.
 
 """
 from __future__ import annotations
-from collections.abc import Callable, Iterator, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from enum import auto, Enum
 from typing import cast, Never, Protocol
 from .err_handling import MB
-from .function import negate
+from .function import negate, swap
 from .singletons import NoValue
 
 __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
@@ -142,10 +142,7 @@ def merge[D](*iterables: Iterable[D], yield_partials: bool=False) -> Iterator[D]
 
 ## dropping and taking
 
-def drop[D](
-        iterable: Iterable[D],
-        n: int, /
-    ) -> Iterator[D]:
+def drop[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
     """Drop the next `n` values from `iterable`."""
     it = iter(iterable)
     for _ in range(n):
@@ -155,26 +152,20 @@ def drop[D](
             break
     return it
 
-def drop_while[D](
-        iterable: Iterable[D],
-        predicate: Callable[[D], bool], /
-    ) -> Iterator[D]:
+def drop_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
     """Drop initial values from `iterable` while predicate is true."""
     it = iter(iterable)
     while True:
         try:
             value = next(it)
-            if not predicate(value):
+            if not pred(value):
                 it = concat((value,), it)
                 break
         except StopIteration:
             break
     return it
 
-def take[D](
-        iterable: Iterable[D],
-        n: int, /
-    ) -> Iterator[D]:
+def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
     """Return an iterator of up to `n` initial values of an iterable"""
     it = iter(iterable)
     for _ in range(n):
@@ -184,10 +175,7 @@ def take[D](
         except StopIteration:
             break
 
-def take_split[D](
-        iterable: Iterable[D],
-        n: int, /
-    ) -> tuple[Iterator[D], Iterator[D]]:
+def take_split[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterator[D]]:
     """Same as take except also return an iterator of the remaining values.
 
        * return a tuple of
@@ -201,14 +189,10 @@ def take_split[D](
 
     return itn, it
 
-def take_while[D](
-        iterable: Iterable[D],
-        pred: Callable[[D], bool], /
-    ) -> Iterator[D]:
+def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
-    **Warning:** risk of potential value loss if iterable is iterator with
-    multiple references.
+    **Warning:** risk of value loss if iterable is multiple referenced iterator.
     """
     it = iter(iterable)
     while True:
@@ -221,10 +205,7 @@ def take_while[D](
         except StopIteration:
             break
 
-def take_while_split[D](
-        iterable: Iterable[D],
-        predicate: Callable[[D], bool], /
-    ) -> tuple[Iterator[D], Iterator[D]]:
+def take_while_split[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> tuple[Iterator[D], Iterator[D]]:
     """Yield values from `iterable` while `predicate` is true.
 
        * return a tuple of two iterators
@@ -248,17 +229,13 @@ def take_while_split[D](
 
     it = iter(iterable)
     value: MB[D] = MB()
-    it_pred = _take_while(it, predicate, value)
+    it_pred = _take_while(it, pred, value)
 
     return (it_pred, concat(value, it))
 
 ## reducing and accumulating
 
-def accumulate[D,L](
-        iterable: Iterable[D],
-        f: Callable[[L, D], L],
-        initial: L|NoValue=NoValue(), /
-    ) -> Iterator[L]:
+def accumulate[D,L](iterable: Iterable[D], f: Callable[[L, D], L], initial: L|NoValue=NoValue(), /) -> Iterator[L]:
     """Returns an iterator of accumulated values.
 
     * pure Python version of standard library's `itertools.accumulate`
@@ -290,10 +267,7 @@ def accumulate[D,L](
                 acc = f(acc, ii)
             yield acc
 
-def reduceL[D](
-        iterable: Iterable[D],
-        f: Callable[[D, D], D], /
-    ) -> D|Never:
+def reduceL[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -314,11 +288,7 @@ def reduceL[D](
 
     return acc
 
-def foldL[D, L](
-        iterable: Iterable[D],
-        f: Callable[[L, D], L],
-        initial: L, /
-    ) -> L|Never:
+def foldL[D, L](iterable: Iterable[D], f: Callable[[L, D], L], initial: L, /) -> L|Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -366,12 +336,13 @@ def mbFoldL[L, D](
 
     return MB(acc)
 
-
 def scReduceL[D](
         iterable: Iterable[D],
         f: Callable[[D, D], D], /,
         start: Callable[[D], bool]=(lambda d: True),
-        stop: Callable[[D], bool]=(lambda d: False)
+        stop: Callable[[D], bool]=(lambda d: False),
+        include_start: bool=True,
+        include_stop: bool=True
     ) -> tuple[D, Iterable[D]]:
     """Short circuit version of a left reduce. Useful for infinite or
      non-reversible iterables.
@@ -386,8 +357,23 @@ def scReduceL[D](
     """
     it1 = drop_while(iterable, negate(start))
     it2, it3 = take_while_split(it1, negate(stop))
+    if include_start:
+        pass
+    else:
+        try:
+            next(it2)
+        except StopIteration:
+            pass
 
-    return (reduceL(it2, f), it3)
+    if include_stop:
+        reduced = reduceL(it2, f)
+        try:
+            reduced = f(reduced, next(it3))
+        except StopIteration:
+            pass
+        return (reduced, it3)
+    else:
+        return (reduceL(it2, f), it3)
 
 def scReduceR[D](
         iterable: Iterable[D],
@@ -421,13 +407,15 @@ def scReduceR[D](
 
     l1.reverse()
     it3, it4 = take_while_split(l1, negate(stop))
+
+    reduced = reduceL(it3, swap(f))
     if include_stop:
         try:
             end = next(it4)
         except StopIteration:
             pass
         else:
-            it3 = concat(it3, (end,))
+            reduced = f(end, reduced)
 
-    return (reduceL(it3, f), it2)
+    return (reduced, it2)
 

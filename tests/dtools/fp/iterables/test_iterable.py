@@ -185,19 +185,67 @@ class Test_fp_iterables:
 
     def test_take_split(self) -> None:
         foo = tuple(range(1000))
-        foo1, rest = take_split(foo, 100)
-        assert list(foo1) == list(range(100))
-        drop(rest, 100)
-        foo2, rest = take_split(rest, 100)
-        assert tuple(foo2) == tuple(range(200, 300))
-        assert tuple(foo2) == tuple()
-        foo3, rest = take_while_split(rest, lambda x: x<600)
-        assert list(foo3) == list(range(300, 600))
-        foo4, _ = take_split(rest, 100)
-        assert list(foo4) == list(range(600, 700))
-        drop(rest, 100)
-        assert list(rest) == list(range(800, 1000))
-        assert list(rest) == list()
-        foo5, rest = take_while_split(rest, lambda x: x<2000)
-        assert list(rest) == list()
+        it1, rest1 = take_split(foo, 100)
+        assert list(it1) == list(range(100))
+        drop(rest1, 100)
+
+        it2, rest2 = take_split(rest1, 100)
+        assert tuple(it2) == tuple(range(200, 300))
+        assert tuple(it2) == tuple()
+
+        it3, rest3 = take_while_split(rest2, lambda n: n<600)
+        assert list(it3) == list(range(300, 600))
+
+        it4, _ = take_split(rest3, 100)
+        assert list(it4) == list(range(600, 700))
+        drop(rest3, 100)
+        assert list(rest3) == list(range(800, 1000))
+        assert list(rest3) == list()
+
+    def test_take_while_split(self) -> None:
+        bar = [1, 1, 1, 42, 1, 1, 42, 1, 1, 1]
+        it1, rest1 = take_while_split(bar, lambda n: n == 1)
+        assert list(it1) == [1, 1, 1]
+        assert next(rest1) == 42
+
+        it2, rest2 = take_while_split(rest1, lambda n: n == 1)
+        assert list(it2) == [1, 1]
+
+        it3, rest3 = take_while_split(rest2, lambda n: n == 1)
+        assert list(it3) == []
+        assert next(rest3) == 42
+
+        it4, rest4 = take_while_split(rest3, lambda n: n == 1)
+        assert list(it4) == [1, 1, 1]
+
+        try:
+            assert next(it4) == -1
+        except StopIteration:
+            assert True
+        else:
+            assert False
+
+        try:
+            assert next(rest4) == -1
+        except StopIteration:
+            assert True
+        else:
+            assert False
+
+    def test_take_while_split_broken_contract(self) -> None:
+        nums = (1, 2, 3, 4, 5)
+
+        it_proper, rest_proper = take_while_split(nums, lambda n: n<3)
+        tup_proper = tuple(it_proper)
+        tup_rest_proper = tuple(rest_proper)
+        assert tup_proper == (1, 2)
+        assert tup_rest_proper == (3, 4, 5)
+
+        it_improper, rest_improper = take_while_split(nums, lambda n: n<3)
+        tup_rest_improper = tuple(rest_improper)
+        tup_improper = tuple(it_improper)
+        assert tup_improper != (1, 2)
+        assert tup_improper == ()
+        assert tup_rest_improper != (3, 4, 5)
+        assert tup_rest_improper == (1, 2, 3, 4, 5)
 
