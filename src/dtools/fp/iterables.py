@@ -30,7 +30,7 @@ Library of iterator related functions and enumerations.
 from __future__ import annotations
 from collections.abc import Callable, Iterable, Iterator
 from enum import auto, Enum
-from typing import cast, Never, Protocol
+from typing import cast, Never, TypeVar
 from .err_handling import MB
 from .function import negate, swap
 from .singletons import NoValue
@@ -39,7 +39,11 @@ __all__ = [ 'FM', 'concat', 'merge', 'exhaust',
             'drop', 'drop_while',
             'take', 'take_while',
             'take_split', 'take_while_split',
-            'accumulate', 'foldL0', 'foldL1', 'mbFoldL', 'scFoldL', 'scFoldR' ]
+            'accumulate', 'foldL', 'mbFoldL', 'reduceL',
+            'scReduceL', 'scReduceR' ]
+
+D = TypeVar('D')
+L = TypeVar('L')
 
 ## Iterate over multiple Iterables
 

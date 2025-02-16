@@ -25,12 +25,16 @@ Useful to delay a function's evaluation until some inner scope.
 """
 from __future__ import annotations
 
-__all__ = [ 'Lazy', 'lazy' ]
-
 from collections.abc import Callable, Sequence
-from typing import Any, Final
+from typing import Any, Final, TypeVar, ParamSpec
 from .err_handling import MB, XOR
 from .function import sequenced
+
+__all__ = [ 'Lazy', 'lazy' ]
+
+D = TypeVar('D')
+R = TypeVar('R')
+P = ParamSpec('P')
 
 class Lazy[D, R]():
     """Delayed evaluation of a singled valued function.

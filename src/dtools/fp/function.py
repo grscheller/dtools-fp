@@ -29,9 +29,15 @@ and application.
 """
 from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
-from typing import Any, cast
+from typing import Any, cast, TypeVar, ParamSpec
 
 __all__ = [ 'swap', 'sequenced', 'partial', 'iter_args', 'negate']
+
+A = TypeVar('A')
+R = TypeVar('R')
+U = TypeVar('U')
+V = TypeVar('V')
+P = ParamSpec('P')
 
 ## Functional Utilities
 

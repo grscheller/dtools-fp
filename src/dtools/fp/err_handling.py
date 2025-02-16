@@ -27,8 +27,15 @@ from __future__ import annotations
 __all__ = [ 'MB', 'XOR' ]
 
 from collections.abc import Callable, Iterator, Sequence
-from typing import cast, Final, Never, overload
+from typing import cast, Final, Never, overload, TypeVar
 from .singletons import Sentinel
+
+D = TypeVar('D')
+L = TypeVar('L')
+R = TypeVar('R')
+T = TypeVar('T')
+U = TypeVar('U')
+V = TypeVar('V')
 
 class MB[D]():
     """Maybe monad - class wrapping a potentially missing value.

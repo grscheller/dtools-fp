@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.singletons - collection of singleton classes
+"""### Module dtools.fp.singletons - collection of singleton classes
 
 Classes permitting at most only one instantiation. Safer, but not as performant,
 than a non-exported module level global. Difficult, but not impossible, for
 a typical end-user to exploit. Different versions tailored for different use
-cases.
+cases. Used mostly for dtools internal implementations.
 
 #### Singleton types:
 

@@ -21,18 +21,14 @@ Handling state functionally.
 * class **State**: A pure FP immutable implementation for the State Monad
   * translated to Python from the book "Functional Programming in Scala"
     * authors Chiusana & Bjarnason
-    * run "action" returns a tuple `(s, a)` instead of book's `(a, s)`
-      * keeps types in the tuple in same order as the type parameters of `State`
-        * the order is just a convention anyway
-        * one less "factoid" to remember
+    * run "action" returns a tuple `(a, s)` reversed to the type `State[S, A]`
+      * the standard convention seen in the FP community
+      * another "factoid" to remember
   * choose the name `bind` instead of `flatmap`
     * the `flatmap` name is misleading for non-container-like monads
     * `flatmap` name too long, `bind` shorter to type
       * without "do-notation", code tends to march to the right
   * typing of the `modify` class method may be a bit suspect
-    * both these types for `modify` class method make mypy complain
-      * `def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]`
-      * `def modify[S1, S2](f: Callable[[S1], S2]) -> State[S2, tuple[()]]`
 
 """
 from __future__ import annotations
@@ -40,7 +36,15 @@ from __future__ import annotations
 __all__ = [ 'State' ]
 
 from collections.abc import Callable
+from typing import TypeVar
 from dtools.circular_array.ca import ca
+
+S = TypeVar('S')
+A = TypeVar('A')
+B = TypeVar('B')
+C = TypeVar('C')
+S1 = TypeVar('S1')
+A1 = TypeVar('A1')
 
 class State[S, A]():
     """Data structure generating values while propagating changes of state.
