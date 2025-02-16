@@ -41,6 +41,11 @@ class MB[D]():
     * immutable semantics, map & bind return new instances
       * warning: hashed values invalidated if contained value is mutated
       * warning: hashed values invalidated if put or pop methods are called
+    * unsafe method `get` and `pop`
+      * will raise `ValueError` if MB is empty
+    * stateful methods `put` and `pop`
+      * useful to treat a `MB` as a stateful object
+      * basically a container that can contain 1 or 0 objects
 
     """
     __slots__ = '_value',

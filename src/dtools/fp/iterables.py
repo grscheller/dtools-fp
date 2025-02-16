@@ -16,37 +16,15 @@
 
 Library of iterator related functions and enumerations.
 
+* Concatenating and merging iterables
+* Dropping and taking values from iterables
+* Reducing and accumulating iterables
+
+#### Assumptions
 * iterables are not necessarily iterators
 * at all times iterator protocol is assumed to be followed, that is
   * all iterators are assumed to be iterable
   * for all iterators `foo` we assume `iter(foo) is foo`
-
-#### Concatenating and merging iterables:
-
-* function **concat**: sequentially chain iterables
-* function **exhaust**: shuffle together iterables until all are exhausted
-* function **merge**: shuffle together iterables until one is exhausted
-
----
-
-#### Dropping and taking values from an iterable:
-
-* function **drop**: drop first `n` values from iterable
-* function **drop_while**: drop values from iterable while predicate holds
-* function **take**: take up to `n` initial values from iterable
-* function **take_split**: splitting out initial `n` initial values of iterable * function **take_while**: take values from iterable while predicate holds
-* function **take_while_split**: splitting an iterable while predicate holds
-
----
-
-#### Reducing and accumulating an iterable:
-
-* function **accumulate**: take iterable & function, return iterator of accumulated values
-* function **foldL0**: fold iterable left with a function
-  * raises `StopIteration` exception if iterable is empty
-* function **foldL1**: fold iterable left with a function and initial value
-* function **mbFoldL**: fold iterable left with an optional initial value
-  * wraps result in a `MB` monad
 
 """
 from __future__ import annotations
@@ -383,7 +361,7 @@ def scReduceR[D](
         include_start: bool=True,
         include_stop: bool=True
     ) -> tuple[D, Iterable[D]]:
-    """Short circuit version of a right fold. Useful for infinite or
+    """Short circuit version of a right reduce. Useful for infinite or
     non-reversible iterables.
 
     * Behavior for default arguments will

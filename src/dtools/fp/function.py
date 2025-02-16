@@ -24,6 +24,7 @@ and application.
 * function **sequenced:** convert function to take a sequence of its arguments
 * function **partial:** returns a partially applied function
 * function **iter_args:** function returning an iterator of its arguments
+* function **negate:** transforms a predicate to its negation
 
 """
 from __future__ import annotations

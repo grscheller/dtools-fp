@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Final, Never
+from typing import Any, Final, Never
 from dtools.fp.state import State
 
 class Test_simple:
@@ -93,17 +93,16 @@ class Test_simple:
         assert countdown.eval(4) == 5
 
     def test_modify(self) -> None:
-        def double(n1: int) -> int:
+        def square(n1: int) -> int:
             return n1*n1
 
         count: State[int, int] = State(lambda s: (s, s+1))
-        square_state: State[int, tuple[()]] = State.modify(double)
 
         def cnt(a: int) -> State[int, int]:
-            return count
+            return State(lambda s: (s, s+1))
 
-        def sqr_st(a: int) -> State[int, tuple[()]]:
-            return square_state
+        def sqr_st(a: tuple[()]) -> State[int, tuple[()]]:
+            return State.modify(square)
 
         do_it = count.bind(cnt).bind(cnt).bind(sqr_st).bind(cnt).bind(sqr_st).bind(cnt)
         a, s = do_it.run(0)

@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Never
+from typing import Any, Final, Iterator, Never
 from dtools.fp.err_handling import MB, XOR
 from dtools.fp.lazy import Lazy, lazy
 
@@ -87,7 +87,7 @@ class counter():
     def set(self, n: int) -> None:
         self._cnt = n
 
-class Test_Lazy_0_0:
+class Test_lazy_0_0:
     def test_pure(self) -> None:
         cnt1 = counter(0)
 
@@ -142,12 +142,12 @@ class Test_Lazy_0_0:
         assert lz_p.eval() == True
         assert cnt1.get() == 5
 
-class Test_Lazy_1_0:
+class Test_lazy_1_0:
     def test_pure(self) -> None:
         cnt2 = counter(0)
 
-        lz_p = Lazy(cnt2.set, 2, pure=True)
-        lz_n = Lazy(cnt2.set, 5, pure=False)
+        lz_p = lazy(cnt2.set, 2, pure=True)
+        lz_n = lazy(cnt2.set, 5, pure=False)
 
         if lz_p:
             assert False
@@ -223,4 +223,69 @@ class Test_lazy:
         else:
             assert lz_fb13.result().get(-1) == -1
             assert str(lz_fb13.exception().get()) == '13'
+
+    def test_lazy_mixed_and_shared_state(self) -> None:
+        it5 = iter((6,5,4,3,2,1))
+
+        def foo(name: str, it: Iterator[int]) -> str:
+            try:
+                ii = next(it)
+            except StopIteration:
+                ii = 0
+            return name*ii
+
+        lz_foo = lazy(foo, 'foo', it5, pure=False)
+        assert next(it5) == 6
+        assert not lz_foo.is_evaluated()
+        assert lz_foo.eval()
+        assert lz_foo.is_evaluated()
+        assert lz_foo.result().get('boobooboobooboo') == 'foofoofoofoofoo'
+        assert lz_foo.is_evaluated()
+        assert next(it5) == 4
+        assert lz_foo.eval()
+        assert lz_foo.exception() == MB()
+        assert lz_foo.result() == MB('foofoofoo')
+
+        lz_foo_pure = lazy(foo, 'foo', it5)
+        if lz_foo_pure.eval():
+            assert lz_foo_pure.result().get() == 'foofoo'
+        else:
+            assert False
+
+        if lz_foo_pure.eval():
+            assert lz_foo_pure.result().get() == 'foofoo'
+        else:
+            assert False
+
+        if lz_foo.eval():
+            assert lz_foo.result().get() == 'foo'
+        else:
+            assert False
+
+        if lz_foo.eval():
+            assert lz_foo.result().get() == ''
+        else:
+            assert False
+
+        if lz_foo.eval():
+            assert lz_foo.result().get() == ''
+        else:
+            assert False
+
+    def test_lazy_failures(self) -> None:
+
+        lz_add2_42 = lazy(add2_if_pos, 40)
+        lz_add2_2 = lazy(add2_if_pos, 0)
+
+        if lz_add2_42.eval():
+            assert lz_add2_42.result() == MB(42)
+        else:
+            assert False
+
+        if lz_add2_2.eval():
+            assert False
+        else:
+            mb_exception = lz_add2_2.exception()
+            if mb_exception:
+                assert isinstance(mb_exception.get(), ValueError)
 
