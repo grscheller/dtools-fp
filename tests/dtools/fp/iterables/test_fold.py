@@ -17,61 +17,69 @@ from dtools.fp.iterables import reduceL, foldL, mbFoldL, scReduceL, scReduceR
 from dtools.fp.err_handling import MB
 from dtools.fp.function import swap, partial
 
-class Test_fp_folds:
-    def test_fold(self) -> None:
-        def add2(ii: int, jj: int) -> int:
-            return ii+jj
+add: Callable[[int, int], int] = lambda a, b: a+b
 
+def ge_n(a: int, n: int) -> bool:
+    return a >= n
+
+def le_n(a: int, n: int) -> bool:
+    return a <= n
+
+class Test_fp_folds:
+    def test_fold_comuinitive(self) -> None:
+        data1 = tuple(range(1, 101))
+        data2 = tuple(range(2, 101))
+        data3: tuple[int, ...] = ()
+        data4 = 42,
+
+        assert reduceL(data1, add) == 5050
+        assert foldL(data1, add, 10) == 5060
+
+        assert reduceL(data2, add) == 5049
+        assert foldL(data2, add, 10) == 5059
+
+        assert foldL(data3, add, 0) == 0
+        assert foldL(data3, add, 10) == 10
+
+        assert reduceL(data4, add) == 42
+        assert foldL(data4, add, 10) == 52
+
+        data1 = (1, 2, 3, 4, 5)
+        data2 = (2, 3, 4, 5)
+        data3: list[int] = []
+        data4 = 42,
+
+        assert reduceL(data1, add) == 15
+        assert foldL(data1, add, 10) == 25
+        assert reduceL(data2, add) == 14
+        assert foldL(data3, add, 0) == 0
+        assert foldL(data3, add, -42) == -42
+        assert reduceL(data4, add) == 42
+        assert reduceL(data4, add) == 42
+
+    def test_fold_noncomuinitive(self) -> None:
         def funcL(acc: int, jj: int) -> int:
             return (acc - 1)*(jj + 1)
 
         def funcR(ii: int, acc: int) -> int:
             return (ii - 1)*(acc + 1)
 
-        data1 = tuple(range(1, 101))
-        data2 = tuple(range(2, 101))
-        data3: tuple[int, ...] = ()
+        data1 = (1, 2, 3, 4, 5)
+        data2 = (2, 3, 4, 5)
+        data3: list[int] = []
         data4 = 42,
 
-        assert reduceL(data1, add2) == 5050
-        assert foldL(data1, add2, 10) == 5060
-
-        assert reduceL(data2, add2) == 5049
-        assert foldL(data2, add2, 10) == 5059
-
-        assert foldL(data3, add2, 0) == 0
-        assert foldL(data3, add2, 10) == 10
-
-        assert reduceL(data4, add2) == 42
-        assert foldL(data4, add2, 10) == 52
-
-        stuff1 = (1, 2, 3, 4, 5)
-        stuff2 = (2, 3, 4, 5)
-        stuff3: list[int] = []
-        stuff4 = 42,
-
-        assert reduceL(stuff1, add2) == 15
-        assert foldL(stuff1, add2, 10) == 25
-        assert reduceL(stuff2, add2) == 14
-        assert foldL(stuff3, add2, 0) == 0
-        assert foldL(stuff3, add2, -42) == -42
-        assert reduceL(stuff4, add2) == 42
-        assert reduceL(stuff4, add2) == 42
-
-        assert reduceL(stuff1, funcL) == -156
-        assert reduceL(stuff2, funcL) == 84
-        assert foldL(stuff3, funcL, 0) == 0
-        assert foldL(stuff3, funcL, -1) == -1
-        assert reduceL(stuff4, funcL) == 42
-        assert reduceL(stuff1, funcL) == -156
-        assert reduceL(stuff2, funcL) == 84
-        assert reduceL(stuff2, funcL) == 84
+        assert reduceL(data1, funcL) == -156
+        assert reduceL(data2, funcL) == 84
+        assert foldL(data3, funcL, 0) == 0
+        assert foldL(data3, funcL, -1) == -1
+        assert reduceL(data4, funcL) == 42
+        assert reduceL(data1, funcL) == -156
+        assert reduceL(data2, funcL) == 84
+        assert reduceL(data2, funcL) == 84
 
 class Test_fp_mbFolds:
     def test_mbFold(self) -> None:
-        def add2(ii: int, jj: int) -> int:
-            return ii+jj
-
         def funcL(acc: int, jj: int) -> int:
             return (acc - 1)*(jj + 1)
 
@@ -83,154 +91,279 @@ class Test_fp_mbFolds:
         data3: tuple[int, ...] = ()
         data4 = 42,
 
-        assert mbFoldL(data1, add2) == MB(5050)
-        assert mbFoldL(data1, add2, 10) == MB(5060)
+        assert mbFoldL(data1, add) == MB(5050)
+        assert mbFoldL(data1, add, 10) == MB(5060)
 
-        assert mbFoldL(data2, add2) == MB(5049)
-        assert mbFoldL(data2, add2, 10) == MB(5059)
+        assert mbFoldL(data2, add) == MB(5049)
+        assert mbFoldL(data2, add, 10) == MB(5059)
 
-        assert mbFoldL(data3, add2) == MB()
-        assert mbFoldL(data3, add2, 10) == MB(10)
+        assert mbFoldL(data3, add) == MB()
+        assert mbFoldL(data3, add, 10) == MB(10)
 
-        assert mbFoldL(data4, add2) == MB(42)
-        assert mbFoldL(data4, add2, 10) == MB(52)
+        assert mbFoldL(data4, add) == MB(42)
+        assert mbFoldL(data4, add, 10) == MB(52)
 
-        stuff1 = (1, 2, 3, 4, 5)
-        stuff2 = (2, 3, 4, 5)
-        stuff3: list[int] = []
-        stuff4 = 42,
+        data1 = (1, 2, 3, 4, 5)
+        data2 = (2, 3, 4, 5)
+        data3: list[int] = []
+        data4 = 42,
 
-        assert mbFoldL(stuff1, add2) == MB(15)
-        assert mbFoldL(stuff1, add2, 10) == MB(25)
-        assert mbFoldL(stuff2, add2) == MB(14)
-        assert mbFoldL(stuff3, add2) == MB()
-        assert mbFoldL(stuff4, add2) == MB(42)
-        assert mbFoldL(stuff4, add2).get(-1) == 42
-        assert mbFoldL(stuff3, add2).get(-1) == -1
+        assert mbFoldL(data1, add) == MB(15)
+        assert mbFoldL(data1, add, 10) == MB(25)
+        assert mbFoldL(data2, add) == MB(14)
+        assert mbFoldL(data3, add) == MB()
+        assert mbFoldL(data4, add) == MB(42)
+        assert mbFoldL(data4, add).get(-1) == 42
+        assert mbFoldL(data3, add).get(-1) == -1
 
-        assert mbFoldL(stuff1, funcL) == MB(-156)
-        assert mbFoldL(stuff2, funcL) == MB(84)
-        assert mbFoldL(stuff3, funcL) == MB()
-        assert mbFoldL(stuff3, funcL).get(-1) == -1
-        assert mbFoldL(stuff4, funcL) == MB(42)
-        assert mbFoldL(stuff1, funcL) == MB(-156)
-        assert mbFoldL(stuff2, funcL) == MB(84)
-        assert mbFoldL(stuff2, funcL).get() == 84
+        assert mbFoldL(data1, funcL) == MB(-156)
+        assert mbFoldL(data2, funcL) == MB(84)
+        assert mbFoldL(data3, funcL) == MB()
+        assert mbFoldL(data3, funcL).get(-1) == -1
+        assert mbFoldL(data4, funcL) == MB(42)
+        assert mbFoldL(data1, funcL) == MB(-156)
+        assert mbFoldL(data2, funcL) == MB(84)
+        assert mbFoldL(data2, funcL).get() == 84
 
 class Test_fp_scReduceL:
 
     def test_defaults(self) -> None:
-        add2: Callable[[int, int], int] = lambda a, b: a+b
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
-        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-
-        sum55, it = scReduceL(stuff, add2)
+        mb_sum55, it = scReduceL(data, add)
         try:
-            nono = next(it)
+            next(it)
         except StopIteration:
-            assert sum55 == 55
+            assert mb_sum55 == MB(55)
         else:
             assert False
 
     def test_start_stop(self) -> None:
-        add2: Callable[[int, int], int] = lambda a, b: a+b
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
-        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+        ge2 = partial(swap(ge_n), 2)
+        ge8 = partial(swap(ge_n), 8)
 
-        def ge2(a: int) -> bool:
-            return a >= 2
-
-        def ge8(a: int) -> bool:
-            return a >= 8
-
-        sum35, it = scReduceL(stuff, add2, start=ge2, stop=ge8)
+        mb_sum35, it = scReduceL(data, add, start=ge2, stop=ge8)
         try:
             int9 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int9, sum35) == (9, 35)
+            assert (int9, mb_sum35) == (9, MB(35))
 
-        sum33, it = scReduceL(stuff, add2, start=ge2, stop=ge8,
-                              include_start=False)
+        mb_sum33, it = scReduceL(data, add, start=ge2, stop=ge8,
+                                 include_start=False)
         try:
             int9 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int9, sum33) == (9, 33)
+            assert (int9, mb_sum33) == (9, MB(33))
 
-        sum27, it = scReduceL(stuff, add2, start=ge2, stop=ge8,
-                              include_stop=False)
+        mb_sum27, it = scReduceL(data, add, start=ge2, stop=ge8,
+                                 include_stop=False)
         try:
             int8 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int8, sum27) == (8, 27)
+            assert (int8, MB(mb_sum27)) == (8, MB(27))
+
+        # ---------------------------------------------------------------
+
+        mb_sum8, it = scReduceL(data, add, start=ge8, stop=ge2)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int9, mb_sum8) == (9, MB(8))
+
+        mb_sum9, it = scReduceL(data, add, start=ge8, stop=ge2,
+                                include_start=False)
+        try:
+            int10 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int10, mb_sum9) == (10, MB(9))
+
+        mb_empty, it = scReduceL(data, add, start=ge8, stop=ge2,
+                                 include_stop=False)
+        try:
+            int8 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int8, mb_empty) == (8, MB())
+
+        mb_empty, it = scReduceL(data, add, start=ge8, stop=ge2,
+                                 include_start=False, include_stop=False)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        else:
+            assert (int9, mb_empty) == (9, MB())
 
 class Test_fp_scReduceR:
 
     def test_defaults(self) -> None:
-        add2: Callable[[int, int], int] = lambda a, b: a+b
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
-        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-
-        sum55, it = scReduceR(stuff, add2)
-        assert sum55 == 55
+        mb_sum55, it = scReduceR(data, add)
         try:
-            nono = next(it)
+            next(it)
         except StopIteration:
             assert True
         else:
             assert False
+        assert mb_sum55 == MB(55)
 
     def test_start_stop(self) -> None:
-        add2: Callable[[int, int], int] = lambda a, b: a+b
-
-        stuff = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-
-        def ge_n(a: int, n: int) -> bool:
-            return a >= n
-
-        def le_n(a: int, n: int) -> bool:
-            return a <= n
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
         ge7 = partial(swap(ge_n), 7)
         le4 = partial(swap(le_n), 4)
 
-        sum22, it = scReduceR(stuff, add2, start=ge7, stop=le4)
+        mb_sum22, it = scReduceR(data, add, start=ge7, stop=le4)
         try:
             int8 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int8, sum22) == (8, 22)
+            assert (int8, mb_sum22) == (8, MB(22))
 
-        sum15, it = scReduceR(stuff, add2, start=ge7, stop=le4,
-                              include_start=False)
+        mb_sum15, it = scReduceR(data, add, start=ge7, stop=le4,
+                                 include_start=False)
         try:
             int7 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int7, sum15) == (7, 15)
+            assert (int7, mb_sum15) == (7, MB(15))
 
-        sum18, it = scReduceR(stuff, add2, start=ge7, stop=le4,
-                              include_stop=False)
+        mb_sum18, it = scReduceR(data, add, start=ge7, stop=le4,
+                                 include_stop=False)
         try:
             int8 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int8, sum18) == (8, 18)
+            assert (int8, mb_sum18) == (8, MB(18))
 
-        sum11, it = scReduceR(stuff, add2, start=ge7, stop=le4,
-                              include_start=False, include_stop=False)
+        mb_sum11, it = scReduceR(data, add, start=ge7, stop=le4,
+                                 include_start=False, include_stop=False)
         try:
             int7 = next(it)
         except StopIteration:
             assert False
         else:
-            assert (int7, sum11) == (7, 11)
+            assert (int7, mb_sum11) == (7, MB(11))
+
+
+    def test_start_stop_edge_case_all(self) -> None:
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        ge10 = partial(swap(ge_n), 10)
+        le1 = partial(swap(le_n), 1)
+
+        mb_sum55, it = scReduceR(data, add, start=ge10, stop=le1)
+        try:
+            next(it)
+        except StopIteration:
+            assert True
+        assert mb_sum55 == MB(55)
+
+        mb_sum44, it = scReduceR(data, add, start=ge10, stop=le1,
+                                 include_start=False, include_stop=False)
+        try:
+            int10 = next(it)
+        except StopIteration:
+            assert False
+        finally:
+            assert (int10, mb_sum44) == (10, MB(44))
+
+        mb_sum45, it = scReduceR(data, add, start=ge10, stop=le1,
+                                 include_start=False)
+        try:
+            int10 = next(it)
+        except StopIteration:
+            assert False
+        assert (int10, mb_sum45) == (10, MB(45))
+
+        mb_sum54, it = scReduceR(data, add, start=ge10, stop=le1,
+                                 include_stop=False)
+        try:
+            int10 = next(it)
+        except StopIteration:
+            assert True
+        assert mb_sum54 == MB(54)
+
+    def test_start_stop_edge_case_next_to(self) -> None:
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+
+        ge8 = partial(swap(ge_n), 8)
+        le7 = partial(swap(le_n), 7)
+
+        mb_sum15, it = scReduceR(data, add, start=ge8, stop=le7)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        assert (int9, mb_sum15) == (9, MB(15))
+
+    def test_start_stop_edge_case_same(self) -> None:
+        data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+        ge8 = partial(swap(ge_n), 8)
+        le8 = partial(swap(le_n), 8)
+
+        mb_sum8, it = scReduceR(data, add, start=ge8, stop=le8)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        assert (int9, mb_sum8) == (9, MB(8))
+
+        # ---------------------------------------------------------------
+
+        mb_empty, it = scReduceR(data, add, start=ge8, stop=le8,
+                                 include_start=False, include_stop=False)
+        try:
+            int8 = next(it)
+        except StopIteration:
+            assert False
+        assert (int8, mb_empty) == (8, MB())
+
+        # ---------------------------------------------------------------
+
+        mb_empty, it = scReduceR(data, add, start=ge8, stop=le8,
+                                 include_stop=False)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        assert (int9, mb_empty) == (9, MB())
+
+        le7 = partial(swap(le_n), 7)
+
+        mb_sum8, it = scReduceR(data, add, start=ge8, stop=le7,
+                                 include_stop=False)
+        try:
+            int9 = next(it)
+        except StopIteration:
+            assert False
+        assert (int9, mb_sum8) == (9, MB(8))
+
+        mb_empty, it = scReduceR(data, add, start=ge8, stop=le7,
+                                 include_start=False, include_stop=False)
+        try:
+            int8 = next(it)
+        except StopIteration:
+            assert False
+        assert (int8, mb_empty) == (8, MB())
+
+        # ---------------------------------------------------------------
 

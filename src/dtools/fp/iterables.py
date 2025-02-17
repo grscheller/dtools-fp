@@ -160,10 +160,10 @@ def take[D](iterable: Iterable[D], n: int, /) -> Iterator[D]:
 def take_split[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterator[D]]:
     """Same as take except also return an iterator of the remaining values.
 
-       * return a tuple of
-         * an iterator of up to `n` initial values
-         * an iterator of the remaining vales of the `iterable`
-       * best practice is not to access second iterator until first is exhausted
+    * return a tuple of
+      * an iterator of up to `n` initial values
+      * an iterator of the remaining vales of the `iterable`
+    * Contract: do not access second iterator until first is exhausted
 
     """
     it = iter(iterable)
@@ -174,7 +174,7 @@ def take_split[D](iterable: Iterable[D], n: int, /) -> tuple[Iterator[D], Iterat
 def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterator[D]:
     """Yield values from `iterable` while predicate is true.
 
-    **Warning:** risk of value loss if iterable is multiple referenced iterator.
+    Warning: risk of value loss if iterable is multiple referenced iterator.
     """
     it = iter(iterable)
     while True:
@@ -190,10 +190,10 @@ def take_while[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> Iterat
 def take_while_split[D](iterable: Iterable[D], pred: Callable[[D], bool], /) -> tuple[Iterator[D], Iterator[D]]:
     """Yield values from `iterable` while `predicate` is true.
 
-       * return a tuple of two iterators
-         * first of initial values where predicate is true, followed by first to fail
-         * second of the remaining values of the iterable after first failed value
-       * best practice is not to access second iterator until first is exhausted
+    * return a tuple of two iterators
+      * first of initial values where predicate is true, followed by first to fail
+      * second of the remaining values of the iterable after first failed value
+    * Contract: do not access second iterator until first is exhausted
 
     """
     def _take_while(it: Iterator[D],
@@ -262,7 +262,7 @@ def reduceL[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D|Never:
     try:
         acc = next(it)
     except StopIteration:
-        msg = "Attemped to left fold an empty iterable."
+        msg = "Attemped to reduce an empty iterable."
         raise StopIteration(msg)
 
     for v in it:
@@ -325,37 +325,41 @@ def scReduceL[D](
         stop: Callable[[D], bool]=(lambda d: False),
         include_start: bool=True,
         include_stop: bool=True
-    ) -> tuple[D, Iterable[D]]:
+    ) -> tuple[MB[D], Iterator[D]]:
     """Short circuit version of a left reduce. Useful for infinite or
-     non-reversible iterables.
+    non-reversible iterables.
 
     * Behavior for default arguments will
-      * left fold finite iterable
+      * left reduce finite iterable
       * start folding immediately
       * continue folding until end (of a possibly infinite iterable)
-    * Callable `start` delays starting the left fold
-    * Callable `stop` prematurely stop the left
+    * Callable `start` delays starting the left reduce
+    * Callable `stop` prematurely stop the left reduce
 
     """
-    it1 = drop_while(iterable, negate(start))
-    it2, it3 = take_while_split(it1, negate(stop))
-    if include_start:
-        pass
-    else:
+    it_start = drop_while(iterable, negate(start))
+    if not include_start:
         try:
-            next(it2)
+            next(it_start)
         except StopIteration:
             pass
-
+    it_reduce, it_rest = take_while_split(it_start, negate(stop))
+    mb_reduced = mbFoldL(it_reduce, f)
     if include_stop:
-        reduced = reduceL(it2, f)
-        try:
-            reduced = f(reduced, next(it3))
-        except StopIteration:
-            pass
-        return (reduced, it3)
-    else:
-        return (reduceL(it2, f), it3)
+        if mb_reduced:
+            try:
+                last = next(it_rest)
+                mb_reduced = MB(f(mb_reduced.get(), last))
+            except StopIteration:
+                pass
+        else:
+            try:
+                last = next(it_rest)
+                mb_reduced = MB(last)
+            except StopIteration:
+                pass
+
+    return (mb_reduced, it_rest)
 
 def scReduceR[D](
         iterable: Iterable[D],
@@ -364,40 +368,42 @@ def scReduceR[D](
         stop: Callable[[D], bool]=(lambda d: False),
         include_start: bool=True,
         include_stop: bool=True
-    ) -> tuple[D, Iterable[D]]:
+    ) -> tuple[MB[D], Iterator[D]]:
     """Short circuit version of a right reduce. Useful for infinite or
     non-reversible iterables.
 
     * Behavior for default arguments will
-      * right fold finite iterable
-      * start folding at end (of a possibly infinite iterable)
-      * continue folding right until beginning
-    * Callable `start` prematurely starts the right fold
-    * Callable `stop` prematurely stops the right fold
-    * best practice is not to access second iterator until first is exhausted
+      * right reduce finite iterable
+      * start reducing at end (of a possibly infinite iterable)
+      * continue reducing right until beginning
+    * Callable `start` prematurely starts the right reduce
+    * Callable `stop` prematurely stops the right reduce
 
     """
-    it1, it2 = take_while_split(iterable, negate(start))
-    l1 = list(it1)
+    it_start, it_rest = take_while_split(iterable, negate(start))
+    l1 = list(it_start)
     if include_start:
         try:
-            begin = next(it2)
+            begin = next(it_rest)
         except StopIteration:
             pass
         else:
             l1.append(begin)
 
     l1.reverse()
-    it3, it4 = take_while_split(l1, negate(stop))
+    it_reduce, it_stop = take_while_split(l1, negate(stop))
 
-    reduced = reduceL(it3, swap(f))
+    mb_reduced = mbFoldL(it_reduce, swap(f))
     if include_stop:
         try:
-            end = next(it4)
+            end = next(it_stop)
         except StopIteration:
             pass
         else:
-            reduced = f(end, reduced)
+            if mb_reduced:
+                mb_reduced = MB(f(end, mb_reduced.get()))
+            else:
+                mb_reduced = MB(end)
 
-    return (reduced, it2)
+    return (mb_reduced, it_rest)
 

@@ -11,15 +11,23 @@ PyPI dtools.fp project.
 
 ## Releases and Important Milestones
 
-### Version 1.3.1 - PyPI release date 2025-02-??
+### Version 1.4.0 - PyPI release date 2025-03-16
+* much work dtools.iterables
+  * finally implemented scReduceL and scReduceR functions
+  * tweaked API across iterables module
+* added two state changing methods to dtools.err_handling.MB
+  * added put method to MB class
+    * if MB is empty, injects a value into it
+    * otherwise, do nothing
+  * added pop method to MB class
+    * if MB is not empty, remove the value and return it
+    * otherwise, raise ValueError
+  * found both methods useful to treat a MB just as a container
+    * avoid using these methods in pure code
+
+### Version 1.3.1 - PyPI release date 2025-02-05
 
 * added class method sequence to class State
-* added put method to err_handling.MB class
-  * if MB is empty, injects a value into it
-  * otherwise, do nothing
-* added pop method to err_handling.MB class
-  * if MB is not empty, remove the value and return it
-  * otherwise, raise ValueError
 
 ### Version 1.3.0 - PyPI release date 2025-01-17
 

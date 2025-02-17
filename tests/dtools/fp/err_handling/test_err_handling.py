@@ -336,4 +336,4 @@ class TestXOR:
         rt_dog1 = dog1.makeRight()
         rt_dog2 = dog2.newRight(42).makeRight()
         rt_dog3 = dog3.mapRight(lambda x: x+1, altRight=-1).makeRight()
-        # need more test cases
+

@@ -20,14 +20,14 @@ remain Pythonic.
 #### Modules and sub-packages
 
 * module dtools.fp.err_handling: monadic maybe and either
-* module dtools.fp.functions: tools combine and partially apply functions
+* module dtools.fp.functions: tools to combine and partially apply functions
 * module dtools.fp.iterables: tools for iterables
 * module dtools.fp.lazy: lazy (non-strict) function evaluation
 * module dtools.fp.singletons: useful types with but one instance
 * module dtools.fp.state: handle state monadically
 
 """
-__version__ = "1.3.1.3"
+__version__ = "1.4.0"
 __author__ = "Geoffrey R. Scheller"
 __copyright__ = "Copyright (c) 2023-2025 Geoffrey R. Scheller"
 __license__ = "Apache License 2.0"
