@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Package dtools.fp - Pythonic Functional Programming
+"""### Developer Tools - Pythonic functional programming
 
 Tools to aid with functional programming in Python yet still endeavoring to
 remain Pythonic.

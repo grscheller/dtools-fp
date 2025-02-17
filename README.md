@@ -1,4 +1,4 @@
-# Developer Tools - Python Functional Programming (FP)
+# Developer Tools - Pythonic Functional Programming
 
 Functional programming tools which endeavor to be Pythonic.
 
