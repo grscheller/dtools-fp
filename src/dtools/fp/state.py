@@ -31,9 +31,10 @@ Handling state functionally.
   * typing of the `modify` class method may be a bit suspect
 
 """
+
 from __future__ import annotations
 
-__all__ = [ 'State' ]
+__all__ = ['State']
 
 from collections.abc import Callable
 from typing import TypeVar
@@ -46,7 +47,8 @@ C = TypeVar('C')
 S1 = TypeVar('S1')
 A1 = TypeVar('A1')
 
-class State[S, A]():
+
+class State[S, A]:
     """Data structure generating values while propagating changes of state.
 
     * class `State` represents neither a state nor (value, state) pair
@@ -55,6 +57,7 @@ class State[S, A]():
     * `bind` is just state propagating function composition
 
     """
+
     __slots__ = 'run'
 
     def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
@@ -62,9 +65,11 @@ class State[S, A]():
 
     def bind[B](self, g: Callable[[A], State[S, B]]) -> State[S, B]:
         """Perform function composition while propagating state."""
+
         def compose(s: S) -> tuple[B, S]:
             a, s = self.run(s)
             return g(a).run(s)
+
         return State(compose)
 
     def eval(self, init: S) -> A:
@@ -120,7 +125,7 @@ class State[S, A]():
           * type: ignore - since mypy has no "a priori" way to know S1.
 
         """
-        return State.get().bind(lambda a: State.put(f(a)))  #type: ignore
+        return State.get().bind(lambda a: State.put(f(a)))  # type: ignore
 
     @staticmethod
     def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:
@@ -130,9 +135,11 @@ class State[S, A]():
         * run method evaluates list front to back
 
         """
-        def append_ret(l: list[A1], a: A1) -> list[A1]:
-            l.append(a)
-            return l
 
-        return ca(sas).foldL(lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[A1]([])))
+        def append_ret(ls: list[A1], a: A1) -> list[A1]:
+            ls.append(a)
+            return ls
 
+        return ca(sas).foldL(
+            lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[A1]([]))
+        )
