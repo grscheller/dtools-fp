@@ -48,7 +48,7 @@ class MB[D]():
     * immutable semantics, map & bind return new instances
       * warning: hashed values invalidated if contained value is mutated
       * warning: hashed values invalidated if put or pop methods are called
-    * unsafe method `get` and `pop`
+    * unsafe methods `get` and `pop`
       * will raise `ValueError` if MB is empty
     * stateful methods `put` and `pop`
       * useful to treat a `MB` as a stateful object
@@ -69,10 +69,8 @@ class MB[D]():
         self._value: D|Sentinel
         _sentinel: Final[Sentinel] = Sentinel('MB')
         match value:
-            case MB(d) if d is not _sentinel:
+            case MB(d):
                 self._value = d
-            case MB(s):
-                self._value = _sentinel
             case d:
                 self._value = d
 
@@ -166,7 +164,7 @@ class MB[D]():
 
     @staticmethod
     def call[U, V](f: Callable[[U], V], u: U) -> MB[V]:
-        """Return an function call wrapped in a MB"""
+        """Return result of a function call wrapped in a MB"""
         try:
             return MB(f(u))
         except Exception:
@@ -201,16 +199,16 @@ class MB[D]():
           * otherwise return an empty `MB`
 
         """
-        l: list[T] = []
+        ts: list[T] = []
 
         for mb_d in seq_mb_d:
             if mb_d:
-                l.append(mb_d.get())
+                ts.append(mb_d.get())
             else:
                 return MB()
 
-        ds = cast(Sequence[T], type(seq_mb_d)(l))  # type: ignore # will be a subclass at runtime
-        return MB(ds)
+        ds = type(seq_mb_d)(ts)  # type: ignore  # runtime duck typing
+        return MB(cast(Sequence[T], ds))
 
 class XOR[L, R]():
     """Either monad - class semantically containing either a left or a right
@@ -246,12 +244,12 @@ class XOR[L, R]():
         self._left: L|MB[L]
         self._right: R
         match left:
-            case MB(l) if l is not Sentinel('MB'):
-                self._left, self._right = cast(L, l), right
+            case MB(ts) if ts is not Sentinel('MB'):
+                self._left, self._right = cast(L, ts), right
             case MB(s):
                 self._left, self._right = MB(), right
-            case l:
-                self._left, self._right = l, right
+            case ts:
+                self._left, self._right = ts, right
 
     def __bool__(self) -> bool:
         return MB() != self._left
@@ -317,21 +315,21 @@ class XOR[L, R]():
         """
         _sentinel = Sentinel('MB')
         match altLeft:
-            case MB(l) if l is not _sentinel:
+            case MB(ts) if ts is not _sentinel:
                 if self:
                     return MB(self._left)
                 else:
-                    return MB(cast(L, l))
+                    return MB(cast(L, ts))
             case MB(s):
                 if self:
                     return MB(self._left)
                 else:
                     return MB()
-            case l:
+            case ts:
                 if self:
                     return MB(self._left)
                 else:
-                    return MB(l)
+                    return MB(ts)
 
     def getRight(self) -> R:
         """Get value of `XOR` if a right, potential right value if a left.
