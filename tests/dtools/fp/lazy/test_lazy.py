@@ -14,9 +14,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Final, Iterator, Never
+from typing import Any, Iterator
 from dtools.fp.err_handling import MB, XOR
-from dtools.fp.lazy import Lazy, lazy
+from dtools.fp.lazy import Lazy, lazy, real_lazy
 
 def add2_if_pos(x: int) -> int:
     if x < 1:
@@ -65,11 +65,11 @@ def return_str(lz: Lazy[Any, str]) -> str:
 
 class Test_Lazy_0_1:
     def test_happy_path(self) -> None:
-        lz_good = lazy(hello, pure=False)
+        lz_good = lazy(hello)
         assert return_str(lz_good) == 'hello'
 
     def test_sad_path(self) -> None:
-        lz_bad = lazy(no_hello, pure=False)
+        lz_bad = lazy(no_hello)
         assert return_str(lz_bad) == 'Error: failed as expected'
 
 #---------------------------------------------------------------
@@ -91,8 +91,8 @@ class Test_lazy_0_0:
     def test_pure(self) -> None:
         cnt1 = counter(0)
 
-        lz_p = lazy(cnt1.inc, pure=True)
-        lz_n = lazy(cnt1.inc, pure=False)
+        lz_p = real_lazy(cnt1.inc)
+        lz_n = lazy(cnt1.inc)
 
         if lz_p:
             assert False
@@ -107,7 +107,7 @@ class Test_lazy_0_0:
         if lz_n.is_exceptional():
             assert False
         assert cnt1.get() == 0
-        assert lz_n.eval() == True
+        assert lz_n.eval()
         assert cnt1.get() == 1
         if lz_p:
             assert False
@@ -121,7 +121,7 @@ class Test_lazy_0_0:
             assert True
         if lz_n.is_exceptional():
             assert False
-        assert lz_p.eval() == True
+        assert lz_p.eval()
         assert cnt1.get() == 2
         if lz_p:
             assert True
@@ -129,25 +129,25 @@ class Test_lazy_0_0:
             assert True
         if lz_p.is_exceptional():
             assert False
-        assert lz_p.eval() == True
+        assert lz_p.eval() is True
         assert cnt1.get() == 2
-        assert lz_n.eval() == True
+        assert lz_n.eval()
         assert cnt1.get() == 3
-        assert lz_p.eval() == True
+        assert lz_p.eval()
         assert cnt1.get() == 3
-        assert lz_n.eval() == True
+        assert lz_n.eval()
         assert cnt1.get() == 4
-        assert lz_n.eval() == True
+        assert lz_n.eval()
         assert cnt1.get() == 5
-        assert lz_p.eval() == True
+        assert lz_p.eval()
         assert cnt1.get() == 5
 
 class Test_lazy_1_0:
     def test_pure(self) -> None:
         cnt2 = counter(0)
 
-        lz_p = lazy(cnt2.set, 2, pure=True)
-        lz_n = lazy(cnt2.set, 5, pure=False)
+        lz_p = real_lazy(cnt2.set, 2)
+        lz_n = lazy(cnt2.set, 5)
 
         if lz_p:
             assert False
@@ -161,17 +161,17 @@ class Test_lazy_1_0:
             assert False
         if lz_n.is_exceptional():
             assert False
-        assert lz_p.eval() == True
+        assert lz_p.eval() is True
         assert cnt2.get() == 2
-        assert lz_n.eval() == True
+        assert lz_n.eval()
         assert cnt2.get() == 5
-        assert lz_p.eval() == True
+        assert lz_p.eval()
         assert cnt2.get() == 5
         cnt2.inc()
         assert cnt2.get() == 6
-        assert lz_p.eval() == True
+        assert lz_p.eval()
         assert cnt2.get() == 6
-        assert lz_n.eval() == True
+        assert lz_n.eval()
         assert cnt2.get() == 5
 
 #---------------------------------------------------------------
@@ -194,14 +194,14 @@ class Test_lazy:
                 else:
                     raise RuntimeError(13)
 
-        lz_42 = lazy(foo42)
+        lz_42 = real_lazy(foo42)
         if lz_42.eval():
             assert lz_42.result().get(-1) == 42
             assert lz_42.exception() == MB()
         else:
             assert False
 
-        lz_not_42 = lazy(bar42)
+        lz_not_42 = real_lazy(bar42)
         if lz_not_42.eval():
             assert False
         else:
@@ -209,7 +209,7 @@ class Test_lazy:
             assert str(lz_not_42.exception().get()) == 'not 42'
 
         fb7 = FooBar(7)
-        lz_fb7 = lazy(fb7.get_secret)
+        lz_fb7 = real_lazy(fb7.get_secret)
         if lz_fb7.eval():
             assert lz_fb7.result().get(-1) == 7
             assert lz_fb7.exception() == MB()
@@ -217,7 +217,7 @@ class Test_lazy:
             assert False
 
         fb13 = FooBar(13)
-        lz_fb13 = lazy(fb13.get_secret)
+        lz_fb13 = real_lazy(fb13.get_secret)
         if lz_fb13.eval():
             assert False
         else:
@@ -234,7 +234,7 @@ class Test_lazy:
                 ii = 0
             return name*ii
 
-        lz_foo = lazy(foo, 'foo', it5, pure=False)
+        lz_foo = lazy(foo, 'foo', it5)
         assert next(it5) == 6
         assert not lz_foo.is_evaluated()
         assert lz_foo.eval()
@@ -246,7 +246,7 @@ class Test_lazy:
         assert lz_foo.exception() == MB()
         assert lz_foo.result() == MB('foofoofoo')
 
-        lz_foo_pure = lazy(foo, 'foo', it5)
+        lz_foo_pure = real_lazy(foo, 'foo', it5)
         if lz_foo_pure.eval():
             assert lz_foo_pure.result().get() == 'foofoo'
         else:
@@ -274,8 +274,8 @@ class Test_lazy:
 
     def test_lazy_failures(self) -> None:
 
-        lz_add2_42 = lazy(add2_if_pos, 40)
-        lz_add2_2 = lazy(add2_if_pos, 0)
+        lz_add2_42 = real_lazy(add2_if_pos, 40)
+        lz_add2_2 = real_lazy(add2_if_pos, 0)
 
         if lz_add2_42.eval():
             assert lz_add2_42.result() == MB(42)

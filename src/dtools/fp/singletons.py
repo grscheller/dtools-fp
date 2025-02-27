@@ -30,7 +30,7 @@ cases. Used mostly for dtools internal implementations.
 While `None` represents "returned no values," `NoValue()` represents the absence
 of a value. Non-existing values should not be comparable to anything, even
 themselves. End-users may use both `None` and `()` as sentinel values which
-colliding with using either to represent "nothingness." 
+colliding with using either to represent "nothingness."
 
 ---
 
@@ -55,14 +55,16 @@ propagates down "the happy path." For almost everything you do with it, it just
 returns itself. The maintainer has not used this construct enough yet to
 determine if it is a brilliant idea or a horrible blunder.
 """
+
 from __future__ import annotations
 
-__all__ = [ 'NoValue', 'Sentinel', 'Nada' ]
+__all__ = ['NoValue', 'Sentinel', 'Nada']
 
 from collections.abc import Callable, Iterator
 from typing import Any, Final, final
 
-class NoValue():
+
+class NoValue:
     """Singleton class representing a missing value.
 
     * similar to `None` but
@@ -78,8 +80,9 @@ class NoValue():
         * if one or both values are missing, then what is there to compare?
 
     """
+
     __slots__ = ()
-    _instance: NoValue|None = None
+    _instance: NoValue | None = None
 
     def __new__(cls) -> NoValue:
         if cls._instance is None:
@@ -95,8 +98,9 @@ class NoValue():
     def __eq__(self, other: object) -> bool:
         return False
 
+
 @final
-class Sentinel():
+class Sentinel:
     """Singleton classes representing a sentinel values.
 
     * intended for library code, not to be exported/shared between modules
@@ -115,7 +119,8 @@ class Sentinel():
         * and never equals anything else, especially other sentinel values
 
     """
-    __slots__ = '_sentinel_name',
+
+    __slots__ = ('_sentinel_name',)
     _instances: dict[str, Sentinel] = {}
 
     def __new__(cls, sentinel_name: str) -> Sentinel:
@@ -130,8 +135,9 @@ class Sentinel():
     def __repr__(self) -> str:
         return "Sentinel('" + self._sentinel_name + "')"
 
+
 @final
-class Nada():
+class Nada:
     """Singleton class representing & propagating failure.
 
     * singleton `_nada: nada = Nada()` represents a non-existent value
@@ -158,8 +164,9 @@ class Nada():
         * and never equals anything else
 
     """
+
     __slots__ = ()
-    _instance: Nada|None = None
+    _instance: Nada | None = None
     _hash: int = 0
 
     sentinel: Final[Sentinel] = Sentinel('Nada')
@@ -215,10 +222,10 @@ class Nada():
     def __lt__(self, right: Any) -> bool:
         return False
 
-    def __getitem__(self, index: int|slice) -> Any:
+    def __getitem__(self, index: int | slice) -> Any:
         return Nada()
 
-    def __setitem__(self, index: int|slice, item: Any) -> None:
+    def __setitem__(self, index: int | slice, item: Any) -> None:
         return
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
@@ -227,12 +234,12 @@ class Nada():
     def __getattr__(self, name: str) -> Callable[..., Any]:
         def method(*args: tuple[Any], **kwargs: dict[str, Any]) -> Any:
             return Nada()
+
         return method
 
-    def nada_get(self, alt: Any=sentinel) -> Any:
+    def nada_get(self, alt: Any = sentinel) -> Any:
         """Get an alternate value, defaults to `Nada()`."""
         if alt == Sentinel('Nada'):
             return Nada()
         else:
             return alt
-

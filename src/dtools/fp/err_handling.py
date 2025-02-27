@@ -22,9 +22,10 @@ Functional data types to use in lieu of exceptions.
 * class **XOR**: Left biased Either monad
 
 """
+
 from __future__ import annotations
 
-__all__ = [ 'MB', 'XOR' ]
+__all__ = ['MB', 'XOR']
 
 from collections.abc import Callable, Iterator, Sequence
 from typing import cast, Final, Never, overload, TypeVar
@@ -37,7 +38,8 @@ T = TypeVar('T')
 U = TypeVar('U')
 V = TypeVar('V')
 
-class MB[D]():
+
+class MB[D]:
     """Maybe monad - class wrapping a potentially missing value.
 
     * where `MB(value)` contains a possible value of type `~D`
@@ -55,8 +57,9 @@ class MB[D]():
       * basically a container that can contain 1 or 0 objects
 
     """
-    __slots__ = '_value',
-    __match_args__ = '_value',
+
+    __slots__ = ('_value',)
+    __match_args__ = ('_value',)
 
     @overload
     def __init__(self) -> None: ...
@@ -65,8 +68,8 @@ class MB[D]():
     @overload
     def __init__(self, value: D) -> None: ...
 
-    def __init__(self, value: D|MB[D]|Sentinel=Sentinel('MB')) -> None:
-        self._value: D|Sentinel
+    def __init__(self, value: D | MB[D] | Sentinel = Sentinel('MB')) -> None:
+        self._value: D | Sentinel
         _sentinel: Final[Sentinel] = Sentinel('MB')
         match value:
             case MB(d):
@@ -88,7 +91,7 @@ class MB[D]():
             return 'MB()'
 
     def __len__(self) -> int:
-        return (1 if self else 0)
+        return 1 if self else 0
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
@@ -102,13 +105,13 @@ class MB[D]():
             return False
 
     @overload
-    def get(self) -> D|Never: ...
+    def get(self) -> D | Never: ...
     @overload
     def get(self, alt: D) -> D: ...
     @overload
-    def get(self, alt: Sentinel) -> D|Never: ...
+    def get(self, alt: Sentinel) -> D | Never: ...
 
-    def get(self, alt: D|Sentinel=Sentinel('MB')) -> D|Never:
+    def get(self, alt: D | Sentinel = Sentinel('MB')) -> D | Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
         * alternate value must be of type `~D`
@@ -130,7 +133,7 @@ class MB[D]():
         if self._value is Sentinel('MB'):
             self._value = value
 
-    def pop(self) -> D|Never:
+    def pop(self) -> D | Never:
         """Pop the value if the MB is not empty, otherwise fail."""
         _sentinel: Final[Sentinel] = Sentinel('MB')
         if self._value is _sentinel:
@@ -158,7 +161,7 @@ class MB[D]():
     def bind[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map `MB` with function `f` and flatten."""
         try:
-            return (f(cast(D, self._value)) if self else MB())
+            return f(cast(D, self._value)) if self else MB()
         except Exception:
             return MB()
 
@@ -174,6 +177,7 @@ class MB[D]():
     def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MB[V]]:
         def ret() -> MB[V]:
             return MB.call(f, u)
+
         return ret
 
     @staticmethod
@@ -188,6 +192,7 @@ class MB[D]():
     def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MB[V]]:
         def ret() -> MB[V]:
             return MB.idx(v, ii)
+
         return ret
 
     @staticmethod
@@ -210,7 +215,8 @@ class MB[D]():
         ds = type(seq_mb_d)(ts)  # type: ignore  # runtime duck typing
         return MB(cast(Sequence[T], ds))
 
-class XOR[L, R]():
+
+class XOR[L, R]:
     """Either monad - class semantically containing either a left or a right
     value, but not both.
 
@@ -232,6 +238,7 @@ class XOR[L, R]():
         * warning: not hashable if value or potential right value mutable
 
     """
+
     __slots__ = '_left', '_right'
     __match_args__ = ('_left', '_right')
 
@@ -240,13 +247,13 @@ class XOR[L, R]():
     @overload
     def __init__(self, left: MB[L], right: R, /) -> None: ...
 
-    def __init__(self, left: L|MB[L], right: R, /) -> None:
-        self._left: L|MB[L]
+    def __init__(self, left: L | MB[L], right: R, /) -> None:
+        self._left: L | MB[L]
         self._right: R
         match left:
             case MB(ts) if ts is not Sentinel('MB'):
                 self._left, self._right = cast(L, ts), right
-            case MB(s):
+            case MB(_):
                 self._left, self._right = MB(), right
             case ts:
                 self._left, self._right = ts, right
@@ -303,7 +310,7 @@ class XOR[L, R]():
     @overload
     def getLeft(self, altLeft: MB[L]) -> MB[L]: ...
 
-    def getLeft(self, altLeft: L|MB[L]=MB()) -> MB[L]:
+    def getLeft(self, altLeft: L | MB[L] = MB()) -> MB[L]:
         """Get value if a left.
 
         * if the `XOR` is a left, return its value
@@ -320,7 +327,7 @@ class XOR[L, R]():
                     return MB(self._left)
                 else:
                     return MB(cast(L, ts))
-            case MB(s):
+            case MB(_):
                 if self:
                     return MB(self._left)
                 else:
@@ -367,6 +374,7 @@ class XOR[L, R]():
         """Map over if a left value.
 
         * if `XOR` is a left then map `f` over its value
+
           * if `f` successful return a left `XOR[S, R]`
           * if `f` unsuccessful return right `XOR[S, R]`
             * swallows any exceptions `f` may throw
@@ -389,11 +397,11 @@ class XOR[L, R]():
         try:
             applied = g(self._right)
             right = applied
-        except:
+        except Exception:
             right = altRight
 
         if self:
-            left: L|MB[L] = cast(L, self._left)
+            left: L | MB[L] = cast(L, self._left)
         else:
             left = MB()
 
@@ -419,9 +427,12 @@ class XOR[L, R]():
             return XOR(MB(), MB(esc))
 
     @staticmethod
-    def lz_call[U, V](f: Callable[[U], V], left: U) -> Callable[[], XOR[V, MB[Exception]]]:
+    def lz_call[U, V](
+        f: Callable[[U], V], left: U
+    ) -> Callable[[], XOR[V, MB[Exception]]]:
         def ret() -> XOR[V, MB[Exception]]:
             return XOR.call(f, left)
+
         return ret
 
     @staticmethod
@@ -435,10 +446,13 @@ class XOR[L, R]():
     def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], XOR[V, MB[Exception]]]:
         def ret() -> XOR[V, MB[Exception]]:
             return XOR.idx(v, ii)
+
         return ret
 
     @staticmethod
-    def sequence(seq_xor_lr: Sequence[XOR[L, R]], potential_right: R) -> XOR[Sequence[L], R]:
+    def sequence(
+        seq_xor_lr: Sequence[XOR[L, R]], potential_right: R
+    ) -> XOR[Sequence[L], R]:
         """Sequence an indexable container of `XOR[L, R]`
 
         * if all the `XOR` values contained in the container are lefts, then
@@ -448,14 +462,13 @@ class XOR[L, R]():
           * return a right XOR containing the right value of the first right
 
         """
-        l: list[L] = []
+        l_l: list[L] = []
 
         for xor_lr in seq_xor_lr:
             if xor_lr:
-                l.append(xor_lr.getLeft().get())
+                l_l.append(xor_lr.getLeft().get())
             else:
                 return XOR(MB(), xor_lr.getRight())
 
-        ds = cast(Sequence[L], type(seq_xor_lr)(l))  # type: ignore # will be a subclass at runtime
+        ds = cast(Sequence[L], type(seq_xor_lr)(l_l))  # type: ignore # will be a subclass at runtime
         return XOR(ds, potential_right)
-

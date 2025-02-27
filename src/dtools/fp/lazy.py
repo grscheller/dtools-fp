@@ -23,20 +23,22 @@ Useful to delay a function's evaluation until some inner scope.
 * function **lazy:** Delay evaluation of a function taking any number of values
 
 """
+
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from typing import Any, Final, TypeVar, ParamSpec
 from .err_handling import MB, XOR
 from .function import sequenced
 
-__all__ = [ 'Lazy', 'lazy' ]
+__all__ = ['Lazy', 'lazy', 'real_lazy']
 
 D = TypeVar('D')
 R = TypeVar('R')
 P = ParamSpec('P')
 
-class Lazy[D, R]():
+
+class Lazy[D, R]:
     """Delayed evaluation of a singled valued function.
 
     Class instance delays the executable of a function where `Lazy(f, arg)`
@@ -52,12 +54,13 @@ class Lazy[D, R]():
     Usually use case is to make a function "non-strict" by passing some of its
     arguments wrapped in Lazy instances.
     """
+
     __slots__ = '_f', '_d', '_result', '_pure'
 
     def __init__(self, f: Callable[[D], R], d: D, pure: bool=True) -> None:
         self._f: Final[Callable[[D], R]] = f
         self._d: Final[D] = d
-        self._pure: Final[bool] = pure
+        self._pure: bool = pure
         self._result: XOR[R, MB[Exception]] = XOR(MB(), MB())
 
     def __bool__(self) -> bool:
@@ -72,9 +75,6 @@ class Lazy[D, R]():
         else:
             return False
 
-    def is_pure(self) -> bool:
-        return self._pure
-
     def eval(self) -> bool:
         """Evaluate function with its argument.
 
@@ -83,7 +83,7 @@ class Lazy[D, R]():
         * reevaluate if `pure == False`
 
         """
-        if not self.is_evaluated() or not self._pure:
+        if not self._pure or not self.is_evaluated():
             try:
                 result = self._f(self._d)
             except Exception as exc:
@@ -92,6 +92,7 @@ class Lazy[D, R]():
             else:
                 self._result = XOR(MB(result), MB())
                 return True
+
         if self:
             return True
         else:
@@ -111,9 +112,10 @@ class Lazy[D, R]():
             self.eval()
         return self._result.getRight()
 
-def lazy[**P, R](f: Callable[P, R],
-                 *args: P.args,
-                 pure: bool=True) -> Lazy[tuple[P.args], R]:
+
+def lazy[**P, R](
+    f: Callable[P, R], *args: P.args, **kwargs: P.kwargs
+) -> Lazy[tuple[Any, ...], R]:
     """Delayed evaluation of a function with arbitrary positional arguments.
 
     Function returning a delayed evaluation of a function of an arbitrary number
@@ -121,12 +123,29 @@ def lazy[**P, R](f: Callable[P, R],
 
     * first positional argument `f` takes a function
     * next positional arguments are the arguments to be applied later to `f`
-      * `f` is evaluated when the `eval` method of the returned `Lazy` is called
-      * `f` is evaluated only once with results cached unless `pure` is `False`
-      * if `pure` is false, the arguments are reapplied to `f`
-        * useful for repeating side effects
-        * when arguments are, or contain, shared references
+      * `f` is reevaluated whenever `eval` method of the returned `Lazy` is called
+    * any kwargs passed are ignored
+      * if `f` needs them then wrap `f` in another function
 
     """
-    return Lazy(sequenced(f), args, pure=pure)
+    return Lazy(sequenced(f), args, pure=False)
 
+
+def real_lazy[**P, R](
+    f: Callable[P, R], *args: P.args, **kwargs: P.kwargs
+) -> Lazy[tuple[Any, ...], R]:
+    """Delayed evaluation of a function with arbitrary positional arguments.
+
+    Function returning a delayed evaluation of a function of an arbitrary number
+    of positional arguments.
+
+    * first positional argument `f` takes a function
+    * next positional arguments are the arguments to be applied later to `f`
+      * `f` is evaluated when `eval` method of the returned `Lazy` is called
+      * `f` is evaluated only once with results cached
+    * any kwargs passed are ignored
+      * if `f` needs them then wrap `f` in another function
+
+    """
+
+    return Lazy(sequenced(f), args)
