@@ -21,6 +21,7 @@ Useful to delay a function's evaluation until some inner scope.
 
 * class **Lazy:** Delay evaluation of function taking & returning single values
 * function **lazy:** Delay evaluation of a function taking any number of values
+* function **real_lazy:** Version of `lazy` with caches its result
 
 """
 
