@@ -62,6 +62,7 @@ L = TypeVar('L')
 
 
 class FM(Enum):
+    """Not sure if this is needed anymore"""
     CONCAT = auto()
     MERGE = auto()
     EXHAUST = auto()
@@ -91,26 +92,25 @@ def exhaust[D](*iterables: Iterable[D]) -> Iterator[D]:
     * iterator yields until all iterables are exhausted
 
     """
-    iterList = list(map(lambda x: iter(x), iterables))
-    if (numIters := len(iterList)) > 0:
+    iter_list = list(map(lambda x: iter(x), iterables))
+    if (num_iters := len(iter_list)) > 0:
         ii = 0
         values = []
         while True:
             try:
-                while ii < numIters:
-                    values.append(next(iterList[ii]))
+                while ii < num_iters:
+                    values.append(next(iter_list[ii]))
                     ii += 1
-                for value in values:
-                    yield value
+                yield from values
                 ii = 0
                 values.clear()
             except StopIteration:
-                numIters -= 1
-                if numIters < 1:
+                num_iters -= 1
+                if num_iters < 1:
                     break
-                del iterList[ii]
-        for value in values:
-            yield value
+                del iter_list[ii]
+
+        yield from values
 
 
 def merge[D](*iterables: Iterable[D], yield_partials: bool = False) -> Iterator[D]:
@@ -123,21 +123,19 @@ def merge[D](*iterables: Iterable[D], yield_partials: bool = False) -> Iterator[
         * if any of the iterables are iterators with external references
 
     """
-    iterList = list(map(lambda x: iter(x), iterables))
+    iter_list = list(map(lambda x: iter(x), iterables))
     values = []
-    if (numIters := len(iterList)) > 0:
+    if (num_iters := len(iter_list)) > 0:
         while True:
             try:
-                for ii in range(numIters):
-                    values.append(next(iterList[ii]))
-                for value in values:
-                    yield value
+                for ii in range(num_iters):
+                    values.append(next(iter_list[ii]))
+                yield from values
                 values.clear()
             except StopIteration:
                 break
         if yield_partials:
-            for value in values:
-                yield value
+            yield from values
 
 
 ## dropping and taking
@@ -262,8 +260,7 @@ def accumulate[D, L](
     except StopIteration:
         if initial is NoValue():
             return
-        else:
-            yield cast(L, initial)
+        yield cast(L, initial)
     else:
         if initial is not NoValue():
             init = cast(L, initial)
@@ -293,9 +290,9 @@ def reduceL[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D | Never:
     it = iter(iterable)
     try:
         acc = next(it)
-    except StopIteration:
+    except StopIteration as exc:
         msg = 'Attemped to reduce an empty iterable.'
-        raise StopIteration(msg)
+        raise StopIteration(msg) from exc
 
     for v in it:
         acc = f(acc, v)

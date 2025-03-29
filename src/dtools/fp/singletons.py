@@ -37,8 +37,8 @@ colliding with using either to represent "nothingness."
 ##### `Sentinel` values used as hidden implementation details
 
 * Here is another implementation for Sentinel:``
-  * on GitHub: [taleinat/python-stdlib-sentinels](https://github.com/taleinat/python-stdlib-sentinels)
-  * on PyPI: [Project: Sentinels](https://pypi.org/project/sentinels/)
+  * on GitHub: taleinat/python-stdlib-sentinels
+  * on PyPI: https://pypi.org/project/sentinels/
   * see: [PEP 661](https://peps.python.org/pep-0661/)
 
 Initially this one was somewhat close to mine and also enabled pickling.
@@ -130,7 +130,6 @@ class Sentinel:
 
     def __init__(self, sentinel_name: str) -> None:
         self._sentinel_name = sentinel_name
-        return
 
     def __repr__(self) -> str:
         return "Sentinel('" + self._sentinel_name + "')"
@@ -169,7 +168,7 @@ class Nada:
     _instance: Nada | None = None
     _hash: int = 0
 
-    sentinel: Final[Sentinel] = Sentinel('Nada')
+    SENTINEL: Final[Sentinel] = Sentinel('Nada')
 
     def __new__(cls) -> Nada:
         if cls._instance is None:
@@ -237,9 +236,8 @@ class Nada:
 
         return method
 
-    def nada_get(self, alt: Any = sentinel) -> Any:
+    def nada_get(self, alt: Any = SENTINEL) -> Any:
         """Get an alternate value, defaults to `Nada()`."""
         if alt == Sentinel('Nada'):
             return Nada()
-        else:
-            return alt
+        return alt

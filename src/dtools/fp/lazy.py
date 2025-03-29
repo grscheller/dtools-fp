@@ -56,25 +56,26 @@ class Lazy[D, R]:
     arguments wrapped in Lazy instances.
     """
 
-    __slots__ = '_f', '_d', '_result', '_pure'
+    __slots__ = ('_f', '_d', '_result', '_pure')
 
-    def __init__(self, f: Callable[[D], R], d: D, pure: bool=True) -> None:
+    def __init__(self, f: Callable[[D], R], d: D, pure: bool = True) -> None:
         self._f: Final[Callable[[D], R]] = f
         self._d: Final[D] = d
         self._pure: bool = pure
         self._result: XOR[R, MB[Exception]] = XOR(MB(), MB())
 
     def __bool__(self) -> bool:
-        return True if self._result else False
+        return bool(self._result)
 
     def is_evaluated(self) -> bool:
+        """Return true if Lazy is evaluated"""
         return self._result != XOR(MB(), MB())
 
     def is_exceptional(self) -> bool:
+        """Return true if Lazy raised exception when evaluated"""
         if self.is_evaluated():
-            return False if self._result else True
-        else:
-            return False
+            return not bool(self._result)
+        return False
 
     def eval(self) -> bool:
         """Evaluate function with its argument.
@@ -94,19 +95,16 @@ class Lazy[D, R]:
                 self._result = XOR(MB(result), MB())
                 return True
 
-        if self:
-            return True
-        else:
-            return False
+        return bool(self)
 
     def result(self) -> MB[R]:
+        """Get result, evaluate if necessary"""
         if not self.is_evaluated():
             self.eval()
 
         if self._result:
             return MB(self._result.getLeft())
-        else:
-            return MB()
+        return MB()
 
     def exception(self) -> MB[Exception]:
         if not self.is_evaluated():
@@ -126,7 +124,7 @@ def lazy[**P, R](
     * next positional arguments are the arguments to be applied later to `f`
       * `f` is reevaluated whenever `eval` method of the returned `Lazy` is called
     * any kwargs passed are ignored
-      * if `f` needs them then wrap `f` in another function
+      * if `f` needs them, then wrap `f` in another function
 
     """
     return Lazy(sequenced(f), args, pure=False)
@@ -135,7 +133,7 @@ def lazy[**P, R](
 def real_lazy[**P, R](
     f: Callable[P, R], *args: P.args, **kwargs: P.kwargs
 ) -> Lazy[tuple[Any, ...], R]:
-    """Delayed evaluation of a function with arbitrary positional arguments.
+    """Cached delayed evaluation of a function with arbitrary positional arguments.
 
     Function returning a delayed evaluation of a function of an arbitrary number
     of positional arguments.
@@ -148,5 +146,4 @@ def real_lazy[**P, R](
       * if `f` needs them then wrap `f` in another function
 
     """
-
     return Lazy(sequenced(f), args)

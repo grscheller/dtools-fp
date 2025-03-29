@@ -34,7 +34,7 @@ from typing import Any, cast, TypeVar, ParamSpec
 
 __all__ = ['swap', 'sequenced', 'partial', 'iter_args', 'negate']
 
-A = TypeVar('A')
+A = TypeVar('A')  # Not needed for mypy, hint for pdoc.
 R = TypeVar('R')
 U = TypeVar('U')
 V = TypeVar('V')
@@ -76,7 +76,7 @@ def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
 
 
 def iter_args[A](*args: A) -> Iterator[A]:
-    """Function returning an iterators of its arguments.
+    """Function returning an iterator of its arguments.
 
     * useful for API's with single iterable constructors
 

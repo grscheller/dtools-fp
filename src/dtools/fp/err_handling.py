@@ -87,8 +87,7 @@ class MB[D]:
     def __repr__(self) -> str:
         if self:
             return 'MB(' + repr(self._value) + ')'
-        else:
-            return 'MB()'
+        return 'MB()'
 
     def __len__(self) -> int:
         return 1 if self else 0
@@ -99,10 +98,9 @@ class MB[D]:
 
         if self._value is other._value:
             return True
-        elif self._value == other._value:
+        if self._value == other._value:
             return True
-        else:
-            return False
+        return False
 
     @overload
     def get(self) -> D | Never: ...
@@ -121,12 +119,10 @@ class MB[D]:
         _sentinel: Final[Sentinel] = Sentinel('MB')
         if self._value is not _sentinel:
             return cast(D, self._value)
-        else:
-            if alt is _sentinel:
-                msg = 'MB: an alternate return type not provided'
-                raise ValueError(msg)
-            else:
-                return cast(D, alt)
+        if alt is _sentinel:
+            msg = 'MB: an alternate return type not provided'
+            raise ValueError(msg)
+        return cast(D, alt)
 
     def put(self, value: D) -> None:
         """Put a value in the MB if empty, if not empty do nothing."""
@@ -139,10 +135,9 @@ class MB[D]:
         if self._value is _sentinel:
             msg = 'MB: Popping from an empty MB'
             raise ValueError(msg)
-        else:
-            popped = cast(D, self._value)
-            self._value = _sentinel
-            return popped
+        popped = cast(D, self._value)
+        self._value = _sentinel
+        return popped
 
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
         """Map function `f` over the 0 or 1 elements of this data structure.
@@ -152,11 +147,10 @@ class MB[D]:
         """
         if self._value is Sentinel('MB'):
             return cast(MB[U], self)
-        else:
-            try:
-                return MB(f(cast(D, self._value)))
-            except Exception:
-                return MB()
+        try:
+            return MB(f(cast(D, self._value)))
+        except Exception:
+            return MB()
 
     def bind[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map `MB` with function `f` and flatten."""
@@ -167,7 +161,7 @@ class MB[D]:
 
     @staticmethod
     def call[U, V](f: Callable[[U], V], u: U) -> MB[V]:
-        """Return result of a function call wrapped in a MB"""
+        """Return MB wrapped result of a function call that can fail"""
         try:
             return MB(f(u))
         except Exception:
@@ -175,6 +169,8 @@ class MB[D]:
 
     @staticmethod
     def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MB[V]]:
+        """Return a MB of a delayed evaluation of a function"""
+
         def ret() -> MB[V]:
             return MB.call(f, u)
 
@@ -182,7 +178,7 @@ class MB[D]:
 
     @staticmethod
     def idx[V](v: Sequence[V], ii: int) -> MB[V]:
-        """Return an indexed value wrapped in a MB"""
+        """Return a MB of an indexed value that can fail"""
         try:
             return MB(v[ii])
         except IndexError:
@@ -190,6 +186,8 @@ class MB[D]:
 
     @staticmethod
     def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MB[V]]:
+        """Return a MB of a delayed indexing of a sequenced type that can fail"""
+
         def ret() -> MB[V]:
             return MB.idx(v, ii)
 
@@ -197,7 +195,7 @@ class MB[D]:
 
     @staticmethod
     def sequence[T](seq_mb_d: Sequence[MB[T]]) -> MB[Sequence[T]]:
-        """Sequence an indexable container of `MB[~D]`
+        """Sequence an indexable container of `MB[~T]`
 
         * if all the contained `MB` values in the container are not empty,
           * return a `MB` of a container containing the values contained
@@ -268,14 +266,12 @@ class XOR[L, R]:
     def __repr__(self) -> str:
         if self:
             return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
-        else:
-            return 'XOR(MB(), ' + repr(self._right) + ')'
+        return 'XOR(MB(), ' + repr(self._right) + ')'
 
     def __str__(self) -> str:
         if self:
             return '< ' + str(self._left) + ' | >'
-        else:
-            return '< | ' + str(self._right) + ' >'
+        return '< | ' + str(self._right) + ' >'
 
     def __len__(self) -> int:
         # Semantically, an XOR always contains just one value.
@@ -288,18 +284,16 @@ class XOR[L, R]:
         if self and other:
             if self._left is other._left:
                 return True
-            elif self._left == other._left:
+            if self._left == other._left:
                 return True
-            else:
-                return False
+            return False
 
         if not self and not other:
             if self._right is other._right:
                 return True
-            elif self._right == other._right:
+            if self._right == other._right:
                 return True
-            else:
-                return False
+            return False
 
         return False
 
@@ -325,18 +319,15 @@ class XOR[L, R]:
             case MB(ts) if ts is not _sentinel:
                 if self:
                     return MB(self._left)
-                else:
-                    return MB(cast(L, ts))
+                return MB(cast(L, ts))
             case MB(_):
                 if self:
                     return MB(self._left)
-                else:
-                    return MB()
+                return MB()
             case ts:
                 if self:
                     return MB(self._left)
-                else:
-                    return MB(ts)
+                return MB(ts)
 
     def getRight(self) -> R:
         """Get value of `XOR` if a right, potential right value if a left.
@@ -356,8 +347,7 @@ class XOR[L, R]:
         """
         if self._left == MB():
             return self
-        else:
-            return cast(XOR[L, R], XOR(MB(), self._right))
+        return cast(XOR[L, R], XOR(MB(), self._right))
 
     def newRight(self, right: R) -> XOR[L, R]:
         """Swap in a right value.
@@ -367,8 +357,7 @@ class XOR[L, R]:
         """
         if self._left == MB():
             return cast(XOR[L, R], XOR(MB(), right))
-        else:
-            return cast(XOR[L, R], XOR(self._left, right))
+        return cast(XOR[L, R], XOR(self._left, right))
 
     def map[U](self, f: Callable[[L], U]) -> XOR[U, R]:
         """Map over if a left value.
@@ -408,7 +397,7 @@ class XOR[L, R]:
         return XOR(left, right)
 
     def bind[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
-        """Flatmap - bind
+        """Flatmap over the left value
 
         * map over then flatten left values
         * propagate right values
@@ -421,6 +410,7 @@ class XOR[L, R]:
 
     @staticmethod
     def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, MB[Exception]]:
+        """Return XOR wrapped result of a function call that can fail"""
         try:
             return XOR(f(left), MB())
         except Exception as esc:
@@ -430,6 +420,8 @@ class XOR[L, R]:
     def lz_call[U, V](
         f: Callable[[U], V], left: U
     ) -> Callable[[], XOR[V, MB[Exception]]]:
+        """Return an XOR of a delayed evaluation of a function"""
+
         def ret() -> XOR[V, MB[Exception]]:
             return XOR.call(f, left)
 
@@ -437,6 +429,7 @@ class XOR[L, R]:
 
     @staticmethod
     def idx[V](v: Sequence[V], ii: int) -> XOR[V, MB[Exception]]:
+        """Return an XOR of an indexed value that can fail"""
         try:
             return XOR(v[ii], MB())
         except Exception as esc:
@@ -444,6 +437,7 @@ class XOR[L, R]:
 
     @staticmethod
     def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], XOR[V, MB[Exception]]]:
+        """Return an XOR of a delayed indexing of a sequenced type that can fail"""
         def ret() -> XOR[V, MB[Exception]]:
             return XOR.idx(v, ii)
 
@@ -453,7 +447,7 @@ class XOR[L, R]:
     def sequence(
         seq_xor_lr: Sequence[XOR[L, R]], potential_right: R
     ) -> XOR[Sequence[L], R]:
-        """Sequence an indexable container of `XOR[L, R]`
+        """Sequence an indexable container of `XOR[~L, ~R]`
 
         * if all the `XOR` values contained in the container are lefts, then
           * return an `XOR` of the same type container of all the left values

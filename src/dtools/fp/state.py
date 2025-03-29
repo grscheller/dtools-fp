@@ -44,8 +44,8 @@ S = TypeVar('S')
 A = TypeVar('A')
 B = TypeVar('B')
 C = TypeVar('C')
-S1 = TypeVar('S1')
-A1 = TypeVar('A1')
+SS = TypeVar('SS')
+AA = TypeVar('AA')
 
 
 class State[S, A]:
@@ -58,7 +58,7 @@ class State[S, A]:
 
     """
 
-    __slots__ = 'run'
+    __slots__ = ('run',)
 
     def __init__(self, run: Callable[[S], tuple[A, S]]) -> None:
         self.run = run
@@ -90,12 +90,12 @@ class State[S, A]:
         return self.map2(rb, lambda a, b: (a, b))
 
     @staticmethod
-    def unit[S1, B](b: B) -> State[S1, B]:
+    def unit[SS, B](b: B) -> State[SS, B]:
         """Create a State action from a value."""
         return State(lambda s: (b, s))
 
     @staticmethod
-    def get[S1]() -> State[S1, S1]:
+    def get[SS]() -> State[SS, SS]:
         """Set run action to return the current state
 
         * the current state is propagated unchanged
@@ -103,10 +103,10 @@ class State[S, A]:
         * will need type annotation
 
         """
-        return State[S1, S1](lambda s: (s, s))
+        return State[SS, SS](lambda s: (s, s))
 
     @staticmethod
-    def put[S1](s: S1) -> State[S1, tuple[()]]:
+    def put[SS](s: SS) -> State[SS, tuple[()]]:
         """Manually insert a state.
 
         * the run action
@@ -117,18 +117,18 @@ class State[S, A]:
         return State(lambda _: ((), s))
 
     @staticmethod
-    def modify[S1](f: Callable[[S1], S1]) -> State[S1, tuple[()]]:
+    def modify[SS](f: Callable[[SS], SS]) -> State[SS, tuple[()]]:
         """Modify previous state.
 
         * like put, but modify previous state via `f`
         * will need type annotation
-          * type: ignore - since mypy has no "a priori" way to know S1.
+          * type: ignore - since mypy has no "a priori" way to know SS.
 
         """
         return State.get().bind(lambda a: State.put(f(a)))  # type: ignore
 
     @staticmethod
-    def sequence[S1, A1](sas: list[State[S1, A1]]) -> State[S1, list[A1]]:
+    def sequence[SS, AA](sas: list[State[SS, AA]]) -> State[SS, list[AA]]:
         """Combine a list of state actions into a state action of a list.
 
         * all state actions must be of the same type
@@ -136,10 +136,10 @@ class State[S, A]:
 
         """
 
-        def append_ret(ls: list[A1], a: A1) -> list[A1]:
+        def append_ret(ls: list[AA], a: AA) -> list[AA]:
             ls.append(a)
             return ls
 
         return ca(sas).foldL(
-            lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[A1]([]))
+            lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[AA]([]))
         )
