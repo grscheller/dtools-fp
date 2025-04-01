@@ -28,7 +28,7 @@ remain Pythonic.
 
 """
 
-__version__ = '1.4.2.1'
+__version__ = '1.5.0.0'
 __author__ = 'Geoffrey R. Scheller'
 __copyright__ = 'Copyright (c) 2023-2025 Geoffrey R. Scheller'
 __license__ = 'Apache License 2.0'
