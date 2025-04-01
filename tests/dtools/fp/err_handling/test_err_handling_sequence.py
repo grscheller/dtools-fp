@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 
-from dtools.datastructures.tuples import FTuple, FT
-from dtools.datastructures.queues import DoubleQueue, DQ
+from dtools.tuples.ftuple import FTuple, FT
+from dtools.queues.restrictive import DoubleQueue, DQ
 from dtools.fp.err_handling import MB, XOR
 
 class TestMB_sequence:
