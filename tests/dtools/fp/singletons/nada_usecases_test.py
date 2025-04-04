@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from dtools.circular_array.ca import CA
+from dtools.circular_array.ca import ca
 from dtools.fp.singletons import Nada
 
 nada = Nada()
@@ -90,20 +90,20 @@ class Test_Builtin_Containers:
         assert dict2[2] is dict2[2]
 
     def test_comparibility(self) -> None:
-        cir1 = 42, CA(42, nada)
-        cir2 = 42, CA(42, nada)
+        cir1 = 42, ca(42, nada)
+        cir2 = 42, ca(42, nada)
         assert cir1 == cir2  # CAs now compare with identity before equality
-        assert not (cir1 is cir2)
+        assert cir1 is not cir2
 
         tup1 = 42, [42]
         tup2 = 42, [42]
         assert tup1 == tup2  # lists must compare identity before equality
-        assert not (tup1 is tup2)
+        assert tup1 is not tup2
 
         tup3 = 42, [42, nada]
         tup4 = 42, [42, nada]
         assert tup3 == tup4
-        assert not (tup3 is tup4)  # because both contain mutable objects
+        assert tup3 is not tup4  # because both contain mutable objects
         assert tup3[1].pop(-1) is nada
         assert tup4[1].pop(-1) is nada
         tup3[1].append(100)

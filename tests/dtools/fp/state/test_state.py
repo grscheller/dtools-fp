@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Final, Never
 from dtools.fp.state import State
 
 class Test_simple:
@@ -143,9 +142,9 @@ class Test_simple:
         sa4 = State(lambda s: (str(s), s+4))
         sas = [sa1, sa2, sa3, sa4]
         sal = State.sequence(sas)
-        l, s = sal.run(0)
+        ll, s = sal.run(0)
         assert s == 10
-        assert l == ["0", "1", "3", "6"]
+        assert ll == ["0", "1", "3", "6"]
 
         sa1 = State(lambda s: (str(1), s))
         sa2 = State(lambda s: (str(2), s))
@@ -156,4 +155,3 @@ class Test_simple:
         l, s = sal.run(0)
         assert s == 0
         assert l == ["1", "2", "3", "4"]
-

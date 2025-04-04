@@ -72,17 +72,16 @@ class Test_function:
         trg2 = [*iter_args(1,2,3)]
         assert ref2 == trg2
 
-        caI = ca((1, 2))
-        caA = CA(1, 2)
+        caI = CA((1, 2))
+        caA = ca(1, 2)
         assert caI == caA
 
-        ca0_ref: ca[int] = ca()
+        ca0_ref: CA[int] = ca()
         ca0_trg: list[int] = list(iter_args())
         assert ref0 == trg0
 
-        ca1_ref: ca[int] = ca((42, 7, 11, 100))
-        ca1_trg = ca(iter_args(42, 7, 11, 100))
-        ca1_splat1 = CA(*iter_args(42, 7, 11, 100))
-        ca1_splat2 = CA(*iter_args(42, 7), *iter_args(11, 100))
+        ca1_ref: CA[int] = CA((42, 7, 11, 100))
+        ca1_trg = CA(iter_args(42, 7, 11, 100))
+        ca1_splat1 = ca(*iter_args(42, 7, 11, 100))
+        ca1_splat2 = ca(*iter_args(42, 7), *iter_args(11, 100))
         assert ca1_ref == ca1_trg == ca1_splat1 == ca1_splat2
-
