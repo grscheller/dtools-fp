@@ -27,7 +27,7 @@ from __future__ import annotations
 
 __all__ = ['MB', 'XOR']
 
-from collections.abc import Callable, Iterator, Sequence
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import cast, Final, Never, overload, TypeVar
 from .singletons import Sentinel
 
@@ -194,24 +194,25 @@ class MB[D]:
         return ret
 
     @staticmethod
-    def sequence[T](seq_mb_d: Sequence[MB[T]]) -> MB[Sequence[T]]:
-        """Sequence an indexable container of `MB[~T]`
+    def sequence[T](itab_mb_d: Iterable[MB[T]]) -> MB[Iterable[T]]:
+        """Sequence an indexable of type `MB[~T]`
 
-        * if all the contained `MB` values in the container are not empty,
-          * return a `MB` of a container containing the values contained
+        * if the iterated `MB` values are not all empty,
+          * return a `MB` of an iterable of the contained values
           * otherwise return an empty `MB`
 
         """
         ts: list[T] = []
 
-        for mb_d in seq_mb_d:
+        for mb_d in itab_mb_d:
             if mb_d:
                 ts.append(mb_d.get())
             else:
                 return MB()
 
-        ds = type(seq_mb_d)(ts)  # type: ignore  # runtime duck typing
-        return MB(cast(Sequence[T], ds))
+        ds = cast(Iterable[T], type(itab_mb_d)(ts))
+
+        return MB(ds)
 
 
 class XOR[L, R]:
@@ -438,6 +439,7 @@ class XOR[L, R]:
     @staticmethod
     def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], XOR[V, MB[Exception]]]:
         """Return an XOR of a delayed indexing of a sequenced type that can fail"""
+
         def ret() -> XOR[V, MB[Exception]]:
             return XOR.idx(v, ii)
 
@@ -445,24 +447,24 @@ class XOR[L, R]:
 
     @staticmethod
     def sequence(
-        seq_xor_lr: Sequence[XOR[L, R]], potential_right: R
-    ) -> XOR[Sequence[L], R]:
-        """Sequence an indexable container of `XOR[~L, ~R]`
+        itab_xor_lr: Iterable[XOR[L, R]], potential_right: R
+    ) -> XOR[Iterable[L], R]:
+        """Sequence an indexable of type `XOR[~L, ~R]`
 
-        * if all the `XOR` values contained in the container are lefts, then
-          * return an `XOR` of the same type container of all the left values
-          * setting the potential right `potential_right`
-        * if at least one of the `XOR` values contained in the container is a right,
-          * return a right XOR containing the right value of the first right
+        * if the iterated `XOR` values are all lefts, then
+          * return an `XOR` of an iterable the left values
+          * setting potential right to `potential_right`
+        * otherwise return a right XOR containing the first right encountered
 
         """
-        l_l: list[L] = []
+        ls: list[L] = []
 
-        for xor_lr in seq_xor_lr:
+        for xor_lr in itab_xor_lr:
             if xor_lr:
-                l_l.append(xor_lr.getLeft().get())
+                ls.append(xor_lr.getLeft().get())
             else:
                 return XOR(MB(), xor_lr.getRight())
 
-        ds = cast(Sequence[L], type(seq_xor_lr)(l_l))  # type: ignore # will be a subclass at runtime
+        ds = cast(Iterable[L], type(itab_xor_lr)(ls))
+
         return XOR(ds, potential_right)

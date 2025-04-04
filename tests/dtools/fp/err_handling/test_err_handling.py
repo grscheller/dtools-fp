@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from dtools.tuples.ftuple import FT
+from dtools.tuples.ftuple import FTuple as FT
 from dtools.fp.err_handling import MB, XOR
 
 def add2(x: int) -> int:

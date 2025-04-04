@@ -140,6 +140,6 @@ class State[S, A]:
             ls.append(a)
             return ls
 
-        return ca(sas).foldL(
+        return ca(sas).foldl(
             lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[AA]([]))
         )

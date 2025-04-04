@@ -301,8 +301,7 @@ def reduceL[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D | Never:
 
 
 def foldL[D, L](
-    iterable: Iterable[D], f: Callable[[L, D], L], initial: L, /
-) -> L | Never:
+    iterable: Iterable[D], f: Callable[[L, D], L], initial: L, /) -> L | Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
