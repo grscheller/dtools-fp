@@ -17,7 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["dtools.circular-array >=3.10.1, < 3.11"]
+dependencies = ["dtools.circular-array >=3.12.0, < 3.13"]
 dynamic = ["version", "description"]
 keywords = [
     "functional",
@@ -32,7 +32,7 @@ keywords = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest >=8.3.5", "dtools.queues >=0.26.1, < 0.27"]
+test = ["pytest >=8.3.5", "dtools.queues >=0.27.0, < 0.28"]
 
 [project.urls]
 Source = "https://github.com/grscheller/dtools-fp"

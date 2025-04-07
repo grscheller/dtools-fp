@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dtools.circular_array.ca import ca, CA
-from dtools.fp.function import partial, sequenced, swap, iter_args
-from dtools.fp.iterables import mbFoldL, take
+from dtools.fp.function import partial, sequenced, swap, it
+from dtools.fp.iterables import mb_fold_left, take
 
 class Test_function:
     def test_same_type(self) -> None:
@@ -35,7 +35,7 @@ class Test_function:
 
     def test_different_types(self) -> None:
         def names(num: int, sep: str, names: list[str]) -> str:
-            return mbFoldL(take(names, num),
+            return mb_fold_left(take(names, num),
                          lambda names, name: names + sep + name,
                          "").get()[len(sep):]
 
@@ -59,17 +59,17 @@ class Test_function:
 
         assert compute(*data) == compute_seq(data)
 
-    def test_iter_args(self) -> None:
+    def test_it(self) -> None:
         ref0: list[int] = []
-        trg0: list[int] = list(iter_args())
+        trg0: list[int] = list(it())
         assert ref0 == trg0
 
         ref1 = [1, 2, 4, 8, 42]
-        trg1 = list(iter_args(1, 2, 4, 8, 42))
+        trg1 = list(it(1, 2, 4, 8, 42))
         assert ref1 == trg1
 
         ref2 = [1, 2, 3]
-        trg2 = [*iter_args(1,2,3)]
+        trg2 = [*it(1,2,3)]
         assert ref2 == trg2
 
         caI = CA((1, 2))
@@ -77,11 +77,11 @@ class Test_function:
         assert caI == caA
 
         ca0_ref: CA[int] = ca()
-        ca0_trg: list[int] = list(iter_args())
-        assert ref0 == trg0
+        ca0_trg: CA[int] = CA[int](it())
+        assert ca0_ref == ca0_trg
 
         ca1_ref: CA[int] = CA((42, 7, 11, 100))
-        ca1_trg = CA(iter_args(42, 7, 11, 100))
-        ca1_splat1 = ca(*iter_args(42, 7, 11, 100))
-        ca1_splat2 = ca(*iter_args(42, 7), *iter_args(11, 100))
+        ca1_trg = CA(it(42, 7, 11, 100))
+        ca1_splat1 = ca(*it(42, 7, 11, 100))
+        ca1_splat2 = ca(*it(42, 7), *it(11, 100))
         assert ca1_ref == ca1_trg == ca1_splat1 == ca1_splat2

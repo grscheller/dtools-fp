@@ -20,27 +20,25 @@ and application.
 
 #### FP utilities to manipulate and partially apply functions:
 
-* function **swap:** swap the arguments of a 2 argument function
-* function **sequenced:** convert function to take a sequence of its arguments
-* function **partial:** returns a partially applied function
-* function **iter_args:** function returning an iterator of its arguments
-* function **negate:** transforms a predicate to its negation
+- *function* swap: Swap the arguments of a 2 argument function
+- *function* sequenced: Convert function to take a sequence of its arguments
+- *function* partial: Returns a partially applied function
+- *function* it: Function returning an iterator of its arguments
+- *function* negate: Transforms a predicate to its negation
 
 """
 
 from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
-from typing import Any, cast, TypeVar, ParamSpec
+from typing import Any, cast, ParamSpec, TypeVar
 
-__all__ = ['swap', 'sequenced', 'partial', 'iter_args', 'negate']
+__all__ = ['swap', 'sequenced', 'partial', 'it', 'negate']
 
-A = TypeVar('A')  # Not needed for mypy, hint for pdoc.
-R = TypeVar('R')
-U = TypeVar('U')
-V = TypeVar('V')
-P = ParamSpec('P')
-
-## Functional Utilities
+A = TypeVar('A')    # Needed only for pdoc documentation generation. Otherwise,
+R = TypeVar('R')    # ignored by both MyPy and Python. Makes linters unhappy
+U = TypeVar('U')    # when these are used on function and method signatures due
+V = TypeVar('V')    # to "redefined-outer-name" warnings. Functions and methods
+P = ParamSpec('P')  # signatures do not support variance and bounds constraints.
 
 
 def swap[U, V, R](f: Callable[[U, V], R]) -> Callable[[V, U], R]:
@@ -62,10 +60,10 @@ def sequenced[R](f: Callable[..., R]) -> Callable[..., R]:
 def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
     """Partially apply arguments to a function, left to right.
 
-    * type-wise the only thing guaranteed is the return value
-    * best practice is to either
-      * use `partial` and `sequenced` results immediately and locally
-      * otherwise cast the results when they are created
+    - type-wise the only thing guaranteed is the return value
+    - best practice is to either
+      - use `partial` and `sequenced` results immediately and locally
+      - otherwise cast the results when they are created
 
     """
 
@@ -75,17 +73,18 @@ def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
     return wrap
 
 
-def iter_args[A](*args: A) -> Iterator[A]:
+def it[A](*args: A) -> Iterator[A]:
     """Function returning an iterator of its arguments.
 
-    * useful for API's with single iterable constructors
+    - useful for API's whose constructors take a single iterable
 
     """
-    for arg in args:
-        yield arg
+    yield from args
 
 
 def negate[**P](f: Callable[P, bool]) -> Callable[P, bool]:
+    """Take a predicate and return its negation."""
+
     def F(*args: Any) -> bool:
         return not sequenced(f)(args)
 

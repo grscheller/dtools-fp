@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dtools.circular_array.ca import ca, CA
 from dtools.fp.iterables import concat, merge, exhaust
 from dtools.fp.iterables import accumulate
 from dtools.fp.iterables import drop, drop_while

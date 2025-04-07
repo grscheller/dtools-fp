@@ -16,15 +16,15 @@
 
 Library of iterator related functions and enumerations.
 
-* Concatenating and merging iterables
-* Dropping and taking values from iterables
-* Reducing and accumulating iterables
+- Concatenating and merging iterables
+- Dropping and taking values from iterables
+- Reducing and accumulating iterables
 
 #### Assumptions
-* iterables are not necessarily iterators
-* at all times iterator protocol is assumed to be followed, that is
-  * all iterators are assumed to be iterable
-  * for all iterators `foo` we assume `iter(foo) is foo`
+- iterables are not necessarily iterators
+- at all times iterator protocol is assumed to be followed, that is
+  - all iterators are assumed to be iterable
+  - for all iterators `foo` we assume `iter(foo) is foo`
 
 """
 
@@ -48,21 +48,28 @@ __all__ = [
     'take_split',
     'take_while_split',
     'accumulate',
-    'foldL',
-    'mbFoldL',
-    'reduceL',
-    'scReduceL',
-    'scReduceR',
+    'foldl',
+    'mb_fold_left',
+    'reducel',
+    'scReducel',
+    'scReducer',
 ]
 
-D = TypeVar('D')
-L = TypeVar('L')
+D = TypeVar('D')  # Needed only for pdoc documentation generation.
+L = TypeVar('L')  # Otherwise, ignored by both MyPy and Python.
 
-## Iterate over multiple Iterables
+# Iterate over multiple iterables
 
 
 class FM(Enum):
-    """Not sure if this is needed anymore"""
+    """Types of iterable blending,
+
+    - **CONCAT:** Concatenate first to last
+    - **MERGE:** Merge until one is exhausted
+    - **EXHAUST:** Merge until all are exhausted
+
+    """
+
     CONCAT = auto()
     MERGE = auto()
     EXHAUST = auto()
@@ -278,7 +285,7 @@ def accumulate[D, L](
             yield acc
 
 
-def reduceL[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D | Never:
+def reducel[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D | Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -300,8 +307,9 @@ def reduceL[D](iterable: Iterable[D], f: Callable[[D, D], D], /) -> D | Never:
     return acc
 
 
-def foldL[D, L](
-    iterable: Iterable[D], f: Callable[[L, D], L], initial: L, /) -> L | Never:
+def foldl[D, L](
+    iterable: Iterable[D], f: Callable[[L, D], L], initial: L, /
+) -> L | Never:
     """Folds an iterable left with optional initial value.
 
     * traditional FP type order given for function `f`
@@ -319,7 +327,7 @@ def foldL[D, L](
     return acc
 
 
-def mbFoldL[L, D](
+def mb_fold_left[L, D](
     iterable: Iterable[D], f: Callable[[L, D], L], initial: L | NoValue = NoValue()
 ) -> MB[L]:
     """Folds an iterable left with optional initial value.
@@ -349,7 +357,7 @@ def mbFoldL[L, D](
     return MB(acc)
 
 
-def scReduceL[D](
+def scReducel[D](
     iterable: Iterable[D],
     f: Callable[[D, D], D],
     /,
@@ -376,7 +384,7 @@ def scReduceL[D](
         except StopIteration:
             pass
     it_reduce, it_rest = take_while_split(it_start, negate(stop))
-    mb_reduced = mbFoldL(it_reduce, f)
+    mb_reduced = mb_fold_left(it_reduce, f)
     if include_stop:
         if mb_reduced:
             try:
@@ -394,7 +402,7 @@ def scReduceL[D](
     return (mb_reduced, it_rest)
 
 
-def scReduceR[D](
+def scReducer[D](
     iterable: Iterable[D],
     f: Callable[[D, D], D],
     /,
@@ -427,7 +435,7 @@ def scReduceR[D](
     l1.reverse()
     it_reduce, it_stop = take_while_split(l1, negate(stop))
 
-    mb_reduced = mbFoldL(it_reduce, swap(f))
+    mb_reduced = mb_fold_left(it_reduce, swap(f))
     if include_stop:
         try:
             end = next(it_stop)

@@ -19,9 +19,9 @@ Useful to delay a function's evaluation until some inner scope.
 
 #### Non-strict delayed function evaluation:
 
-* class **Lazy:** Delay evaluation of function taking & returning single values
-* function **lazy:** Delay evaluation of a function taking any number of values
-* function **real_lazy:** Version of `lazy` with caches its result
+- *class* Lazy: Delay evaluation of function taking & returning single values.
+- *function* lazy: Delay evaluation of a function taking any number of values.
+- *function* real_lazy: Version of `lazy` which caches its result.
 
 """
 
@@ -34,9 +34,9 @@ from .function import sequenced
 
 __all__ = ['Lazy', 'lazy', 'real_lazy']
 
-D = TypeVar('D')
-R = TypeVar('R')
-P = ParamSpec('P')
+D = TypeVar('D')    # Needed only for pdoc documentation generation. When
+R = TypeVar('R')    # used on function and method signatures, linters will
+P = ParamSpec('P')  # show "redefined-outer-name" warnings.
 
 
 class Lazy[D, R]:
@@ -91,9 +91,8 @@ class Lazy[D, R]:
             except Exception as exc:
                 self._result = XOR(MB(), MB(exc))
                 return False
-            else:
-                self._result = XOR(MB(result), MB())
-                return True
+            self._result = XOR(MB(result), MB())
+            return True
 
         return bool(self)
 
@@ -107,6 +106,7 @@ class Lazy[D, R]:
         return MB()
 
     def exception(self) -> MB[Exception]:
+        """Get exception if exceptional, evaluate if necessary"""
         if not self.is_evaluated():
             self.eval()
         return self._result.getRight()

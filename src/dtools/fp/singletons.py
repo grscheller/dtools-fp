@@ -21,9 +21,9 @@ cases. Used mostly for dtools internal implementations.
 
 #### Singleton types:
 
-* **class NoValue:** singleton instance representing the absence of a value
-* **Class Sentinel:** singleton instances used as a "hidden" sentinel value
-* **class Nada:** singleton instance representing & propagating failure
+- *class* NoValue: Singleton instance representing the absence of a value
+- *Class* Sentinel: Singleton instances used as a "hidden" sentinel value
+- *class* Nada: Singleton instance representing & propagating failure
 
 ##### `NoValue` was designed as a None replacement
 
@@ -36,10 +36,10 @@ colliding with using either to represent "nothingness."
 
 ##### `Sentinel` values used as hidden implementation details
 
-* Here is another implementation for Sentinel:``
-  * on GitHub: taleinat/python-stdlib-sentinels
-  * on PyPI: https://pypi.org/project/sentinels/
-  * see: [PEP 661](https://peps.python.org/pep-0661/)
+- Here is another implementation for Sentinel:``
+  - on GitHub: taleinat/python-stdlib-sentinels
+  - on PyPI: https://pypi.org/project/sentinels/
+  - see: [PEP 661](https://peps.python.org/pep-0661/)
 
 Initially this one was somewhat close to mine and also enabled pickling.
 Subsequently it was "enhanced" to allow sentinel values to be subclassed. My
@@ -54,6 +54,7 @@ Nada is a singleton representing & propagating failure. Failure just blissfully
 propagates down "the happy path." For almost everything you do with it, it just
 returns itself. The maintainer has not used this construct enough yet to
 determine if it is a brilliant idea or a horrible blunder.
+
 """
 
 from __future__ import annotations
@@ -67,17 +68,17 @@ from typing import Any, Final, final
 class NoValue:
     """Singleton class representing a missing value.
 
-    * similar to `None` but
-      * while `None` represents "returned no values"
-      * `NoValue()` represents the absence of a value
-    * usage
-      * `import NoValue from dtools.fp.err_handling` and then
-        * either use `NoValue()` directly
-        * or define `_noValue: Final[NoValue] = NoValue()` don't export it
-      * compare using `is` and `is not`
-        * not `==` or `!=`
-        * `None` means returned no values, so `None == None` makes sense
-        * if one or both values are missing, then what is there to compare?
+    - similar to `None` but
+      - while `None` represents "returned no values"
+      - `NoValue()` represents the absence of a value
+    - usage
+      - `import NoValue from dtools.fp.err_handling` and then
+        - either use `NoValue()` directly
+        - or define `_noValue: Final[NoValue] = NoValue()` don't export it
+      - compare using `is` and `is not`
+        - not `==` or `!=`
+        - `None` means returned no values, so `None == None` makes sense
+        - if one or both values are missing, then what is there to compare?
 
     """
 
@@ -103,20 +104,20 @@ class NoValue:
 class Sentinel:
     """Singleton classes representing a sentinel values.
 
-    * intended for library code, not to be exported/shared between modules
-      * otherwise some of its intended typing guarantees may be lost
-    * useful substitute for `None` as a hidden sentinel value
-      * allows `None` to be stored in data structures
-      * allows end users to choose to use `None` or `()` as sentinel values
-      * always equals itself (unlike `noValue`)
-    * usage
-      * import Sentinel and then either
-        * define `_my_sentinel: Final[Sentinel] = Sentinel('my_sentinel')`
-        * or use `Sentinel('my_sentinel')` directly
-      * compare using either
-        * `is` and `is not` or `==` and `!=`
-        * the `Sentinel()` value always equals itself
-        * and never equals anything else, especially other sentinel values
+    - intended for library code, not to be exported/shared between modules
+      - otherwise some of its intended typing guarantees may be lost
+    - useful substitute for `None` as a hidden sentinel value
+      - allows `None` to be stored in data structures
+      - allows end users to choose to use `None` or `()` as sentinel values
+      - always equals itself (unlike `noValue`)
+    - usage
+      - import Sentinel and then either
+        - define `_my_sentinel: Final[Sentinel] = Sentinel('my_sentinel')`
+        - or use `Sentinel('my_sentinel')` directly
+      - compare using either
+        - `is` and `is not` or `==` and `!=`
+        - the `Sentinel()` value always equals itself
+        - and never equals anything else, especially other sentinel values
 
     """
 
@@ -139,28 +140,28 @@ class Sentinel:
 class Nada:
     """Singleton class representing & propagating failure.
 
-    * singleton `_nada: nada = Nada()` represents a non-existent value
-    * returns itself for arbitrary method calls
-    * returns itself if called as a Callable with arbitrary arguments
-    * interpreted as an empty container by standard Python functions
-    * warning: non-standard equality semantics
-      * comparison compares true only when 2 non-missing values compare true
-      * thus `a == b` means two non-missing values compare as equal
-    * usage
-      * import `Nada` and then
-        * either use `Nada()` directly
-        * or define `_nada: Final[Nada] = Nada()` don't export it
-      * start propagating failure by setting a propagating value to Nada()
-        * works best when working with expression
-        * failure may fail to propagate
-          * for a function/method with just side effects
-          * engineer Nada() to fail to trigger side effects
-      * test for failure by comparing a result to `Nada()` itself using
-        * `is` and `is not`
-      * propagate failure through a calculation using
-        * `==` and `!=`
-        * the `Nada()` value never equals itself
-        * and never equals anything else
+    - singleton `_nada: nada = Nada()` represents a non-existent value
+    - returns itself for arbitrary method calls
+    - returns itself if called as a Callable with arbitrary arguments
+    - interpreted as an empty container by standard Python functions
+    - warning: non-standard equality semantics
+      - comparison compares true only when 2 non-missing values compare true
+      - thus `a == b` means two non-missing values compare as equal
+    - usage
+      - import `Nada` and then
+        - either use `Nada()` directly
+        - or define `_nada: Final[Nada] = Nada()` don't export it
+      - start propagating failure by setting a propagating value to Nada()
+        - works best when working with expression
+        - failure may fail to propagate
+          - for a function/method with just side effects
+          - engineer Nada() to fail to trigger side effects
+      - test for failure by comparing a result to `Nada()` itself using
+        - `is` and `is not`
+      - propagate failure through a calculation using
+        - `==` and `!=`
+        - the `Nada()` value never equals itself
+        - and never equals anything else
 
     """
 

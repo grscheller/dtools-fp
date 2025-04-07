@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from typing import reveal_type
 from dtools.tuples.ftuple import FTuple as FT
+from dtools.tuples.ftuple import f_tuple as ft
 from dtools.queues.restrictive import DoubleQueue as DQ, double_queue as dq
 from dtools.fp.err_handling import MB, XOR
 
@@ -44,7 +45,7 @@ class TestMB_sequence:
     def test_with_empties(self) -> None:
         list_of_mb_int = [MB[int](), MB(2), MB(3), MB(4)]
         tuple_of_mb_int = MB(1), MB[int](), MB(3), MB(4)
-        ftuple_of_mb_int = FT(MB(1), MB(2), MB[int](), MB(4))
+        ftuple_of_mb_int = ft(MB(1), MB(2), MB[int](), MB(4))
         dqueue_of_mb_int = dq(MB(1), MB(2), MB(3), MB[int]())
 
         mb_list_int = MB.sequence(list_of_mb_int)
@@ -92,7 +93,7 @@ class TestXOR_sequence:
             XOR(3, '3'),
             XOR(4, '4'),
         )
-#       ftuple_of_xor_int_str = FT(
+#       ftuple_of_xor_int_str = ft(
 #           XOR(1, '1'), XOR(2, '2'), XOR(MB(), '3'), XOR(4, '4')
 #       )
         dqueue_of_xor_int_str = dq(

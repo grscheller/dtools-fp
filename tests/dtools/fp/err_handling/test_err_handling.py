@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from dtools.tuples.ftuple import FTuple as FT
+from dtools.tuples.ftuple import f_tuple as ft
 from dtools.fp.err_handling import MB, XOR
 
 def add2(x: int) -> int:
@@ -127,7 +127,7 @@ class TestXOR:
         thing2: XOR[int, str] = xor_42.bind(lambda _: XOR(MB(), 'none?'))
         assert thing1 == thing2
 
-        ft_xor_int_str = FT(xor41, xor42, xor43)
+        ft_xor_int_str = ft(xor41, xor42, xor43)
         ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42))
 
         assert ft_xor_bool_str[0] == XOR(True, '41')
