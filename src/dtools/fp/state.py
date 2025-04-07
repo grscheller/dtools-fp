@@ -93,12 +93,12 @@ class State[S, A]:
         return self.map2(rb, lambda a, b: (a, b))
 
     @staticmethod
-    def unit[SS, B](b: B) -> State[SS, B]:
+    def unit[ST, B](b: B) -> State[ST, B]:
         """Create a State action returning the given value."""
         return State(lambda s: (b, s))
 
     @staticmethod
-    def get[SS]() -> State[SS, SS]:
+    def get[ST]() -> State[ST, ST]:
         """Set run action to return the current state
 
         - the current state is propagated unchanged
@@ -106,10 +106,10 @@ class State[S, A]:
         - will need type annotation
 
         """
-        return State[SS, SS](lambda s: (s, s))
+        return State[ST, ST](lambda s: (s, s))
 
     @staticmethod
-    def put[SS](s: SS) -> State[SS, tuple[()]]:
+    def put[ST](s: ST) -> State[ST, tuple[()]]:
         """Manually insert a state.
 
         - the run action

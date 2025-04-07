@@ -9,6 +9,10 @@ PyPI dtools.fp project.
 
 ## Releases and Important Milestones
 
+### Version 1.6.0 - PyPI release date 2025-04-07
+
+- typing improvements
+
 ### Version 1.4.0 - PyPI release date 2025-03-16
 
 - much work dtools.iterables
