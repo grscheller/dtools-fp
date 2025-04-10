@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.err_handling - monadic error handling
+"""### Module dtools.fp.err_handling - monadic error handling
 
 Functional data types to use in lieu of exceptions.
 
-#### Error handling types:
-
-- *class* MB: Maybe (Optional) monad
-- *class* XOR: Left biased Either monad
+- *class* MB: maybe (Optional) monad
+- *class* XOR: left biased either monad
 
 """
 
