@@ -86,9 +86,9 @@ class TestMB:
     def test_equal_self(self) -> None:
         mb42 = MB(40+2)
         mbno: MB[int] = MB()
-        mb42 != mbno
-        mb42 == mb42
-        mbno == mbno
+        assert mb42 != mbno
+        assert mb42 == mb42
+        assert mbno == mbno
 
 def gt42(x: int) -> MB[bool]:
     if x > 42:
@@ -122,8 +122,10 @@ class TestXOR:
         assert xor42 != xor_fortytwo
         assert xor42 == xor42tuple
 
-        xor_42 = xor42.mapRight(lambda _: 'none', 'mapRight failed')
-        thing1: XOR[int, str] = xor_42.mapRight((lambda s: s + '?'), 'Not sure if I need this.').makeRight()
+        xor_42 = xor42.map_right(lambda _: 'none', 'map_right failed')
+        thing1: XOR[int, str] = xor_42.map_right(
+                    (lambda s: s + '?'), 'Not sure if I need this.'
+                ).make_right()
         thing2: XOR[int, str] = xor_42.bind(lambda _: XOR(MB(), 'none?'))
         assert thing1 == thing2
 
@@ -134,7 +136,7 @@ class TestXOR:
         assert ft_xor_bool_str[1] == XOR(False, 'does not matter what we put here')
         assert ft_xor_bool_str[2] == XOR(MB(), '43')
 
-        ft_xor_bool_str_right = ft_xor_bool_str.map(lambda x: x.makeRight())
+        ft_xor_bool_str_right = ft_xor_bool_str.map(lambda x: x.make_right())
 
         assert ft_xor_bool_str_right[0] == XOR(MB(), '41')
         assert ft_xor_bool_str_right[1] == XOR(MB(), '42')
@@ -148,14 +150,18 @@ class TestXOR:
 
         assert xor_99.map(gt42) == xor_86.map(gt42)
         assert xor_21.map(gt42) != xor_12.map(gt42)
-        assert xor_21.map(gt42).newRight('lt 42') == xor_12.map(gt42).newRight('lt 42')
+        assert xor_21.map(gt42).new_right('lt 42') == xor_12.map(gt42).new_right('lt 42')
 
-        hymie = xor_86.map(gt42).mapRight((lambda s: f'Hymie says: {s}'), 'got some oil?')
-        chief = xor_86.map(gt42).mapRight((lambda s: f'Chief says: {s}'), 'not the dome of silence!')
-        ratton = xor_21.map(gt42).mapRight((lambda s: f'Dr. Ratton says: {s}'), 'where is hymie?')
-        seigfried_lambda = lambda s: f'Seigfried says: {s}'
+        hymie = xor_86.map(gt42).map_right(
+            (lambda s: f'Hymie says: {s}'), 'got some oil?'
+        )
+        chief = xor_86.map(gt42).map_right((lambda s: f'Chief says: {s}'), 'not the dome of silence!')
+        ratton = xor_21.map(gt42).map_right((lambda s: f'Dr. Ratton says: {s}'), 'where is hymie?')
         seigfried_secret_headquarters = 'somewhere in NJ'
-        seigfried = xor_21.map(gt42).mapRight(seigfried_lambda, seigfried_secret_headquarters)
+        seigfried = xor_21.map(gt42).map_right(
+            lambda s: f'Seigfried says: {s}',
+        seigfried_secret_headquarters
+        )
 
         assert hymie == chief
         assert ratton != seigfried
@@ -165,7 +171,7 @@ class TestXOR:
         assert repr(ratton) == "XOR(MB(), 'Dr. Ratton says: orig 21')"
         assert repr(seigfried) == "XOR(MB(), 'Seigfried says: orig 21')"
 
-        assert xor_12.map(gt42).newRight('not greater than 42') == XOR(MB(), 'not greater than 42')
+        assert xor_12.map(gt42).new_right('not greater than 42') == XOR(MB(), 'not greater than 42')
 
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42, '')
@@ -233,28 +239,28 @@ class TestXOR:
                 return MB()
 
         s1 = XOR(3, 'foofoo rules')
-        s2 = s1.map(noMoreThan5).mapRight((lambda _: 'more than 5'), 'failed')
+        s2 = s1.map(noMoreThan5).map_right((lambda _: 'more than 5'), 'failed')
         s3 = XOR(42, 'foofoo rules')
-        s4 = s3.map(noMoreThan5).mapRight((lambda s: s + ' more than 5'), 'failed')
-        assert s1.getLeft() == MB(3)
-        assert s2.getLeft().get(42) == 3
-        assert s4.getLeft(MB(42)) == MB(42)
-        assert s4.getLeft(42) == MB(42)
+        s4 = s3.map(noMoreThan5).map_right((lambda s: s + ' more than 5'), 'failed')
+        assert s1.get_left() == MB(3)
+        assert s2.get_left().get(42) == 3
+        assert s4.get_left(MB(42)) == MB(42)
+        assert s4.get_left(42) == MB(42)
         try:
-            assert s4.getLeft(42).get().get() == 42
+            assert s4.get_left(42).get().get() == 42
         except AttributeError:
             assert True
         else:
             assert False
         bar = 'barbell'
-        bar = s1.getRight()
+        bar = s1.get_right()
         assert bar == 'foofoo rules'
-        assert s2.getRight() == 'more than 5'
-        assert s3.getRight() == 'foofoo rules'
-        assert s4.getRight() == 'foofoo rules more than 5'
-        assert s1.getLeft(0) == MB(3)
-        assert s3.getLeft(0) == MB(42)
-        assert s4.getLeft(0) == MB(0)
+        assert s2.get_right() == 'more than 5'
+        assert s3.get_right() == 'foofoo rules'
+        assert s4.get_right() == 'foofoo rules more than 5'
+        assert s1.get_left(0) == MB(3)
+        assert s3.get_left(0) == MB(42)
+        assert s4.get_left(0) == MB(0)
 
     def test_either_bind(self) -> None:
         def lessThan2(x: int) -> XOR[int, str]:
@@ -307,10 +313,10 @@ class TestXOR:
         assert lt5 == XOR(4, 'boo')
         assert lt5 != XOR(42, 'boohoo')
 
-        lt2 = left7.bind(lessThan2).mapRight(lambda _: 'greater than or equal 2',
-                                                altRight='failed')
-        lt5 = left7.bind(lessThan5).mapRight(lambda s: s + ', greater than or equal 5',
-                                                altRight='failed')
+        lt2 = left7.bind(lessThan2).map_right(lambda _: 'greater than or equal 2',
+                                                alt_right='failed')
+        lt5 = left7.bind(lessThan5).map_right(lambda s: s + ', greater than or equal 5',
+                                                alt_right='failed')
         assert lt2 == XOR(MB(), 'greater than or equal 2')
         assert lt5 == XOR(MB(), '>=5, greater than or equal 5')
 
@@ -323,7 +329,6 @@ class TestXOR:
         assert left42 == XOR(42, 'fail!')
         assert right == XOR(MB(), 'Nobody home')
 
-        ph42 = MB(XOR(left42, 'also a failure'))
         phNot1: MB[XOR[int, str]] = MB(XOR(MB(), ''))
         phNot2 = MB(XOR[int, str](MB(), ''))
         assert phNot1 == phNot2
@@ -333,7 +338,7 @@ class TestXOR:
         dog2 = XOR('Flash', 2)
         dog3 = XOR[str, int](MB(), 3)
 
-        rt_dog1 = dog1.makeRight()
-        rt_dog2 = dog2.newRight(42).makeRight()
-        rt_dog3 = dog3.mapRight(lambda x: x+1, altRight=-1).makeRight()
+        rt_dog1 = dog1.make_right()
+        rt_dog2 = dog2.new_right(42).make_right()
+        rt_dog3 = dog3.map_right(lambda x: x+1, alt_right=-1).make_right()
 

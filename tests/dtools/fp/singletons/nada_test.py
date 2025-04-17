@@ -86,7 +86,6 @@ class Test_Nada:
     def test_iterate(self) -> None:
         no1 = Nada()
         no2 = Nada()
-        no3 = nada
         l1 = [42]
         v: int
         for v in no1:
@@ -103,7 +102,6 @@ class Test_Nada:
         got1 = no1.nada_get()
         got2 = no1.nada_get('forty-two')
         assert got1 is Nada()
-        assert got2 is 'forty-two'
         assert got2 == 'forty-two'
         assert no2.nada_get(13) == (10 + 3)
         assert no2.nada_get(10//7) == 10//7

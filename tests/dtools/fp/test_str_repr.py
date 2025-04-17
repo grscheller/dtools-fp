@@ -21,9 +21,9 @@ from dtools.fp.err_handling import MB, XOR
 _noValue: Final[NoValue] = NoValue()
 
 def addLt42(x: int, y: int) -> MB[int]:
-    sum = x + y
-    if sum < 42:
-        return MB(sum)
+    sum_xy = x + y
+    if sum_xy < 42:
+        return MB(sum_xy)
     else:
         return MB()
 
@@ -38,7 +38,6 @@ class Test_str:
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
-        s1 = MB(1)
         assert str(nt1) == str(mb2) =='MB()'
 
     def test_XOR_str(self) -> None:

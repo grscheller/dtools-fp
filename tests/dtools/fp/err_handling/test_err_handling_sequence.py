@@ -100,10 +100,10 @@ class TestXOR_sequence:
             XOR(1, '1'), XOR(2, '2'), XOR(3, '3'), XOR(MB(), '4')
         )
 
-        xor_list_int = XOR.sequence(list_of_xor_int_str, 'OK')
-        xor_tuple_int = XOR.sequence(tuple_of_xor_int_str, 'OK')
-#       xor_ftuple_int = XOR.sequence(ftuple_of_xor_int_str, 'OK')
-        xor_dqueue_int = XOR.sequence(dqueue_of_xor_int_str, 'OK')
+        xor_list_int = XOR.sequence(list_of_xor_int_str, 'OK').map(list)
+        xor_tuple_int = XOR.sequence(tuple_of_xor_int_str, 'OK').map(tuple)
+#       xor_ftuple_int = XOR.sequence(ftuple_of_xor_int_str, 'OK').map(FT)
+        xor_dqueue_int = XOR.sequence(dqueue_of_xor_int_str, 'OK').map(DQ)
 
         assert xor_list_int == XOR(MB(), '1')
         assert xor_tuple_int == XOR(MB(), '2')

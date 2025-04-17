@@ -46,16 +46,15 @@ class Test_fp_folds:
 
         data1 = (1, 2, 3, 4, 5)
         data2 = (2, 3, 4, 5)
-        data3: list[int] = []
-        data4 = 42,
+        data5: list[int] = []
 
         assert reducel(data1, add) == 15
         assert foldl(data1, add, 10) == 25
         assert reducel(data2, add) == 14
-        assert foldl(data3, add, 0) == 0
-        assert foldl(data3, add, -42) == -42
         assert reducel(data4, add) == 42
         assert reducel(data4, add) == 42
+        assert foldl(data5, add, 0) == 0
+        assert foldl(data5, add, -42) == -42
 
     def test_fold_noncomuinitive(self) -> None:
         def funcL(acc: int, jj: int) -> int:

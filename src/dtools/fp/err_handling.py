@@ -289,13 +289,13 @@ class XOR[L, R]:
         return False
 
     @overload
-    def getLeft(self) -> MB[L]: ...
+    def get_left(self) -> MB[L]: ...
     @overload
-    def getLeft(self, altLeft: L) -> MB[L]: ...
+    def get_left(self, alt_left: L) -> MB[L]: ...
     @overload
-    def getLeft(self, altLeft: MB[L]) -> MB[L]: ...
+    def get_left(self, alt_left: MB[L]) -> MB[L]: ...
 
-    def getLeft(self, altLeft: L | MB[L] = MB()) -> MB[L]:
+    def get_left(self, alt_left: L | MB[L] = MB()) -> MB[L]:
         """Get value if a left.
 
         - if the `XOR` is a left, return its value
@@ -306,7 +306,7 @@ class XOR[L, R]:
 
         """
         _sentinel = Sentinel('MB')
-        match altLeft:
+        match alt_left:
             case MB(ls) if ls is not _sentinel:
                 if self:
                     return MB(self._left)
@@ -320,7 +320,7 @@ class XOR[L, R]:
                     return MB(self._left)
                 return MB(ls)
 
-    def getRight(self) -> R:
+    def get_right(self) -> R:
         """Get value of `XOR` if a right, potential right value if a left.
 
         - if `XOR` is a right, return its value
@@ -329,7 +329,7 @@ class XOR[L, R]:
         """
         return self._right
 
-    def makeRight(self) -> XOR[L, R]:
+    def make_right(self) -> XOR[L, R]:
         """Make a right based on the `XOR`.
 
         - return a right based on potential right value
@@ -340,7 +340,7 @@ class XOR[L, R]:
             return self
         return cast(XOR[L, R], XOR(MB(), self._right))
 
-    def newRight(self, right: R) -> XOR[L, R]:
+    def new_right(self, right: R) -> XOR[L, R]:
         """Swap in a right value.
 
         - returns a new instance with a new right (or potential right) value
@@ -360,7 +360,7 @@ class XOR[L, R]:
             - swallows any exceptions `f` may throw
         - if `XOR` is a right
           - return new `XOR(right=self._right): XOR[S, R]`
-          - use method `mapRight` to adjust the returned value
+          - use method `map_right` to adjust the returned value
 
         """
         if self._left == MB():
@@ -372,13 +372,13 @@ class XOR[L, R]:
 
         return XOR(applied, self._right)
 
-    def mapRight(self, g: Callable[[R], R], altRight: R) -> XOR[L, R]:
+    def map_right(self, g: Callable[[R], R], alt_right: R) -> XOR[L, R]:
         """Map over a right or potential right value."""
         try:
             applied = g(self._right)
             right = applied
         except Exception:
-            right = altRight
+            right = alt_right
 
         if self:
             left: L | MB[L] = cast(L, self._left)
@@ -451,8 +451,8 @@ class XOR[L, R]:
 
         for xor_lr in itab_xor_lr:
             if xor_lr:
-                ts.append(xor_lr.getLeft().get())
+                ts.append(xor_lr.get_left().get())
             else:
-                return XOR(MB(), xor_lr.getRight())
+                return XOR(MB(), xor_lr.get_right())
 
         return XOR(iter(ts), potential_right)

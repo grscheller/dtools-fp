@@ -150,6 +150,7 @@ class Test_fp_iterables:
         fooMult = list(accumulate(foo, lambda a,b: a*b))
         assert fooPlus == [5, 9, 12, 14, 15]
         assert fooMult == [5, 20, 60, 120, 120]
+        assert fooPlusOne == [10, 16, 21, 25, 28, 30]
 
         bar: list[int] = []
         barPlus = list(accumulate(bar, add))

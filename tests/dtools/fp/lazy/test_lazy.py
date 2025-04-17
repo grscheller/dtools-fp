@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Any, Iterator
-from dtools.fp.err_handling import MB, XOR
+from dtools.fp.err_handling import MB
 from dtools.fp.lazy import Lazy, lazy, real_lazy
 
 def add2_if_pos(x: int) -> int:
@@ -43,8 +43,7 @@ def hello() -> str:
     while len(hello) > 1:
         if hello == 'hello':
             return hello
-        else:
-            hello = hello[:-1]
+        hello = hello[:-1]
     raise ValueError('hello')
 
 def no_hello() -> str:
@@ -74,7 +73,7 @@ class Test_Lazy_0_1:
 
 #---------------------------------------------------------------
 
-class counter():
+class Counter():
     def __init__(self, n: int=0) -> None:
         self._cnt = n
 
@@ -87,9 +86,9 @@ class counter():
     def set(self, n: int) -> None:
         self._cnt = n
 
-class Test_lazy_0_0:
+class TestLazy00:
     def test_pure(self) -> None:
-        cnt1 = counter(0)
+        cnt1 = Counter(0)
 
         lz_p = real_lazy(cnt1.inc)
         lz_n = lazy(cnt1.inc)
@@ -142,9 +141,9 @@ class Test_lazy_0_0:
         assert lz_p.eval()
         assert cnt1.get() == 5
 
-class Test_lazy_1_0:
+class TestLazy10:
     def test_pure(self) -> None:
-        cnt2 = counter(0)
+        cnt2 = Counter(0)
 
         lz_p = real_lazy(cnt2.set, 2)
         lz_n = lazy(cnt2.set, 5)
@@ -176,7 +175,7 @@ class Test_lazy_1_0:
 
 #---------------------------------------------------------------
 
-class Test_lazy:
+class TestLazy:
     def test_lazy_0(self) -> None:
         def foo42() -> int:
             return 42

@@ -72,9 +72,9 @@ class Test_function:
         trg2 = [*it(1,2,3)]
         assert ref2 == trg2
 
-        caI = CA((1, 2))
-        caA = ca(1, 2)
-        assert caI == caA
+        ca_iter = CA((1, 2))
+        ca_args = ca(1, 2)
+        assert ca_iter == ca_args
 
         ca0_ref: CA[int] = ca()
         ca0_trg: CA[int] = CA[int](it())

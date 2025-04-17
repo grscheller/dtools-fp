@@ -102,14 +102,14 @@ class Lazy[D, R]:
             self.eval()
 
         if self._result:
-            return MB(self._result.getLeft())
+            return MB(self._result.get_left())
         return MB()
 
     def exception(self) -> MB[Exception]:
         """Get exception if exceptional, evaluate if necessary"""
         if not self.is_evaluated():
             self.eval()
-        return self._result.getRight()
+        return self._result.get_right()
 
 
 def lazy[**P, R](
