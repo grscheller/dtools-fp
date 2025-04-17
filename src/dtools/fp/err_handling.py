@@ -302,7 +302,7 @@ class XOR[L, R]:
         - if a right, return an alternate value of type ~L` if it is provided
           - alternate value provided directly
           - or optionally provided with a MB
-        - returns a `MB[L]` for when an altLeft value is needed but not provided
+        - returns a `MB[L]` for when an alt_left value is needed but not provided
 
         """
         _sentinel = Sentinel('MB')

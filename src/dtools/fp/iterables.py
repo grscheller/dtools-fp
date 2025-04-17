@@ -51,8 +51,8 @@ __all__ = [
     'foldl',
     'mb_fold_left',
     'reducel',
-    'scReducel',
-    'scReducer',
+    'sc_reducel',
+    'sc_reducer',
 ]
 
 D = TypeVar('D')  # Needed only for pdoc documentation generation.
@@ -357,7 +357,7 @@ def mb_fold_left[L, D](
     return MB(acc)
 
 
-def scReducel[D](
+def sc_reducel[D](
     iterable: Iterable[D],
     f: Callable[[D, D], D],
     /,
@@ -402,7 +402,7 @@ def scReducel[D](
     return (mb_reduced, it_rest)
 
 
-def scReducer[D](
+def sc_reducer[D](
     iterable: Iterable[D],
     f: Callable[[D, D], D],
     /,

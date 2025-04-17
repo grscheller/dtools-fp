@@ -109,7 +109,7 @@ class Sentinel:
     - useful substitute for `None` as a hidden sentinel value
       - allows `None` to be stored in data structures
       - allows end users to choose to use `None` or `()` as sentinel values
-      - always equals itself (unlike `noValue`)
+      - always equals itself (unlike `NoValue`)
     - usage
       - import Sentinel and then either
         - define `_my_sentinel: Final[Sentinel] = Sentinel('my_sentinel')`
