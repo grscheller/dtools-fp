@@ -80,9 +80,9 @@ class Lazy[D, R]:
     def eval(self) -> bool:
         """Evaluate function with its argument.
 
-        * evaluate function
-        * cache results or exceptions if `pure == True`
-        * reevaluate if `pure == False`
+        - evaluate function
+        - cache results or exceptions if `pure == True`
+        - reevaluate if `pure == False`
 
         """
         if not self._pure or not self.is_evaluated():
@@ -120,11 +120,11 @@ def lazy[**P, R](
     Function returning a delayed evaluation of a function of an arbitrary number
     of positional arguments.
 
-    * first positional argument `f` takes a function
-    * next positional arguments are the arguments to be applied later to `f`
-      * `f` is reevaluated whenever `eval` method of the returned `Lazy` is called
-    * any kwargs passed are ignored
-      * if `f` needs them, then wrap `f` in another function
+    - first positional argument `f` takes a function
+    - next positional arguments are the arguments to be applied later to `f`
+      - `f` is reevaluated whenever `eval` method of the returned `Lazy` is called
+    - any kwargs passed are ignored
+      - if `f` needs them, then wrap `f` in another function
 
     """
     return Lazy(sequenced(f), args, pure=False)
@@ -138,12 +138,12 @@ def real_lazy[**P, R](
     Function returning a delayed evaluation of a function of an arbitrary number
     of positional arguments.
 
-    * first positional argument `f` takes a function
-    * next positional arguments are the arguments to be applied later to `f`
-      * `f` is evaluated when `eval` method of the returned `Lazy` is called
-      * `f` is evaluated only once with results cached
-    * any kwargs passed are ignored
-      * if `f` needs them then wrap `f` in another function
+    - first positional argument `f` takes a function
+    - next positional arguments are the arguments to be applied later to `f`
+      - `f` is evaluated when `eval` method of the returned `Lazy` is called
+      - `f` is evaluated only once with results cached
+    - any kwargs passed are ignored
+      - if `f` needs them then wrap `f` in another function
 
     """
     return Lazy(sequenced(f), args)

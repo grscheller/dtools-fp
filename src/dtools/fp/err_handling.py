@@ -192,11 +192,11 @@ class MB[D]:
         return ret
 
     @staticmethod
-    def sequence[T](itab_mb_d: Iterable[MB[T]]) -> MB[Iterable[T]]:
+    def sequence[T](itab_mb_d: Iterable[MB[T]]) -> MB[Iterator[T]]:
         """Sequence an indexable of type `MB[~T]`
 
         * if the iterated `MB` values are not all empty,
-          * return a `MB` of an iterable of the contained values
+          * return a `MB` of an iterator of the contained values
           * otherwise return an empty `MB`
 
         """
@@ -208,9 +208,7 @@ class MB[D]:
             else:
                 return MB()
 
-        ts = cast(Iterable[T], type(itab_mb_d)(ls))
-
-        return MB(ts)
+        return MB(iter(ls))
 
 
 class XOR[L, R]:
@@ -281,18 +279,12 @@ class XOR[L, R]:
             return False
 
         if self and other:
-            if self._left is other._left:
+            if (self._left is other._left) or (self._left == other._left):
                 return True
-            if self._left == other._left:
-                return True
-            return False
 
         if not self and not other:
-            if self._right is other._right:
+            if (self._right is other._right) or (self._right == other._right):
                 return True
-            if self._right == other._right:
-                return True
-            return False
 
         return False
 
@@ -377,8 +369,8 @@ class XOR[L, R]:
             applied = f(cast(L, self._left))
         except Exception:
             return cast(XOR[U, R], XOR(MB(), self._right))
-        else:
-            return XOR(applied, self._right)
+
+        return XOR(applied, self._right)
 
     def mapRight(self, g: Callable[[R], R], altRight: R) -> XOR[L, R]:
         """Map over a right or potential right value."""
@@ -404,8 +396,8 @@ class XOR[L, R]:
         """
         if self._left == MB():
             return cast(XOR[U, R], self)
-        else:
-            return f(cast(L, self._left))
+
+        return f(cast(L, self._left))
 
     @staticmethod
     def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, MB[Exception]]:
@@ -446,7 +438,7 @@ class XOR[L, R]:
     @staticmethod
     def sequence(
         itab_xor_lr: Iterable[XOR[L, R]], potential_right: R
-    ) -> XOR[Iterable[L], R]:
+    ) -> XOR[Iterator[L], R]:
         """Sequence an indexable of type `XOR[~L, ~R]`
 
         - if the iterated `XOR` values are all lefts, then
@@ -463,7 +455,4 @@ class XOR[L, R]:
             else:
                 return XOR(MB(), xor_lr.getRight())
 
-        #ds = cast(Iterable[L], type(itab_xor_lr)(ls))
-        ls = cast(Iterable[L], type(itab_xor_lr)(ts))
-
-        return XOR(ls, potential_right)
+        return XOR(iter(ts), potential_right)

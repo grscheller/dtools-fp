@@ -51,10 +51,10 @@ def sequenced[R](f: Callable[..., R]) -> Callable[..., R]:
     a sequence of the original arguments.
     """
 
-    def F(arguments: Sequence[Any]) -> R:
+    def ff(arguments: Sequence[Any]) -> R:
         return f(*arguments)
 
-    return F
+    return ff
 
 
 def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
@@ -85,7 +85,7 @@ def it[A](*args: A) -> Iterator[A]:
 def negate[**P](f: Callable[P, bool]) -> Callable[P, bool]:
     """Take a predicate and return its negation."""
 
-    def F(*args: Any) -> bool:
+    def ff(*args: Any) -> bool:
         return not sequenced(f)(args)
 
-    return cast(Callable[P, bool], F)
+    return cast(Callable[P, bool], ff)

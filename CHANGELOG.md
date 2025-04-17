@@ -9,6 +9,16 @@ PyPI dtools.fp project.
 
 ## Releases and Important Milestones
 
+### Version 1.6.1.0 - Breaking API change 2025-04-17
+
+- MB.sequence and XOR.sequence now return a wrapped iterator
+  - to get a MB or XOR of the container
+    - MB.sequence(list_of_mb).map(list)
+    - XOR.sequence(ca_of_mb).map(CA)
+  - eliminates runtime polymorphism
+  - TODO: don't force a full evaluation
+- Also noticed MB and XOR still have camelCase APIs
+
 ### Version 1.6.0 - PyPI release date 2025-04-07
 
 - typing improvements

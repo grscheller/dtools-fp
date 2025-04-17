@@ -32,10 +32,10 @@ class TestMB_sequence:
 #       reveal_type(ftuple_mb_int)
         reveal_type(dqueue_mb_int)
 
-        mb_list_int = MB.sequence(list_mb_int)
-        mb_tuple_int = MB.sequence(tuple_mb_int)
+        mb_list_int = MB.sequence(list_mb_int).map(list)
+        mb_tuple_int = MB.sequence(tuple_mb_int).map(tuple)
 #       mb_ftuple_int = MB.sequence(ftuple_mb_int)
-        mb_dqueue_int = MB.sequence(dqueue_mb_int)
+        mb_dqueue_int = MB.sequence(dqueue_mb_int).map(DQ)
 
         assert mb_list_int == MB(list(range(1, 2501)))
         assert mb_tuple_int == MB(tuple(range(1, 2501)))
@@ -66,14 +66,14 @@ class TestXOR_sequence:
 #       ftuple_of_xor_int_str = FT(*map(lambda x: XOR(x, str(x)), range(1, 2501)))
         dqueue_of_xor_int_str = DQ(map(lambda x: XOR(x, str(x)), range(1, 2501)))
 
-        xor_listInt_str = XOR.sequence(list_of_xor_int_str, 'OK')
-        xor_tupleInt_str = XOR.sequence(tuple_of_xor_int_str, 'OK')
+        xor_listInt_str = XOR.sequence(list_of_xor_int_str, 'OK').map(list)
+        xor_tupleInt_str = XOR.sequence(tuple_of_xor_int_str, 'OK').map(tuple)
 #       xor_ftuple_int_str: XOR[FT[int], str] = XOR.sequence(
 #           ftuple_of_xor_int_str, 'OK'
 #       )
         xor_dqueue_int_str: XOR[DQ[int], str] = XOR.sequence(
             dqueue_of_xor_int_str, 'OK'
-        )
+        ).map(DQ)
 
         assert xor_listInt_str == XOR(list(range(1, 2501)), 'does not matter')
         assert xor_tupleInt_str == XOR(tuple(range(1, 2501)), 'for this test')
