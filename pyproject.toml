@@ -37,6 +37,7 @@ dependencies = [
 test = [
     "pytest >=8.3.5",
     "dtools.queues >=0.27.0, < 0.28",
+    "dtools.tuples >=0.27.0, < 0.28",
 ]
 
 [project.urls]
