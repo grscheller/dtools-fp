@@ -60,6 +60,16 @@ class MB[D]:
     __match_args__ = ('_value',)
 
     @overload
+    def __new__(cls) -> MB[D]: ...
+    @overload
+    def __new__(cls, value: MB[D]) -> MB[D]: ...
+    @overload
+    def __new__(cls, value: D) -> MB[D]: ...
+
+    def __new__(cls, value: D | MB[D] | Sentinel = Sentinel('MB')) -> MB[D]:
+        return super(MB, cls).__new__(cls)
+
+    @overload
     def __init__(self) -> None: ...
     @overload
     def __init__(self, value: MB[D]) -> None: ...
@@ -68,7 +78,6 @@ class MB[D]:
 
     def __init__(self, value: D | MB[D] | Sentinel = Sentinel('MB')) -> None:
         self._value: D | Sentinel
-        _sentinel: Final[Sentinel] = Sentinel('MB')
         match value:
             case MB(d):
                 self._value = d
@@ -238,20 +247,20 @@ class XOR[L, R]:
     __match_args__ = ('_left', '_right')
 
     @overload
-    def __init__(self, left: L, right: R, /) -> None: ...
-    @overload
     def __init__(self, left: MB[L], right: R, /) -> None: ...
+    @overload
+    def __init__(self, left: L, right: R, /) -> None: ...
 
     def __init__(self, left: L | MB[L], right: R, /) -> None:
         self._left: L | MB[L]
         self._right: R
         match left:
-            case MB(ls) if ls is not Sentinel('MB'):
-                self._left, self._right = cast(L, ls), right
+            case MB(l) if l is not Sentinel('MB'):
+                self._left, self._right = cast(L, l), right
             case MB(_):
                 self._left, self._right = MB(), right
-            case ls:
-                self._left, self._right = ls, right
+            case l:
+                self._left, self._right = l, right
 
     def __bool__(self) -> bool:
         return MB() != self._left

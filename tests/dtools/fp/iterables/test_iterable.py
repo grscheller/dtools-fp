@@ -18,6 +18,7 @@ from dtools.fp.iterables import drop, drop_while
 from dtools.fp.iterables import take, take_while
 from dtools.fp.iterables import take_split, take_while_split
 
+
 class Test_fp_iterables:
     def test_taking_dropping(self) -> None:
         foo = tuple(range(10))
@@ -25,13 +26,13 @@ class Test_fp_iterables:
         assert list(take(foo, 5)) == [0, 1, 2, 3, 4]
         assert list(drop(foo, 5)) == [5, 6, 7, 8, 9]
         assert list(take_while(foo, lambda x: x <= 4)) == [0, 1, 2, 3, 4]
-        assert list(drop_while(foo, lambda x: x <= 4 )) == [5, 6, 7, 8, 9]
+        assert list(drop_while(foo, lambda x: x <= 4)) == [5, 6, 7, 8, 9]
 
         empty: list[int] = []
         assert list(take(empty, 5)) == []
         assert list(drop(empty, 5)) == []
         assert list(take_while(empty, lambda x: x <= 4)) == []
-        assert list(drop_while(empty, lambda x: x <= 4 )) == []
+        assert list(drop_while(empty, lambda x: x <= 4)) == []
 
     def test_iterable_composition(self) -> None:
         ones = (1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -60,20 +61,32 @@ class Test_fp_iterables:
         assert mixed_tup_concat[23:29] == ('x', 'y', 'z', 0, 1, 2)
 
         assert mixed_tup_merge[0:6] == ('a', 0, 'b', 1, 'c', 2)
-        assert mixed_tup_merge[-6:] == ('x' ,23 ,'y', 24, 'z', 25)
+        assert mixed_tup_merge[-6:] == ('x', 23, 'y', 24, 'z', 25)
 
         assert mixed_tup_exhaust[0:8] == ('a', 0, 'b', 1, 'c', 2, 'd', 3)
-        assert mixed_tup_exhaust[46:54] == ('x', 23, 'y' ,24 ,'z', 25, 26, 27)
+        assert mixed_tup_exhaust[46:54] == ('x', 23, 'y', 24, 'z', 25, 26, 27)
 
     def test_yield_partials(self) -> None:
-        i0, i1, i2 = iter(['a0', 'b0', 'c0', 'd0', 'e0']), iter(['a1', 'b1', 'c1']), iter(['a2', 'b2', 'c2', 'd2', 'e2'])
-        assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2') == tuple(merge(i0, i1, i2))
-        assert i0.__next__() == 'e0'        # 'd0' is lost!
+        i0, i1, i2 = (
+            iter(['a0', 'b0', 'c0', 'd0', 'e0']),
+            iter(['a1', 'b1', 'c1']),
+            iter(['a2', 'b2', 'c2', 'd2', 'e2']),
+        )
+        assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2') == tuple(
+            merge(i0, i1, i2)
+        )
+        assert i0.__next__() == 'e0'  # 'd0' is lost!
         assert i2.__next__() == 'd2'
         assert i2.__next__() == 'e2'
 
-        i0, i1, i2 = iter(['a0', 'b0', 'c0', 'd0', 'e0']), iter(['a1', 'b1', 'c1']), iter(['a2', 'b2', 'c2', 'd2', 'e2'])
-        assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2', 'd0') == tuple(merge(i0, i1, i2, yield_partials=True))
+        i0, i1, i2 = (
+            iter(['a0', 'b0', 'c0', 'd0', 'e0']),
+            iter(['a1', 'b1', 'c1']),
+            iter(['a2', 'b2', 'c2', 'd2', 'e2']),
+        )
+        assert ('a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2', 'd0') == tuple(
+            merge(i0, i1, i2, yield_partials=True)
+        )
         assert i0.__next__() == 'e0'
         assert i2.__next__() == 'd2'
         assert i2.__next__() == 'e2'
@@ -133,21 +146,21 @@ class Test_fp_iterables:
         assert tup1 == ('a3', 'b3', 'c3', 'h', 'e', 'l', 'l', 'o', 1, 2, 3, 4)
 
         i3, ih, i4 = iter(('a3', 'b3', 'c3')), iter('hello'), iter([1, 2, 3, 4])
-        tup2: tuple[int|str, ...] = tuple(concat(i3, ih, i4))
+        tup2: tuple[int | str, ...] = tuple(concat(i3, ih, i4))
         assert len(tup2) == 12
         assert tup2 == ('a3', 'b3', 'c3', 'h', 'e', 'l', 'l', 'o', 1, 2, 3, 4)
 
     def test_accumulate(self) -> None:
         def add(x: int, y: int) -> int:
-            return x+y
+            return x + y
 
         def addPlusOne(x: int, y: int) -> int:
-            return x+y+1
+            return x + y + 1
 
-        foo: list[int] = [5,4,3,2,1]
+        foo: list[int] = [5, 4, 3, 2, 1]
         fooPlusOne = list(accumulate(foo, addPlusOne, 10))
         fooPlus = list(accumulate(foo, add))
-        fooMult = list(accumulate(foo, lambda a,b: a*b))
+        fooMult = list(accumulate(foo, lambda a, b: a * b))
         assert fooPlus == [5, 9, 12, 14, 15]
         assert fooMult == [5, 20, 60, 120, 120]
         assert fooPlusOne == [10, 16, 21, 25, 28, 30]
@@ -156,31 +169,31 @@ class Test_fp_iterables:
         barPlus = list(accumulate(bar, add))
         assert barPlus == []
         barPlus = list(accumulate(bar, add, 0))
-        barMult = list(accumulate(bar, lambda a,b: a*b, 1))
+        barMult = list(accumulate(bar, lambda a, b: a * b, 1))
         assert barPlus == [0]
         assert barMult == [1]
 
-        woo: list[int] = [5,4,3,2,1]
+        woo: list[int] = [5, 4, 3, 2, 1]
         wooPlus1 = list(accumulate(woo, add, 1))
-        wooMult1 = list(accumulate(woo, lambda a,b: a*b, 10))
+        wooMult1 = list(accumulate(woo, lambda a, b: a * b, 10))
         assert wooPlus1 == [1, 6, 10, 13, 15, 16]
         assert wooMult1 == [10, 50, 200, 600, 1200, 1200]
         nowooPlus1 = list(accumulate([], add, 1))
-        nowooMult1 = list(accumulate([], lambda a,b: a*b, 10))
+        nowooMult1 = list(accumulate([], lambda a, b: a * b, 10))
         assert nowooPlus1 == [1]
         assert nowooMult1 == [10]
 
         baz: list[int] = []
         bazPlus = list(accumulate(baz, addPlusOne, 1))
-        bazMult = list(accumulate(baz, lambda a,b: a*b, 10))
+        bazMult = list(accumulate(baz, lambda a, b: a * b, 10))
         assert bazPlus == [1]
         assert bazMult == [10]
         bazPlus = list(accumulate(baz, addPlusOne))
         assert bazPlus == []
 
-        bat = (5,4,3,2,1)
+        bat = (5, 4, 3, 2, 1)
         empty: tuple[int, ...] = ()
-        batPlus = list(accumulate(bat, lambda t,i: (i,) + t, empty))
+        batPlus = list(accumulate(bat, lambda t, i: (i,) + t, empty))
         assert batPlus == [(), (5,), (4, 5), (3, 4, 5), (2, 3, 4, 5), (1, 2, 3, 4, 5)]
 
     def test_take_split(self) -> None:
@@ -193,7 +206,7 @@ class Test_fp_iterables:
         assert tuple(it2) == tuple(range(200, 300))
         assert tuple(it2) == tuple()
 
-        it3, rest3 = take_while_split(rest2, lambda n: n<600)
+        it3, rest3 = take_while_split(rest2, lambda n: n < 600)
         assert list(it3) == list(range(300, 600))
 
         it4, _ = take_split(rest3, 100)
@@ -233,19 +246,20 @@ class Test_fp_iterables:
             assert False
 
     def test_take_while_split_broken_contract(self) -> None:
+        """We are "breaking the contract the second time through
+        because we are accessing `rest` before exhausting `it`."""
         nums = (1, 2, 3, 4, 5)
 
-        it_proper, rest_proper = take_while_split(nums, lambda n: n<3)
-        tup_proper = tuple(it_proper)
-        tup_rest_proper = tuple(rest_proper)
+        it, rest = take_while_split(nums, lambda n: n < 3)
+        tup_proper = tuple(it)
+        tup_rest_proper = tuple(rest)
         assert tup_proper == (1, 2)
         assert tup_rest_proper == (3, 4, 5)
 
-        it_improper, rest_improper = take_while_split(nums, lambda n: n<3)
-        tup_rest_improper = tuple(rest_improper)
-        tup_improper = tuple(it_improper)
+        it, rest = take_while_split(nums, lambda n: n < 3)
+        tup_rest_improper = tuple(rest)
+        tup_improper = tuple(it)
         assert tup_improper != (1, 2)
         assert tup_improper == ()
         assert tup_rest_improper != (3, 4, 5)
         assert tup_rest_improper == (1, 2, 3, 4, 5)
-
