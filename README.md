@@ -8,28 +8,26 @@ Functional programming tools which endeavor to be Pythonic.
 - Detailed documentation for dtools.fp
   - [Detailed API documentation][3] on *GH-Pages*
 
-This project is part of the [Developer Tools for Python][4] **dtools.**
+This project is part of the [Developer Tools for Python][4] **dtools**
 namespace project.
-
-## Overview
-
-TODO: ...
 
 - Benefits of FP
   - improved composability
-  - avoid exception driven code paths
-  - data sharing becomes trivial due to immutability
+  - avoid hard to refactor exception driven code paths
+  - data sharing becomes trivial when immutability leveraged
 
-### Error handling
+## Overview of submodules
 
-- dtools.fp.err_handling
-  - monadic tools for handling missing values & unexpected events
+### Error handling: dtools.fp.err_handling
+
+- monadic tools for handling missing values & unexpected events
+  - *class* MB: Maybe (Optional) monad
+  - *class* XOR: Either monad
 
 ______________________________________________________________________
 
-### Functions as first class objects
+### Functions as first class objects: dtools.fp.function
 
-- dtools.fp.function
   - utilities to manipulate and partially apply functions
 
 ______________________________________________________________________

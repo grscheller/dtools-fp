@@ -21,16 +21,16 @@ and application.
 #### FP utilities to manipulate and partially apply functions:
 
 - *function* swap: Swap the arguments of a 2 argument function
-- *function* sequenced: Convert function to take a sequence of its arguments
-- *function* partial: Returns a partially applied function
 - *function* it: Function returning an iterator of its arguments
+- *function* sequenced: Convert function to take a sequence of its arguments
 - *function* negate: Transforms a predicate to its negation
+- *function* partial: Returns a partially applied function
 
 """
 
 from __future__ import annotations
-from collections.abc import Callable, Iterator, Sequence
-from typing import Any, cast, ParamSpec, TypeVar
+from collections.abc import Callable, Iterator
+from typing import Any, ParamSpec, TypeVar
 
 __all__ = ['swap', 'sequenced', 'partial', 'it', 'negate']
 
@@ -46,46 +46,46 @@ def swap[U, V, R](f: Callable[[U, V], R]) -> Callable[[V, U], R]:
     return lambda v, u: f(u, v)
 
 
-def sequenced[R](f: Callable[..., R]) -> Callable[..., R]:
-    """Convert a function with arbitrary positional arguments to one taking
-    a sequence of the original arguments.
-    """
-
-    def ff(arguments: Sequence[Any]) -> R:
-        return f(*arguments)
-
-    return ff
-
-
-def partial[R](f: Callable[..., R], *args: Any) -> Callable[..., R]:
-    """Partially apply arguments to a function, left to right.
-
-    - type-wise the only thing guaranteed is the return value
-    - best practice is to either
-      - use `partial` and `sequenced` results immediately and locally
-      - otherwise cast the results when they are created
-
-    """
-
-    def wrap(*rest: R) -> R:
-        return sequenced(f)(args + rest)
-
-    return wrap
-
-
 def it[A](*args: A) -> Iterator[A]:
-    """Function returning an iterator of its arguments.
-
-    - useful for API's whose constructors take a single iterable
-
-    """
+    """Function returning an iterator of its arguments."""
     yield from args
 
 
 def negate[**P](f: Callable[P, bool]) -> Callable[P, bool]:
     """Take a predicate and return its negation."""
 
-    def ff(*args: Any) -> bool:
-        return not sequenced(f)(args)
+    def ff(*args: P.args, **kwargs: P.kwargs) -> bool:
+        return not f(*args, **kwargs)
 
-    return cast(Callable[P, bool], ff)
+    return ff
+
+
+def sequenced[R](f: Callable[..., R]) -> Callable[[tuple[Any]], R]:
+    """Convert a function with arbitrary positional arguments to one taking
+    a tuple of the original arguments.
+
+    - was awaiting typing and mypy "improvements" to ParamSpec
+      - return type: Callable[tuple[P.args], R]   ???
+      - return type: Callable[[tuple[P.args]], R] ???
+    - not going to happen - https://github.com/python/mypy/pull/18278
+    - TODO: look into replacing this function with a Callable class
+
+    """
+    def ff(tupled_args: tuple[Any]) -> R:
+        return f(*tupled_args)
+
+    return ff
+
+
+def partial[**P, R](f: Callable[P, R], *args: Any) -> Callable[..., R]:
+    """Partially apply arguments to a function, left to right.
+
+    - type-wise the only thing guaranteed is the return type
+    - best practice is to cast the result immediately
+
+    """
+
+    def finish(*rest: Any) -> R:
+        return sequenced(f)(args + rest)
+
+    return finish
