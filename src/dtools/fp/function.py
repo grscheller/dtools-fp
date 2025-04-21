@@ -37,7 +37,7 @@ __all__ = ['swap', 'sequenced', 'partial', 'it', 'negate']
 A = TypeVar('A')    # Needed only for pdoc documentation generation. Otherwise,
 R = TypeVar('R')    # ignored by both MyPy and Python. Makes linters unhappy
 U = TypeVar('U')    # when these are used on function and method signatures due
-V = TypeVar('V')    # to "redefined-outer-name" warnings. Functions and methods
+V = TypeVar('V')    # to "redefined-outer-name" warnings. Function and method
 P = ParamSpec('P')  # signatures do not support variance and bounds constraints.
 
 
@@ -68,7 +68,7 @@ def sequenced[R](f: Callable[..., R]) -> Callable[[tuple[Any]], R]:
       - return type: Callable[tuple[P.args], R]   ???
       - return type: Callable[[tuple[P.args]], R] ???
     - not going to happen - https://github.com/python/mypy/pull/18278
-    - TODO: look into replacing this function with a Callable class
+    - TODO: Look into replacing this function with a Callable class?
 
     """
     def ff(tupled_args: tuple[Any]) -> R:

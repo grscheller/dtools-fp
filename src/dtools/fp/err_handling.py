@@ -33,7 +33,7 @@ D = TypeVar('D')  # Needed only for pdoc documentation generation.
 L = TypeVar('L')  # Otherwise, ignored by both MyPy and Python. Makes
 R = TypeVar('R')  # linters unhappy when these are used on function
 T = TypeVar('T')  # and method signatures due to "redefined-outer-name"
-U = TypeVar('U')  # warnings. Functions and methods signatures do not
+U = TypeVar('U')  # warnings. Function and method signatures do not
 V = TypeVar('V')  # support variance and bounds constraints.
 
 
