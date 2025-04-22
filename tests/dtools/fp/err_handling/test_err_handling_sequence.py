@@ -17,7 +17,7 @@ from __future__ import annotations
 from typing import reveal_type
 from dtools.tuples.ftuple import FTuple as FT
 from dtools.tuples.ftuple import f_tuple as ft
-from dtools.queues.restrictive import DoubleQueue as DQ, double_queue as dq
+from dtools.queues.types import DoubleQueue as DQ, double_queue as dq
 from dtools.fp.err_handling import MB, XOR
 
 class TestMB_sequence:
