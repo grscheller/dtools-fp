@@ -9,6 +9,13 @@ PyPI dtools.fp project.
 
 ## Releases and Important Milestones
 
+### Version 1.7.0 - Breaking API change 2025-04-22
+
+- API changes along the lines of dtools.ca 3.12
+- typing improvements
+- docstring changes
+- pyproject.toml standardization
+
 ### Version 1.6.1.0 - Breaking API change 2025-04-17
 
 - MB.sequence and XOR.sequence now return a wrapped iterator
