@@ -27,15 +27,18 @@ __all__ = ['MB', 'XOR']
 
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import cast, Final, Never, overload, TypeVar
+from .bool import _Bool, _True, _False
 from .singletons import Sentinel
 
-D = TypeVar('D')  # Needed only for pdoc documentation generation.
-L = TypeVar('L')  # Otherwise, ignored by both MyPy and Python. Makes
-R = TypeVar('R')  # linters unhappy when these are used on function
-T = TypeVar('T')  # and method signatures due to "redefined-outer-name"
-U = TypeVar('U')  # warnings. Function and method signatures do not
-V = TypeVar('V')  # support variance and bounds constraints.
-
+## Uncomment these for pdoc documentation generation.
+## Linters complain too much if left uncommented.
+# D = TypeVar('D')
+# L = TypeVar('L')
+# R = TypeVar('R')
+# T = TypeVar('T')
+# U = TypeVar('U')
+# V = TypeVar('V')
+# E = TypeVar('E')
 
 class MB[D]:
     """Maybe monad - class wrapping a potentially missing value.
@@ -209,15 +212,15 @@ class MB[D]:
           * otherwise return an empty `MB`
 
         """
-        ls: list[T] = []
+        item: list[T] = []
 
         for mb_d in itab_mb_d:
             if mb_d:
-                ls.append(mb_d.get())
+                item.append(mb_d.get())
             else:
                 return MB()
 
-        return MB(iter(ls))
+        return MB(iter(item))
 
 
 class XOR[L, R]:
@@ -225,9 +228,10 @@ class XOR[L, R]:
     value, but not both.
 
     - implements a left biased Either Monad
-    - `XOR(left: ~L, right: ~R)` produces a left `XOR` which
-      - contains a value of type `~L`
-      - and a potential right value of type `~R`
+    - `XOR(value: ~L|~R,  /, right: = False )`
+      - let `left: ~L` and `right: ~R` then
+        - XOR[~L, ~R](left) is a left XOR
+        - XOR(right, True) produces a right XOR
     - `XOR(MB(), right)` produces a right `XOR`
     - in a Boolean context
       - `True` if a left `XOR`
@@ -243,44 +247,49 @@ class XOR[L, R]:
 
     """
 
-    __slots__ = '_left', '_right'
-    __match_args__ = ('_left', '_right')
+    __slots__ = '_value', '_is_left'
+    __match_args__ = ('_value', '_is_left')
 
     @overload
-    def __init__(self, left: MB[L], right: R, /) -> None: ...
+    def __new__(cls, value: L) -> XOR[L, R]: ...
     @overload
-    def __init__(self, left: L, right: R, /) -> None: ...
+    def __new__(cls, value: L, is_left: _True) -> XOR[L, R]: ...
+    @overload
+    def __new__(cls, value: R, is_left: _False) -> XOR[L, R]: ...
 
-    def __init__(self, left: L | MB[L], right: R, /) -> None:
-        self._left: L | MB[L]
-        self._right: R
-        match left:
-            case MB(l) if l is not Sentinel('MB'):
-                self._left, self._right = cast(L, l), right
-            case MB(_):
-                self._left, self._right = MB(), right
-            case l:
-                self._left, self._right = l, right
+    def __new__(cls, value: L|R, is_left: _Bool = _False()) -> XOR[L, R]:
+        return super(XOR, cls).__new__(cls)
+
+    @overload
+    def __init__(self, value: L) -> None: ...
+    @overload
+    def __init__(self, value: R, is_left: _True) -> None: ...
+    @overload
+    def __init__(self, value: L, is_left: _False) -> None: ...
+
+    def __init__(self, value: L|R, is_left: _Bool = _True()) -> None:
+        self._value = value
+        self._is_left = True if is_left else False
 
     def __bool__(self) -> bool:
-        return MB() != self._left
+        return self._is_left
 
     def __iter__(self) -> Iterator[L]:
         if self:
-            yield cast(L, self._left)
+            yield cast(L, self._value)
 
     def __repr__(self) -> str:
         if self:
-            return 'XOR(' + repr(self._left) + ', ' + repr(self._right) + ')'
-        return 'XOR(MB(), ' + repr(self._right) + ')'
+            return 'XOR(' + repr(self._value) + ')'
+        return 'XOR(' + repr(self._value) + ', is_left=False)'
 
     def __str__(self) -> str:
         if self:
-            return '< ' + str(self._left) + ' | >'
-        return '< | ' + str(self._right) + ' >'
+            return '< ' + str(self._value) + ' | >'
+        return '< | ' + str(self._value) + ' >'
 
     def __len__(self) -> int:
-        # Semantically, an XOR always contains just one value.
+        # An XOR always contains just one value.
         return 1
 
     def __eq__(self, other: object) -> bool:
@@ -288,78 +297,59 @@ class XOR[L, R]:
             return False
 
         if self and other:
-            if (self._left is other._left) or (self._left == other._left):
+            if (self._value is other._value) or (self._value == other._value):
                 return True
 
         if not self and not other:
-            if (self._right is other._right) or (self._right == other._right):
+            if (self._value is other._value) or (self._value == other._value):
                 return True
 
         return False
 
     @overload
-    def get_left(self) -> MB[L]: ...
+    def get(self) -> MB[L]: ...
     @overload
-    def get_left(self, alt_left: L) -> MB[L]: ...
+    def get(self, alt: L) -> MB[L]: ...
     @overload
-    def get_left(self, alt_left: MB[L]) -> MB[L]: ...
+    def get(self, alt: MB[L]) -> MB[L]: ...
 
-    def get_left(self, alt_left: L | MB[L] = MB()) -> MB[L]:
+    def get(self, alt: L | MB[L] = MB()) -> MB[L]:
         """Get value if a left.
 
         - if the `XOR` is a left, return its value
         - if a right, return an alternate value of type ~L` if it is provided
           - alternate value provided directly
           - or optionally provided with a MB
-        - returns a `MB[L]` for when an alt_left value is needed but not provided
+        - returns a `MB[L]` for when an alt value is needed but not provided
 
         """
         _sentinel = Sentinel('MB')
-        match alt_left:
-            case MB(ls) if ls is not _sentinel:
+        match alt:
+            case MB(item) if item is not _sentinel:
                 if self:
-                    return MB(self._left)
-                return MB(cast(L, ls))
+                    return MB(cast(L, self._value))
+                return MB(cast(L, item))
             case MB(_):
                 if self:
-                    return MB(self._left)
+                    return MB(cast(L, self._value))
                 return MB()
-            case ls:
+            case item:
                 if self:
-                    return MB(self._left)
-                return MB(ls)
+                    return MB(cast(L, self._value))
+                return MB(item)
 
-    def get_right(self) -> R:
-        """Get value of `XOR` if a right, potential right value if a left.
+    def get_right(self) -> MB[R]:
+        """Get value of `XOR` if a right
 
-        - if `XOR` is a right, return its value
-        - if `XOR` is a left, return the potential right value
-
-        """
-        return self._right
-
-    def make_right(self) -> XOR[L, R]:
-        """Make a right based on the `XOR`.
-
-        - return a right based on potential right value
-        - returns itself if already a right
+        - if `XOR` is a right, return a MB of its value
+        - if `XOR` is a left, return MB()
 
         """
-        if self._left == MB():
-            return self
-        return cast(XOR[L, R], XOR(MB(), self._right))
+        if self:
+            return MB()
+        return MB(cast(R, self._value))
 
-    def new_right(self, right: R) -> XOR[L, R]:
-        """Swap in a right value.
-
-        - returns a new instance with a new right (or potential right) value
-
-        """
-        if self._left == MB():
-            return cast(XOR[L, R], XOR(MB(), right))
-        return cast(XOR[L, R], XOR(self._left, right))
-
-    def map[U](self, f: Callable[[L], U]) -> XOR[U, R]:
+    def map[U](self, f: Callable[[L], U], failed_map: R) -> XOR[U, R]:
         """Map over if a left value.
 
         - if `XOR` is a left then map `f` over its value
@@ -372,14 +362,14 @@ class XOR[L, R]:
           - use method `map_right` to adjust the returned value
 
         """
-        if self._left == MB():
+        if not self._is_left:
             return cast(XOR[U, R], self)
         try:
-            applied = f(cast(L, self._left))
+            applied = f(cast(L, self._value))
         except Exception:
-            return cast(XOR[U, R], XOR(MB(), self._right))
+            return cast(XOR[U, R], XOR(self._value, is_left))
 
-        return XOR(applied, self._right)
+        return XOR(applied)
 
     def map_right(self, g: Callable[[R], R], alt_right: R) -> XOR[L, R]:
         """Map over a right or potential right value."""
