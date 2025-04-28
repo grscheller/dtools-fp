@@ -17,6 +17,7 @@
 Tools to aid with functional programming in Python yet still endeavoring to
 remain Pythonic.
 
+- *module* dtools.fp.bool: boolean with subtypes
 - *module* dtools.fp.err_handling: Monadic maybe and either
 - *module* dtools.fp.function: Tools to combine and partially apply functions
 - *module* dtools.fp.iterables: Tools for iterables
@@ -26,7 +27,7 @@ remain Pythonic.
 
 """
 
-__version__ = '1.7.0'
+__version__ = '1.7.1.0'
 __author__ = 'Geoffrey R. Scheller'
 __copyright__ = 'Copyright (c) 2023-2025 Geoffrey R. Scheller'
 __license__ = 'Apache License 2.0'

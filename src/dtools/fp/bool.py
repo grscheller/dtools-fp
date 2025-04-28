@@ -29,12 +29,25 @@ Python (at least CPython for Python 3.13) does not permit bool to be subclassed.
   - should be only used as an implementation detail in library code
   - should not be used in application code
 
+#### Usage hint
+
+In client code import and define,
+
+```python
+    from dtools.fp.bool import _Bool, _True, _False
+
+    True_: Final[_True] = _True()
+    False_: Final[_False] = _False()
+```
+
+Otherwise, just use `_True()` and `_False()` as your type `_Bool` "truth"
+values.
+
 """
 
 from __future__ import annotations
 
-__all__ = ['_Bool', '_True', '_False']
-
+__all__ = ['_Bool', '_True', '_False' ]
 
 
 class _Bool(int):

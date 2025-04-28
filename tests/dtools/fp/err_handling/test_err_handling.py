@@ -14,11 +14,18 @@
 
 from __future__ import annotations
 
+from typing import Final
 from dtools.tuples.ftuple import f_tuple as ft
 from dtools.fp.err_handling import MB, XOR
+from dtools.fp.bool import _True, _False
+
+True_: Final[_True] = _True()
+False_: Final[_False] = _False()
+
 
 def add2(x: int) -> int:
     return x + 2
+
 
 class TestMB:
     def test_identity(self) -> None:
@@ -81,14 +88,15 @@ class TestMB:
         finally:
             assert foo == 42
         assert n1.get(13) == (10 + 3)
-        assert n1.get(10//7) == 10//7
+        assert n1.get(10 // 7) == 10 // 7
 
     def test_equal_self(self) -> None:
-        mb42 = MB(40+2)
+        mb42 = MB(40 + 2)
         mbno: MB[int] = MB()
         assert mb42 != mbno
         assert mb42 == mb42
         assert mbno == mbno
+
 
 def gt42(x: int) -> MB[bool]:
     if x > 42:
@@ -97,70 +105,67 @@ def gt42(x: int) -> MB[bool]:
         return MB(False)
     return MB()
 
+
 def lt42(x: int) -> XOR[bool, str]:
     if x < 42:
-        return XOR(True, str(x))
+        return XOR(True)
     if x == 42:
-        return XOR(False, str(x))
-    return XOR(MB(), str(x))
+        return XOR(False)
+    return XOR(str(x), False_)
+
 
 class TestXOR:
     def test_equal_self(self) -> None:
-        xor41 = XOR(40+1, '41')
-        xor42 = XOR(40+2, '42')
-        xor43 = XOR(40+3, '43')
-        xorno42: XOR[int, str] = XOR(MB(), 'no 42')
-        xor_fortytwo = XOR('forty-two', 21*2)
-        xor42tuple = XOR(42, (2, 3))
+        xor41 = XOR[int, str](40 + 1)
+        xor42: XOR[int, str] = XOR(40 + 2)
+        xor43: XOR[int, str] = XOR(40 + 3)
+        xor_no42: XOR[int, str] = XOR('no 42', False_)
+        xor_fortytwo: XOR[str, int] = XOR('forty-two', True_)
+        xor_str_42: XOR[str, int] = XOR(21 * 2, False_)
+        xor_42tuple: XOR[int, tuple[int, ...]] = XOR(42)
+        xor42_tuple: XOR[int, tuple[int, ...]] = XOR((2, 3), is_left=False_)
 
         assert xor42 == xor42
-        assert xorno42 == xorno42
+        assert xor_no42 == xor_no42
         assert xor_fortytwo == xor_fortytwo
-        assert xor42tuple == xor42tuple
+        assert xor_str_42 == xor_str_42
+        assert xor_42tuple == xor_42tuple
+        assert xor42_tuple == xor42_tuple
 
         assert xor41 != xor43
         assert xor42 != xor_fortytwo
-        assert xor42 == xor42tuple
-
-        xor_42 = xor42.map_right(lambda _: 'none', 'map_right failed')
-        thing1: XOR[int, str] = xor_42.map_right(
-                    (lambda s: s + '?'), 'Not sure if I need this.'
-                ).make_right()
-        thing2: XOR[int, str] = xor_42.bind(lambda _: XOR(MB(), 'none?'))
-        assert thing1 == thing2
+        assert xor42 != xor_str_42
+        assert xor42 == xor_42tuple
+        assert xor_42tuple != xor42_tuple
 
         ft_xor_int_str = ft(xor41, xor42, xor43)
         ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42))
 
-        assert ft_xor_bool_str[0] == XOR(True, '41')
-        assert ft_xor_bool_str[1] == XOR(False, 'does not matter what we put here')
-        assert ft_xor_bool_str[2] == XOR(MB(), '43')
+        assert ft_xor_bool_str[0] == XOR[bool, str](True)
+        assert ft_xor_bool_str[1] == XOR[bool, str](False)
+        assert ft_xor_bool_str[2] == XOR[bool, str]('43', False_)
 
-        ft_xor_bool_str_right = ft_xor_bool_str.map(lambda x: x.make_right())
+        xor_99 = XOR[int, str](99)
+        xor_86 = XOR[int, str](86)
+        xor_42 = XOR[int, str](42)
+        xor_21 = XOR[int, str](21)
+        xor_12 = XOR[int, str](12)
 
-        assert ft_xor_bool_str_right[0] == XOR(MB(), '41')
-        assert ft_xor_bool_str_right[1] == XOR(MB(), '42')
-        assert ft_xor_bool_str_right[2] == XOR(MB(), '43')
+        assert xor_99.map(gt42, 'failed 1') == xor_86.map(gt42, 'failed 2')
+        assert xor_21.map(gt42, 'failed 3') == xor_12.map(gt42, 'failed 4')
 
-        xor_99 = XOR(99, 'orig 99')
-        xor_86 = XOR(86, 'orig 86')
-        xor_42 = XOR(42, 'orig 42')
-        xor_21 = XOR(21, 'orig 21')
-        xor_12 = XOR(12, 'orig 12')
-
-        assert xor_99.map(gt42) == xor_86.map(gt42)
-        assert xor_21.map(gt42) != xor_12.map(gt42)
-        assert xor_21.map(gt42).new_right('lt 42') == xor_12.map(gt42).new_right('lt 42')
-
-        hymie = xor_86.map(gt42).map_right(
+        hymie = xor_86.map(gt42, 'failed map 1').map_right(
             (lambda s: f'Hymie says: {s}'), 'got some oil?'
         )
-        chief = xor_86.map(gt42).map_right((lambda s: f'Chief says: {s}'), 'not the dome of silence!')
-        ratton = xor_21.map(gt42).map_right((lambda s: f'Dr. Ratton says: {s}'), 'where is hymie?')
+        chief = xor_86.map(gt42, 'failed map 2').map_right(
+            (lambda s: f'Chief says: {s}'), 'not the dome of silence!'
+        )
+        ratton = xor_21.map(gt42, 'failed map 3').map_right(
+            (lambda s: f'Dr. Ratton says: {s}'), 'where is hymie?'
+        )
         seigfried_secret_headquarters = 'somewhere in NJ'
-        seigfried = xor_21.map(gt42).map_right(
-            lambda s: f'Seigfried says: {s}',
-        seigfried_secret_headquarters
+        seigfried = xor_21.map(gt42, 'failed map 4').map_right(
+            lambda s: f'Seigfried says: {s}', seigfried_secret_headquarters
         )
 
         assert hymie == chief
@@ -171,14 +176,12 @@ class TestXOR:
         assert repr(ratton) == "XOR(MB(), 'Dr. Ratton says: orig 21')"
         assert repr(seigfried) == "XOR(MB(), 'Seigfried says: orig 21')"
 
-        assert xor_12.map(gt42).new_right('not greater than 42') == XOR(MB(), 'not greater than 42')
-
     def test_identity(self) -> None:
-        e1: XOR[int, str] = XOR(42, '')
-        e2: XOR[int, str] = XOR(42, '')
-        e3: XOR[int, str] = XOR(42, 'The secret is unknown')
-        e4: XOR[int, str] = XOR(MB(), 'not 42')
-        e5: XOR[int, str] = XOR(MB(), 'also not 42')
+        e1: XOR[int, str] = XOR(42)
+        e2: XOR[int, str] = XOR(42)
+        e3: XOR[int, str] = XOR('The secret is unknown', False_)
+        e4: XOR[int, str] = XOR('not 42', False_)
+        e5: XOR[int, str] = XOR('also not 42', False_)
         e6 = e3
         assert e1 is e1
         assert e1 is not e2
@@ -203,11 +206,11 @@ class TestXOR:
         assert e6 is e6
 
     def test_equality(self) -> None:
-        e1: XOR[int, str] = XOR(42, '')
-        e2: XOR[int, str] = XOR(42, '')
-        e3: XOR[int, str] = XOR(MB(), 'not 42')
-        e4: XOR[int, str] = XOR(MB(), 'not 42')
-        e5: XOR[int, str] = XOR(MB(), 'also not 42')
+        e1: XOR[int, str] = XOR(42, True_)
+        e2: XOR[int, str] = XOR(42, True_)
+        e3: XOR[int, str] = XOR('not 42', False_)
+        e4: XOR[int, str] = XOR('not 42', False_)
+        e5: XOR[int, str] = XOR('also not 42', False_)
         e6 = e3
         assert e1 == e1
         assert e1 == e2
@@ -303,7 +306,7 @@ class TestXOR:
 
         lt2 = left1.bind(lessThan2)
         lt5 = left1.bind(lessThan5)
-        assert lt2 == XOR(1,'not me')
+        assert lt2 == XOR(1, 'not me')
         assert lt5 == XOR(1, 'not me too')
 
         lt2 = left4.bind(lessThan2)
@@ -313,10 +316,12 @@ class TestXOR:
         assert lt5 == XOR(4, 'boo')
         assert lt5 != XOR(42, 'boohoo')
 
-        lt2 = left7.bind(lessThan2).map_right(lambda _: 'greater than or equal 2',
-                                                alt_right='failed')
-        lt5 = left7.bind(lessThan5).map_right(lambda s: s + ', greater than or equal 5',
-                                                alt_right='failed')
+        lt2 = left7.bind(lessThan2).map_right(
+            lambda _: 'greater than or equal 2', alt_right='failed'
+        )
+        lt5 = left7.bind(lessThan5).map_right(
+            lambda s: s + ', greater than or equal 5', alt_right='failed'
+        )
         assert lt2 == XOR(MB(), 'greater than or equal 2')
         assert lt5 == XOR(MB(), '>=5, greater than or equal 5')
 
@@ -340,5 +345,4 @@ class TestXOR:
 
         rt_dog1 = dog1.make_right()
         rt_dog2 = dog2.new_right(42).make_right()
-        rt_dog3 = dog3.map_right(lambda x: x+1, alt_right=-1).make_right()
-
+        rt_dog3 = dog3.map_right(lambda x: x + 1, alt_right=-1).make_right()
