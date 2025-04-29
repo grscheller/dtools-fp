@@ -15,17 +15,26 @@
 from __future__ import annotations
 
 from typing import Final
+from dtools.fp.bool import _False
 from dtools.fp.singletons import NoValue
 from dtools.fp.err_handling import MB, XOR
 
 _noValue: Final[NoValue] = NoValue()
+False_: Final[_False] = _False()
 
-def addLt42(x: int, y: int) -> MB[int]:
+def add_lt_42(x: int, y: int) -> MB[int]:
     sum_xy = x + y
     if sum_xy < 42:
         return MB(sum_xy)
     else:
         return MB()
+
+def add_gt_42(x: int, y: int) -> XOR[int, str]:
+    sum_xy = x + y
+    if sum_xy > 42:
+        return XOR(sum_xy)
+    else:
+        return XOR('too small', False_)
 
 class Test_str:
     def test_MB_str(self) -> None:
@@ -33,20 +42,20 @@ class Test_str:
         o1 = MB(42)
         assert str(n1) == 'MB()'
         assert str(o1) == 'MB(42)'
-        mb1 = addLt42(3, 7)
-        mb2 = addLt42(15, 30)
+        mb1 = add_lt_42(3, 7)
+        mb2 = add_lt_42(15, 30)
         assert str(mb1) == 'MB(10)'
         assert str(mb2) == 'MB()'
         nt1: MB[int] = MB()
         assert str(nt1) == str(mb2) =='MB()'
 
     def test_XOR_str(self) -> None:
-        assert str(XOR(10, '')) == '< 10 | >'
-        assert str(XOR(addLt42(10, -4), 'foofoo')) == '< 6 | >'
-        assert str(XOR(addLt42(10, 40), 'too big')) == "< | too big >"
-        assert str(XOR(MB(), 'Foofoo rules')) == "< | Foofoo rules >"
-        assert str(XOR(42, '')) == "< 42 | >"
-        assert str(XOR('13', 0)) == "< 13 | >"
+        assert str(XOR[int, str](10)) == '< 10 | >'
+        assert str(add_gt_42(10, -4)) == '< | too small >'
+        assert str(add_gt_42(10, 40)) == "< 50 | >"
+        assert str(XOR('Foofoo rules', False_)) == "< | Foofoo rules >"
+        assert str(XOR[int, str](42)) == "< 42 | >"
+        assert str(XOR[str, int]('foofoo')) == "< foofoo | >"
 
     def test_noValue_str(self) -> None:
         assert str(_noValue) == 'NoValue()'
@@ -92,13 +101,13 @@ class Test_repr:
             assert False
 
     def test_xor_repr(self) -> None:
-        e1: XOR[int, str] = XOR(MB(), 'Nobody home!')
-        e2: XOR[int, str] = XOR(MB(), 'Somebody not home!')
-        e3: XOR[int, str] = XOR(MB(), '')
+        e1: XOR[int, str] = XOR('Nobody home!', False_)
+        e2: XOR[int, str] = XOR('Somebody not home!', False_)
+        e3: XOR[int, str] = XOR(5)
         assert e1 != e2
         e5 = eval(repr(e2))
-        assert e2 != XOR(MB(), 'Nobody home!')
-        assert e2 == XOR(MB(), 'Somebody not home!')
+        assert e2 != XOR('Nobody home!', False_)
+        assert e2 == XOR('Somebody not home!', False_)
         assert e5 == e2
         assert e5 != e3
         assert e5 is not e2
@@ -110,25 +119,25 @@ class Test_repr:
             else:
                 return MB()
 
-        def lt5_or_none_XOR(x: int) -> XOR[int, str]:
+        def lt5_or_str(x: int) -> XOR[int, str]:
             if x < 5:
-                return XOR(x, 'None!')
+                return XOR(x)
             else:
-                return XOR(MB(), f'was to be {x}')
+                return XOR(f'was to be {x}', False_)
 
-        e1 = XOR(lt5_or_nothing(2), 'potential right value does not matter')
-        e2 = lt5_or_none_XOR(2)
-        e3 = lt5_or_none_XOR(3)
-        e7: XOR[int, str] = XOR(lt5_or_nothing(7), 'was to be 7')
-        e8 = XOR(8, 'no go for 8').bind(lt5_or_none_XOR)
+        e6 = lt5_or_nothing(2)
+        e7 = lt5_or_str(2)
+        e8 = lt5_or_str(3)
+        e9 = lt5_or_nothing(7)
+        e10 = XOR[int, str](10).bind(lt5_or_str)
 
-        assert e1 == e2
-        assert e2 != e3
+        assert e6 != e7
         assert e7 != e8
-        assert e7 == eval(repr(e7))
+        assert e9 != e10
+        assert e8 == eval(repr(e7)).map(lambda x: x+1, 'Who is John Gult?')
 
-        assert repr(e1) ==  "XOR(2, 'potential right value does not matter')"
-        assert repr(e2) ==  "XOR(2, 'None!')"
-        assert repr(e3) ==  "XOR(3, 'None!')"
-        assert repr(e7) == "XOR(MB(), 'was to be 7')"
-        assert repr(e8) ==  "XOR(MB(), 'was to be 8')"
+        assert repr(e6) ==  "MB(2)"
+        assert repr(e7) ==  "XOR(2)"
+        assert repr(e8) ==  "XOR(3)"
+        assert repr(e9) == "MB()"
+        assert repr(e10) ==  "XOR('was to be 10', _False())"

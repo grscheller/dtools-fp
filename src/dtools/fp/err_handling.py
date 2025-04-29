@@ -289,7 +289,7 @@ class XOR[L, R]:
     def __repr__(self) -> str:
         if self:
             return 'XOR(' + repr(self._value) + ')'
-        return 'XOR(' + repr(self._value) + ', is_left=False)'
+        return 'XOR(' + repr(self._value) + ', _False())'
 
     def __str__(self) -> str:
         if self:
