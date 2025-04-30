@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Never
+from typing import Any, Never
 from dtools.tuples.ftuple import f_tuple as ft
 from dtools.fp.err_handling import MB, XOR, LEFT, RIGHT
 
@@ -94,24 +94,85 @@ class TestMB:
         assert mbno == mbno
 
 
-def gt42(x: int) -> MB[bool]:
+def gt42(x: int) -> bool|Never:
+    """function that fails for 42, returns a bool"""
     if x > 42:
-        return MB(True)
-    if x == 42:
-        return MB(False)
-    return MB()
-
-
-def lt42(x: int) -> XOR[bool, str]:
+        return True
     if x < 42:
-        return XOR(True)
-    if x == 42:
-        return XOR(False)
-    return XOR[bool, str](str(x), RIGHT)
+        return False
+    raise ValueError('x = 42')
 
+def lt42(x: int) -> XOR[int, str]|Never:
+    """function that fails for 42, returns an XOR"""
+    if x < 42:
+        return XOR(x, LEFT)
+    if x > 42:
+        return XOR(f'{x}', RIGHT)
+    raise ValueError(f'{42}')
+
+def fail(x: Any) -> Never:
+    raise AttributeError
 
 class TestXOR:
+    def test_usecase(self) -> None:
+        """Non-systematic tests for ease of use"""
+        xor_99 = XOR[int, str](99, LEFT)
+        xor_86 = XOR[int, str]('Max', RIGHT)
+        xor_49 = XOR[int, str](49)
+        xor_42 = XOR[int, str](42)
+        xor_42_clone = XOR[int, str](42)
+        xor_21 = XOR[int, str](21)
+        xor_12 = XOR[int, str](12)
+        xor_03 = XOR[int, str]('Max', RIGHT)
+        xor_02 = XOR[int, str]('2', RIGHT)
+        xor_01 = XOR[int, str](1)
+
+        assert xor_99.get() == 99
+        assert xor_99.get_right() == MB()
+        try:
+            assert xor_86.get() == 86
+        except AssertionError:
+            assert False
+        except ValueError:
+            assert True
+        else:
+            assert False
+        assert xor_86.get_right() == MB('Max')
+
+        assert            XOR(True, LEFT) == xor_99.map(gt42, 'left 99')            == xor_49.map(gt42, 'left 49')
+        assert           XOR(False, LEFT) == xor_01.map(gt42, 'map failed')         != xor_86.map(gt42, 'map failed') == XOR('Max', RIGHT)
+        assert           XOR(False, LEFT) == xor_12.map(gt42, 'map failed')         == xor_21.map(gt42, 'map failed')
+        assert       XOR('failed', RIGHT) == xor_42.map(gt42, 'failed')             == xor_42_clone.map(gt42, 'failed')
+        assert XOR('clone failed', RIGHT) == xor_42_clone.map(gt42, 'clone failed') != xor_42.map(gt42, 'failed')     == XOR('failed', RIGHT)
+
+        chief1 = xor_86.map_right(
+            (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
+        )
+        chief2 = xor_42.map(gt42, 'Smart').map_right(
+            (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
+        )
+        chief3 = xor_86.map_right(fail, 'Not the dome of silence!')
+        chief4 = xor_99.map_right(fail, 'Not the dome of silence!')
+        hymie99 = xor_99.map(
+            (lambda s: f'Hymie says: Hello agent {s}!'), 'Got some oil?'
+        )
+        hymie21 = xor_21.bind(lt42, 'Seigfried').map(
+            (lambda s: f'Hymie says: Hello agent {s}!'), 'Got some oil?'
+        )
+        hymie42 = xor_42.bind(lt42, 'Ratton').map_right(fail, 'Got some oil?')
+
+        assert chief1 != chief2
+        assert chief3 != chief4
+        assert chief1 == XOR('Max, you idiot!', RIGHT)
+        assert chief2 == XOR('Smart, you idiot!', RIGHT)
+        assert chief3 == XOR('Not the dome of silence!', RIGHT)
+        assert chief4 == XOR(True, LEFT)
+        assert hymie99 == XOR('Hello agent 99!', LEFT)
+        assert hymie21 == XOR('Hello agent 21!', LEFT)
+        assert hymie42 == XOR('Got some oil?', RIGHT)
+
     def test_equal(self) -> None:
+        """some non-systematic tests"""
         xor41 = XOR[int, str](40 + 1)
         xor42: XOR[int, str] = XOR(40 + 2)
         xor43: XOR[int, str] = XOR(40 + 3)
@@ -135,47 +196,11 @@ class TestXOR:
         assert xor_42tuple != xor42_tuple
 
         ft_xor_int_str = ft(xor41, xor42, xor43)
-        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42))
+        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42, 'failure'))
 
-        assert ft_xor_bool_str[0] == XOR[bool, str](True)
-        assert ft_xor_bool_str[1] == XOR[bool, str](False)
+        assert ft_xor_bool_str[0] == XOR[bool, str](True, LEFT)
+        assert ft_xor_bool_str[1] == XOR[bool, str](False, LEFT)
         assert ft_xor_bool_str[2] == XOR[bool, str]('43', RIGHT)
-
-        xor_99 = XOR[int, str](99, LEFT)
-        xor_86 = XOR[int, str]('MAX', RIGHT)
-        xor_42 = XOR[int, str](42)
-        xor_21 = XOR[int, str](21)
-        xor_12 = XOR[int, str](12)
-
-        assert xor_99.get() == MB(99)
-        assert xor_86.get() == MB()
-        assert xor_99.get_right() == MB()
-        assert xor_86.get_right() == MB('Max')
-        assert xor_99.map(gt42, 'failed 1') == xor_86.map(gt42, 'failed 2')
-        assert xor_42.map(gt42, 'failed 3') == xor_86.map(gt42, 'failed 4')
-        assert xor_21.map(gt42, 'failed 5') == xor_12.map(gt42, 'failed 6')
-
-        chief = xor_86.map_right(gt42, 'failed map 2').map_right(
-            (lambda s: f'Chief says: {s}'), 'Not the dome of silence!'
-        )
-        hymie = xor_99.map(gt42, 'failed map 1').map(
-            (lambda s: f'Hymie says: Hello agent {s}!'), 'Got some oil?'
-        )
-        ratton = xor_21.map(gt42, 'failed map 3').map_right(
-            (lambda s: f'Dr. Ratton says: {s}'), 'where is hymie?'
-        )
-        seigfried_secret_headquarters = 'somewhere in NJ'
-        seigfried = xor_21.map(gt42, 'failed map 4').map_right(
-            lambda s: f'Seigfried says: {s}', seigfried_secret_headquarters
-        )
-
-        assert hymie == chief
-        assert ratton != seigfried
-
-        assert repr(hymie) == "XOR(TRUE, 'Hymie says: orig 86')"
-        assert repr(chief) == "XOR(TRUE, 'Chief says: orig 86')"
-        assert repr(ratton) == "XOR(MB(), 'Dr. Ratton says: orig 21')"
-        assert repr(seigfried) == "XOR(MB(), 'Seigfried says: orig 21')"
 
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42)
@@ -359,23 +384,23 @@ class TestXOR:
         else:
             assert False
 
-    def test_either_bind(self) -> None:
+    def test_xor_bind(self) -> None:
         def lessThan2(x: int) -> XOR[int, str]:
             if x < 2:
-                return XOR(x, 'fail!')
+                return XOR(x, LEFT)
             else:
-                return XOR(MB(), '>=2')
+                return XOR(f'{x} >= 2', RIGHT)
 
         def lessThan5(x: int) -> XOR[int, str]:
             if x < 5:
-                return XOR(x, '')
+                return XOR(x, LEFT)
             else:
-                return XOR(MB(), '>=5')
+                return XOR('x >= 5', RIGHT)
 
-        left1 = XOR(1, 'no')
-        left4 = XOR(4, '')
-        left7 = XOR(7, 'foobar')
-        right: XOR[int, str] = XOR(MB(), 'Nobody home')
+        left1 = XOR[int, str](1, LEFT)
+        left4 = XOR[int, str](4, LEFT)
+        left7 = XOR[int, str](7, LEFT)
+        right: XOR[int, str] = XOR('Nobody home', RIGHT)
 
         nobody = right.bind(lessThan2)
         assert nobody == XOR(MB(), 'Nobody home')
@@ -431,12 +456,3 @@ class TestXOR:
         phNot1: MB[XOR[int, str]] = MB(XOR(MB(), ''))
         phNot2 = MB(XOR[int, str](MB(), ''))
         assert phNot1 == phNot2
-
-    def test_XOR_No_Pot_Rt(self) -> None:
-        dog1 = XOR('Lucy', 1)
-        dog2 = XOR('Flash', 2)
-        dog3 = XOR[str, int](MB(), 3)
-
-        rt_dog1 = dog1.make_right()
-        rt_dog2 = dog2.new_right(42).make_right()
-        rt_dog3 = dog3.map_right(lambda x: x + 1, alt_right=-1).make_right()

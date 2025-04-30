@@ -395,15 +395,19 @@ class XOR[L, R]:
 
         return XOR(value, RIGHT)
 
-    def bind[U](self, f: Callable[[L], XOR[U, R]]) -> XOR[U, R]:
+    def bind[U](self, f: Callable[[L], XOR[U, R]], alt_right: R) -> XOR[U, R]:
         """Flatmap over the left value
 
-        - map over and then flatten the left value
+        - map over and then trivially "flatten" the left value
         - propagate right values
+        - if bind fails, return alt_right wrapped in an right XOR
 
         """
         if self:
-            return f(cast(L, self._value))
+            try:
+                return f(cast(L, self._value))
+            except Exception:
+                XOR(alt_right, RIGHT)
         return cast(XOR[U, R], self)
 
     @staticmethod
