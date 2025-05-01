@@ -285,7 +285,7 @@ class XOR[L, R]:
 
     def __repr__(self) -> str:
         if self:
-            return 'XOR(' + repr(self._value) + ')'
+            return 'XOR(' + repr(self._value) + ', LEFT)'
         return 'XOR(' + repr(self._value) + ', RIGHT)'
 
     def __str__(self) -> str:
@@ -407,7 +407,7 @@ class XOR[L, R]:
             try:
                 return f(cast(L, self._value))
             except Exception:
-                XOR(alt_right, RIGHT)
+                return XOR(alt_right, RIGHT)
         return cast(XOR[U, R], self)
 
     @staticmethod

@@ -15,12 +15,10 @@
 from __future__ import annotations
 
 from typing import Final
-from dtools.fp.bool import _False
 from dtools.fp.singletons import NoValue
-from dtools.fp.err_handling import MB, XOR
+from dtools.fp.err_handling import MB, XOR, LEFT, RIGHT
 
 _noValue: Final[NoValue] = NoValue()
-False_: Final[_False] = _False()
 
 def add_lt_42(x: int, y: int) -> MB[int]:
     sum_xy = x + y
@@ -34,7 +32,7 @@ def add_gt_42(x: int, y: int) -> XOR[int, str]:
     if sum_xy > 42:
         return XOR(sum_xy)
     else:
-        return XOR('too small', False_)
+        return XOR('too small', RIGHT)
 
 class Test_str:
     def test_MB_str(self) -> None:
@@ -53,7 +51,7 @@ class Test_str:
         assert str(XOR[int, str](10)) == '< 10 | >'
         assert str(add_gt_42(10, -4)) == '< | too small >'
         assert str(add_gt_42(10, 40)) == "< 50 | >"
-        assert str(XOR('Foofoo rules', False_)) == "< | Foofoo rules >"
+        assert str(XOR('Foofoo rules', RIGHT)) == "< | Foofoo rules >"
         assert str(XOR[int, str](42)) == "< 42 | >"
         assert str(XOR[str, int]('foofoo')) == "< foofoo | >"
 
@@ -101,13 +99,13 @@ class Test_repr:
             assert False
 
     def test_xor_repr(self) -> None:
-        e1: XOR[int, str] = XOR('Nobody home!', False_)
-        e2: XOR[int, str] = XOR('Somebody not home!', False_)
-        e3: XOR[int, str] = XOR(5)
+        e1: XOR[int, str] = XOR('Nobody home!', RIGHT)
+        e2: XOR[int, str] = XOR('Somebody not home!', RIGHT)
+        e3: XOR[int, str] = XOR(5, LEFT)
         assert e1 != e2
         e5 = eval(repr(e2))
-        assert e2 != XOR('Nobody home!', False_)
-        assert e2 == XOR('Somebody not home!', False_)
+        assert e2 != XOR('Nobody home!', RIGHT)
+        assert e2 == XOR('Somebody not home!', RIGHT)
         assert e5 == e2
         assert e5 != e3
         assert e5 is not e2
@@ -123,13 +121,13 @@ class Test_repr:
             if x < 5:
                 return XOR(x)
             else:
-                return XOR(f'was to be {x}', False_)
+                return XOR(f'was to be {x}', RIGHT)
 
         e6 = lt5_or_nothing(2)
         e7 = lt5_or_str(2)
         e8 = lt5_or_str(3)
         e9 = lt5_or_nothing(7)
-        e10 = XOR[int, str](10).bind(lt5_or_str)
+        e10 = XOR[int, str](10).bind(lt5_or_str, 'bind_failed')
 
         assert e6 != e7
         assert e7 != e8
@@ -137,7 +135,7 @@ class Test_repr:
         assert e8 == eval(repr(e7)).map(lambda x: x+1, 'Who is John Gult?')
 
         assert repr(e6) ==  "MB(2)"
-        assert repr(e7) ==  "XOR(2)"
-        assert repr(e8) ==  "XOR(3)"
+        assert repr(e7) ==  "XOR(2, LEFT)"
+        assert repr(e8) ==  "XOR(3, LEFT)"
         assert repr(e9) == "MB()"
-        assert repr(e10) ==  "XOR('was to be 10', _False())"
+        assert repr(e10) ==  "XOR('was to be 10', RIGHT)"

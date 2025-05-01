@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Never
+from typing import Never
 from dtools.tuples.ftuple import f_tuple as ft
 from dtools.fp.err_handling import MB, XOR, LEFT, RIGHT
 
@@ -33,10 +33,25 @@ def lt42(x: int) -> XOR[int, str]|Never:
         return XOR(x, LEFT)
     if x > 42:
         return XOR(f'{x}', RIGHT)
-    raise ValueError(f'{42}')
+    raise ValueError('42 failed')
 
-def fail(x: Any) -> Never:
-    raise AttributeError
+def lt42bool(x: int) -> XOR[bool, str]|Never:
+    """function that fails for 42, returns an XOR"""
+    if x < 42:
+        return XOR(True, LEFT)
+    if x > 42:
+        return XOR(f'{x}', RIGHT)
+    raise ValueError('42 failed')
+
+def fail_int(x: int) -> int|Never:
+    if x != -666:
+        raise ValueError
+    return x
+
+def fail_str(s: str) -> str|Never:
+    if s != '-666':
+        raise ValueError
+    return s
 
 class TestXOR:
     def test_usecase(self) -> None:
@@ -48,8 +63,6 @@ class TestXOR:
         xor_42_clone = XOR[int, str](42)
         xor_21 = XOR[int, str](21)
         xor_12 = XOR[int, str](12)
-        xor_03 = XOR[int, str]('Max', RIGHT)
-        xor_02 = XOR[int, str]('2', RIGHT)
         xor_01 = XOR[int, str](1)
 
         assert xor_99.get() == 99
@@ -74,24 +87,22 @@ class TestXOR:
             (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
         )
         chief2 = xor_42.map(gt42, 'Smart').map_right(
-            (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
+            (lambda s: f'{s}, you\'re fired!'), 'Not the dome of silence!'
         )
-        chief3 = xor_86.map_right(fail, 'Not the dome of silence!')
-        chief4 = xor_99.map_right(fail, 'Not the dome of silence!')
-        hymie99 = xor_99.map(
-            (lambda s: f'Hymie says: Hello agent {s}!'), 'Got some oil?'
-        )
+        chief3 = xor_86.map_right(fail_str, 'Not the dome of silence!')
+        chief4 = xor_99.map_right(fail_str, 'Not the dome of silence!')
+        hymie99 = xor_99.map((lambda s: f'Hello agent {s}!'), 'Got some oil?')
         hymie21 = xor_21.bind(lt42, 'Seigfried').map(
-            (lambda s: f'Hymie says: Hello agent {s}!'), 'Got some oil?'
+            (lambda s: f'Hello agent {s}!'), 'Got some oil?'
         )
-        hymie42 = xor_42.bind(lt42, 'Ratton').map_right(fail, 'Got some oil?')
+        hymie42 = xor_42.bind(lt42, 'Ratton').map_right(fail_str, 'Got some oil?')
 
         assert chief1 != chief2
         assert chief3 != chief4
         assert chief1 == XOR('Max, you idiot!', RIGHT)
-        assert chief2 == XOR('Smart, you idiot!', RIGHT)
+        assert chief2 == XOR('Smart, you\'re fired!', RIGHT)
         assert chief3 == XOR('Not the dome of silence!', RIGHT)
-        assert chief4 == XOR(True, LEFT)
+        assert chief4 == XOR(99, LEFT)
         assert hymie99 == XOR('Hello agent 99!', LEFT)
         assert hymie21 == XOR('Hello agent 21!', LEFT)
         assert hymie42 == XOR('Got some oil?', RIGHT)
@@ -121,10 +132,10 @@ class TestXOR:
         assert xor_42tuple != xor42_tuple
 
         ft_xor_int_str = ft(xor41, xor42, xor43)
-        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42, 'failure'))
+        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42bool, 'bind failed'))
 
         assert ft_xor_bool_str[0] == XOR[bool, str](True, LEFT)
-        assert ft_xor_bool_str[1] == XOR[bool, str](False, LEFT)
+        assert ft_xor_bool_str[1] == XOR[bool, str]('bind failed', RIGHT)
         assert ft_xor_bool_str[2] == XOR[bool, str]('43', RIGHT)
 
     def test_identity(self) -> None:
@@ -309,6 +320,7 @@ class TestXOR:
         else:
             assert False
 
+
     def test_xor_bind(self) -> None:
         def lessThan2(x: int) -> XOR[int, str]:
             if x < 2:
@@ -320,64 +332,65 @@ class TestXOR:
             if x < 5:
                 return XOR(x, LEFT)
             else:
-                return XOR('x >= 5', RIGHT)
+                return XOR(f'{x} >= 5', RIGHT)
 
         left1 = XOR[int, str](1, LEFT)
         left4 = XOR[int, str](4, LEFT)
         left7 = XOR[int, str](7, LEFT)
-        right: XOR[int, str] = XOR('Nobody home', RIGHT)
+        right: XOR[int, str] = XOR('Nobody home.', RIGHT)
 
-        nobody = right.bind(lessThan2)
-        assert nobody == XOR(MB(), 'Nobody home')
+        nobody = right.bind(lessThan2, 'Anybody home?')
+        assert nobody == XOR('Nobody home.', RIGHT)
 
-        lt2 = left1.bind(lessThan2)
-        lt5 = left1.bind(lessThan5)
-        assert lt2 == XOR(1, 'foofoo rules')
-        assert lt5 == XOR(1, '')
+        lt2 = left1.bind(lessThan2, '')
+        lt5 = left1.bind(lessThan5, '')
+        assert lt2 == XOR(1, LEFT)
+        assert lt5 == XOR(1, LEFT)
 
-        lt2 = left4.bind(lessThan2)
-        lt5 = left4.bind(lessThan5)
-        assert lt2 == XOR(MB(), '>=2')
-        assert lt5 == XOR(4, '>=5')
+        lt2 = left4.bind(lessThan2, '')
+        lt5 = left4.bind(lessThan5, '')
+        assert lt2 == XOR('4 >= 2', RIGHT)
+        assert lt5 == XOR(4)
 
-        lt2 = left7.bind(lessThan2)
-        lt5 = left7.bind(lessThan5)
-        assert lt2 == XOR(MB(), '>=2')
-        assert lt5 == XOR(MB(), '>=5')
+        lt2 = left7.bind(lessThan2, '')
+        lt5 = left7.bind(lessThan5, '')
+        assert lt2 == XOR('7 >= 2', RIGHT)
+        assert lt5 == XOR('7 >= 5', RIGHT)
 
-        nobody = right.bind(lessThan5)
-        assert nobody == XOR(MB(), 'Nobody home')
+        nobody = right.bind(lessThan5, '')
+        assert nobody == XOR('Nobody home.', RIGHT)
 
-        lt2 = left1.bind(lessThan2)
-        lt5 = left1.bind(lessThan5)
-        assert lt2 == XOR(1, 'not me')
-        assert lt5 == XOR(1, 'not me too')
+        lt2 = left1.bind(lessThan2, '')
+        lt5 = left1.bind(lessThan5, '')
+        assert lt2 == XOR(1, LEFT)
+        assert lt5 == XOR(1, LEFT)
 
-        lt2 = left4.bind(lessThan2)
-        lt5 = left4.bind(lessThan5)
-        assert lt2 == XOR(MB(), '>=2')
-        assert lt2 != XOR(42, '>=42')
-        assert lt5 == XOR(4, 'boo')
-        assert lt5 != XOR(42, 'boohoo')
+        lt2 = left4.bind(lessThan2, '')
+        lt5 = left4.bind(lessThan5, '')
+        assert lt2 == XOR('4 >= 2', RIGHT)
+        assert lt2 != XOR('42 >= 2', RIGHT)
+        assert lt5 == XOR(4, LEFT)
+        assert lt5 != XOR('5 >= 5', RIGHT)
 
-        lt2 = left7.bind(lessThan2).map_right(
-            lambda _: 'greater than or equal 2', alt_right='failed'
+        lt2 = left7.bind(lessThan2, alt_right='map failed').map_right(
+            lambda _: 'greater than or equal 2', alt_right='map_right failed'
         )
-        lt5 = left7.bind(lessThan5).map_right(
-            lambda s: s + ', greater than or equal 5', alt_right='failed'
+        lt5 = left7.bind(lessThan5, alt_right='bind failed').map_right(
+            lambda s: s + ', greater than or equal 5', alt_right='map_right failed'
         )
-        assert lt2 == XOR(MB(), 'greater than or equal 2')
-        assert lt5 == XOR(MB(), '>=5, greater than or equal 5')
+        assert lt2 == XOR('greater than or equal 2', RIGHT)
+        assert lt5 == XOR('7 >= 5, greater than or equal 5', RIGHT)
 
     def test_MB_XOR(self) -> None:
-        mb42 = MB(42)
-        mbNot: MB[int] = MB()
+        """Proving a nothing can be stored in a something."""
+        mb_42 = MB(42)
+        mb_not: MB[int] = MB()
 
-        left42 = XOR(mb42, 'failed')
-        right = XOR[int, str](mbNot, 'Nobody home')
-        assert left42 == XOR(42, 'fail!')
-        assert right == XOR(MB(), 'Nobody home')
+        left_mb_42: XOR[MB[int], str] = XOR(mb_42, LEFT)
+        left_mb_not: XOR[MB[int], str] = XOR(mb_not, LEFT)
+        assert left_mb_42 == XOR(MB(42), LEFT)
+        assert left_mb_not == XOR(MB(), LEFT)
 
-        phNot1: MB[XOR[int, str]] = MB(XOR(MB(), ''))
-        phNot2 = MB(XOR[int, str](MB(), ''))
-        assert phNot1 == phNot2
+        phNot1: MB[XOR[MB[int], str]] = MB(XOR(MB[int](), LEFT))
+        phNot2 = MB(XOR[int, str]('', RIGHT))
+        assert phNot1 != phNot2
