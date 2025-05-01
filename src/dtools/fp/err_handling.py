@@ -445,7 +445,7 @@ class XOR[L, R]:
         return ret
 
     @staticmethod
-    def sequence(itab_xor_lr: Iterable[XOR[L, R]]) -> XOR[Iterator[L], R]:
+    def sequence(itab_xor_lr: Iterable[XOR[L, R]], right: R) -> XOR[Iterator[L], R]:
         """Sequence an indexable of type `XOR[~L, ~R]`
 
         - if the iterated `XOR` values are all lefts, then
@@ -456,9 +456,9 @@ class XOR[L, R]:
         ts: list[L] = []
 
         for xor_lr in itab_xor_lr:
-            if mb := xor_lr.get():
-                ts.append(mb)
+            if xor_lr:
+                ts.append(xor_lr.get())
             else:
-                return XOR(xor_lr.get_right().get(), side=RIGHT)
+                return XOR(right, RIGHT)
 
         return XOR(iter(ts))
