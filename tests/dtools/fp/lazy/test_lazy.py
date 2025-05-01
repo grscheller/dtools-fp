@@ -287,4 +287,3 @@ class TestLazy:
             mb_exception = lz_add2_2.exception()
             if mb_exception:
                 assert isinstance(mb_exception.get(), ValueError)
-

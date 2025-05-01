@@ -29,7 +29,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any, Final, TypeVar, ParamSpec
-from .err_handling import MB, XOR
+from .err_handling import MB, XOR, LEFT, RIGHT
 from .function import sequenced
 
 __all__ = ['Lazy', 'lazy', 'real_lazy']
@@ -62,14 +62,14 @@ class Lazy[D, R]:
         self._f: Final[Callable[[D], R]] = f
         self._d: Final[D] = d
         self._pure: bool = pure
-        self._result: XOR[R, MB[Exception]] = XOR(MB(), MB())
+        self._result: XOR[R, MB[Exception]] = XOR(MB(), RIGHT)
 
     def __bool__(self) -> bool:
         return bool(self._result)
 
     def is_evaluated(self) -> bool:
         """Return true if Lazy is evaluated"""
-        return self._result != XOR(MB(), MB())
+        return self._result != XOR(MB(), RIGHT)
 
     def is_exceptional(self) -> bool:
         """Return true if Lazy raised exception when evaluated"""
@@ -89,9 +89,9 @@ class Lazy[D, R]:
             try:
                 result = self._f(self._d)
             except Exception as exc:
-                self._result = XOR(MB(), MB(exc))
+                self._result = XOR(MB(exc), RIGHT)
                 return False
-            self._result = XOR(MB(result), MB())
+            self._result = XOR(result, LEFT)
             return True
 
         return bool(self)
@@ -102,7 +102,7 @@ class Lazy[D, R]:
             self.eval()
 
         if self._result:
-            return MB(self._result.get_left())
+            return MB(self._result.get())
         return MB()
 
     def exception(self) -> MB[Exception]:
