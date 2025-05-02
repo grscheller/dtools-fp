@@ -31,21 +31,23 @@ from .bool import _Bool as Both, _True as Left, _False as Right
 from .singletons import Sentinel
 
 
+# -- class MB ------------------------------------------------------------------
+
 D = TypeVar('D')
+
 
 class MB[D]:
     """Maybe monad - class wrapping a potentially missing value.
 
     - where `MB(value)` contains a possible value of type `~D`
     - `MB()` semantically represent a non-existent or missing value of type `~D`
-    - `MB` objects are self flattening, therefore a `MB` cannot contain a MB
-      - `MB(MB(d)) == MB(d)`
-      - `MB(MB()) == MB()`
     - immutable semantics, map & bind return new instances
-      - warning: hashed values invalidated if contained value is mutated
-      - warning: hashed values invalidated if put or pop methods are called
+      - can store any value of any type with one exception
+        - if `~D` is `Sentinel`, storing `Sentinel(MB)` results in a MB()
+      - warning: hashability invalidated if contained value is mutated
+      - warning: hashed values invalidated if `put` or `pop` methods called
     - unsafe methods `get` and `pop`
-      - will raise `ValueError` if MB is empty
+      - could raise `ValueError` if MB is empty and alt values not given
     - stateful methods `put` and `pop`
       - useful to treat a `MB` as a stateful object
       - basically a container that can contain 1 or 0 objects
@@ -60,29 +62,12 @@ class MB[D]:
     V = TypeVar('V')
 
     @overload
-    def __new__(cls) -> MB[D]: ...
-    @overload
-    def __new__(cls, value: MB[D]) -> MB[D]: ...
-    @overload
-    def __new__(cls, value: D) -> MB[D]: ...
-
-    def __new__(cls, value: D | MB[D] | Sentinel = Sentinel('MB')) -> MB[D]:
-        return super(MB, cls).__new__(cls)
-
-    @overload
     def __init__(self) -> None: ...
-    @overload
-    def __init__(self, value: MB[D]) -> None: ...
     @overload
     def __init__(self, value: D) -> None: ...
 
-    def __init__(self, value: D | MB[D] | Sentinel = Sentinel('MB')) -> None:
-        self._value: D | Sentinel
-        match value:
-            case MB(d):
-                self._value = d
-            case d:
-                self._value = d
+    def __init__(self, value: D | Sentinel = Sentinel('MB')) -> None:
+        self._value: D | Sentinel = value
 
     def __bool__(self) -> bool:
         return self._value is not Sentinel('MB')
@@ -132,12 +117,20 @@ class MB[D]:
         return cast(D, alt)
 
     def put(self, value: D) -> None:
-        """Put a value in the MB if empty, if not empty do nothing."""
+        """Put a value in the MB if empty, if not empty do nothing.
+
+        - warning: method will invalidate hashability if used
+
+        """
         if self._value is Sentinel('MB'):
             self._value = value
 
     def pop(self) -> D | Never:
-        """Pop the value if the MB is not empty, otherwise fail."""
+        """Pop the value if the MB is not empty, otherwise fail.
+
+        - warning: method will invalidate hashability if used
+
+        """
         _sentinel: Final[Sentinel] = Sentinel('MB')
         if self._value is _sentinel:
             msg = 'MB: Popping from an empty MB'
@@ -220,11 +213,14 @@ class MB[D]:
         return MB(iter(item))
 
 
+# -- class XOR -----------------------------------------------------------------
+
 L = TypeVar('L')
 R = TypeVar('R')
 
 LEFT = Left()
 RIGHT = Right()
+
 
 class XOR[L, R]:
     """Either monad - class semantically containing either a left or a right
@@ -318,7 +314,7 @@ class XOR[L, R]:
     @overload
     def get(self, alt: MB[L]) -> L: ...
 
-    def get(self, alt: L | MB[L] = MB()) -> L|Never:
+    def get(self, alt: L | MB[L] = MB()) -> L | Never:
         """Get value if a left.
 
         - if the `XOR` is a left, return its value
@@ -329,7 +325,7 @@ class XOR[L, R]:
           - best practice check self in a boolean context first
 
         """
-        value: L|Sentinel = Sentinel('MB')
+        value: L | Sentinel = Sentinel('MB')
 
         match alt:
             case MB(item):

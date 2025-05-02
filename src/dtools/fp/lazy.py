@@ -50,7 +50,8 @@ class Lazy[D, R]:
     * second argument `arg: ~D` is the argument to be passed to `f`
       * where the type `~D` is the `tuple` type of the argument types to `f`
     * function is evaluated when the `eval` method is called
-    * result is cached unless `pure` is set to `False` in `__init__` method
+    * result is cached unless `pure` is set to `False`
+    * returns True in Boolean context if evaluated
 
     Usually use case is to make a function "non-strict" by passing some of its
     arguments wrapped in Lazy instances.
@@ -65,19 +66,11 @@ class Lazy[D, R]:
         self._result: XOR[R, MB[Exception]] = XOR(MB(), RIGHT)
 
     def __bool__(self) -> bool:
-        return bool(self._result)
-
-    def is_evaluated(self) -> bool:
-        """Return true if Lazy is evaluated"""
+        if self._result:
+            return True
         return self._result != XOR(MB(), RIGHT)
 
-    def is_exceptional(self) -> bool:
-        """Return true if Lazy raised exception when evaluated"""
-        if self.is_evaluated():
-            return not bool(self._result)
-        return False
-
-    def eval(self) -> bool:
+    def eval(self) -> None:
         """Evaluate function with its argument.
 
         - evaluate function
@@ -85,30 +78,39 @@ class Lazy[D, R]:
         - reevaluate if `pure == False`
 
         """
-        if not self._pure or not self.is_evaluated():
+        if not self._pure or not self:
             try:
                 result = self._f(self._d)
             except Exception as exc:
                 self._result = XOR(MB(exc), RIGHT)
-                return False
             self._result = XOR(result, LEFT)
-            return True
 
-        return bool(self)
-
-    def result(self) -> MB[R]:
-        """Get result, evaluate if necessary"""
-        if not self.is_evaluated():
-            self.eval()
-
-        if self._result:
-            return MB(self._result.get())
+    def got_result(self) -> MB[bool]:
+        """Return true if Lazy did not raised exception."""
+        if self:
+            return MB(False) if self._result.get_right() else MB(True)
         return MB()
 
-    def exception(self) -> MB[Exception]:
+    def got_exception(self) -> MB[bool]:
+        """Return true if Lazy raised exception."""
+        if self:
+            return MB(True) if self._result.get_right() else MB(False)
+        return MB()
+
+    def get_result(self) -> MB[R]:
+        """Get result if evaluate."""
+        if self:
+            if self._result:
+                return MB(self._result.get())
+        return MB()
+
+    def get_exception(self) -> MB[Exception]:
         """Get exception if exceptional, evaluate if necessary"""
-        if not self.is_evaluated():
-            self.eval()
+        if self:
+            if self._result:
+                return MB()
+
+
         return self._result.get_right()
 
 

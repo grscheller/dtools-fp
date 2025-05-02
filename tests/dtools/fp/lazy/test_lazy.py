@@ -24,10 +24,10 @@ def add2_if_pos(x: int) -> int:
     return x + 2
 
 def evaluate_it(lz: Lazy[int, int]) -> int:
-    if lz.eval():
-        return lz.result().get()
-    else:
+    if lz.is_exceptional():
         return -1
+    else:
+        return lz.result().get()
 
 class Test_Lazy:
     def test_happy_path(self) -> None:
@@ -56,11 +56,9 @@ def no_hello() -> str:
     return hello
 
 def return_str(lz: Lazy[Any, str]) -> str:
-    if lz.eval():
-        return lz.result().get()
-    else:
-        esc = lz.exception().get()
-        return f'Error: {esc}'
+    if result := lz.result():
+        return result.get()
+    return f'Error: {lz.exception().get()}'
 
 class Test_Lazy_0_1:
     def test_happy_path(self) -> None:
@@ -90,55 +88,45 @@ class TestLazy00:
     def test_pure(self) -> None:
         cnt1 = Counter(0)
 
-        lz_p = real_lazy(cnt1.inc)
-        lz_n = lazy(cnt1.inc)
+        lz_pure = real_lazy(cnt1.inc)
+        lz_impure = lazy(cnt1.inc)
 
-        if lz_p:
+        if lz_pure:
             assert False
-        if lz_p.is_evaluated():
+        if lz_pure.is_exceptional():
             assert False
-        if lz_p.is_exceptional():
+        if lz_impure:
             assert False
-        if lz_n:
-            assert False
-        if lz_n.is_evaluated():
-            assert False
-        if lz_n.is_exceptional():
+        if lz_impure.is_exceptional():
             assert False
         assert cnt1.get() == 0
-        assert lz_n.eval()
+        lz_impure.eval()
         assert cnt1.get() == 1
-        if lz_p:
+        if lz_pure:
             assert False
-        if lz_p.is_evaluated():
+        if lz_pure.is_exceptional():
             assert False
-        if lz_p.is_exceptional():
-            assert False
-        if lz_n:
+        if lz_impure:
             assert True
-        if lz_n.is_evaluated():
-            assert True
-        if lz_n.is_exceptional():
+        if lz_impure.is_exceptional():
             assert False
-        assert lz_p.eval()
+        lz_pure.eval()
         assert cnt1.get() == 2
-        if lz_p:
+        if lz_pure:
             assert True
-        if lz_p.is_evaluated():
-            assert True
-        if lz_p.is_exceptional():
+        if lz_pure.is_exceptional():
             assert False
-        assert lz_p.eval() is True
+        lz_pure.eval()
         assert cnt1.get() == 2
-        assert lz_n.eval()
+        lz_impure.eval()
         assert cnt1.get() == 3
-        assert lz_p.eval()
+        lz_pure.eval()
         assert cnt1.get() == 3
-        assert lz_n.eval()
+        lz_impure.eval()
         assert cnt1.get() == 4
-        assert lz_n.eval()
+        lz_impure.eval()
         assert cnt1.get() == 5
-        assert lz_p.eval()
+        lz_pure.eval()
         assert cnt1.get() == 5
 
 class TestLazy10:
