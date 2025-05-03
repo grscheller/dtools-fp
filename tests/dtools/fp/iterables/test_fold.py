@@ -102,27 +102,27 @@ class Test_fp_mbFolds:
         assert mb_fold_left(data4, add) == MB(42)
         assert mb_fold_left(data4, add, 10) == MB(52)
 
-        data1 = (1, 2, 3, 4, 5)
-        data2 = (2, 3, 4, 5)
-        data3: list[int] = []
-        data4 = 42,
+        data5 = [1, 2, 3, 4, 5]
+        data6 = [2, 3, 4, 5]
+        data7: list[int] = []
+        data8 = [42]
 
-        assert mb_fold_left(data1, add) == MB(15)
-        assert mb_fold_left(data1, add, 10) == MB(25)
-        assert mb_fold_left(data2, add) == MB(14)
-        assert mb_fold_left(data3, add) == MB()
-        assert mb_fold_left(data4, add) == MB(42)
-        assert mb_fold_left(data4, add).get(-1) == 42
-        assert mb_fold_left(data3, add).get(-1) == -1
+        assert mb_fold_left(data5, add) == MB(15)
+        assert mb_fold_left(data5, add, 10) == MB(25)
+        assert mb_fold_left(data6, add) == MB(14)
+        assert mb_fold_left(data7, add) == MB()
+        assert mb_fold_left(data8, add) == MB(42)
+        assert mb_fold_left(data8, add).get(-1) == 42
+        assert mb_fold_left(data7, add).get(-1) == -1
 
-        assert mb_fold_left(data1, funcL) == MB(-156)
-        assert mb_fold_left(data2, funcL) == MB(84)
-        assert mb_fold_left(data3, funcL) == MB()
-        assert mb_fold_left(data3, funcL).get(-1) == -1
-        assert mb_fold_left(data4, funcL) == MB(42)
-        assert mb_fold_left(data1, funcL) == MB(-156)
-        assert mb_fold_left(data2, funcL) == MB(84)
-        assert mb_fold_left(data2, funcL).get() == 84
+        assert mb_fold_left(data5, funcL) == MB(-156)
+        assert mb_fold_left(data6, funcL) == MB(84)
+        assert mb_fold_left(data7, funcL) == MB()
+        assert mb_fold_left(data7, funcL).get(-1) == -1
+        assert mb_fold_left(data8, funcL) == MB(42)
+        assert mb_fold_left(data5, funcL) == MB(-156)
+        assert mb_fold_left(data6, funcL) == MB(84)
+        assert mb_fold_left(data6, funcL).get() == 84
 
 class Test_fp_sc_reducel:
 
@@ -167,7 +167,7 @@ class Test_fp_sc_reducel:
         except StopIteration:
             assert False
         else:
-            assert (int8, MB(mb_sum27)) == (8, MB(27))
+            assert (int8, MB(mb_sum27)) == (8, MB(MB(27)))
 
         # ---------------------------------------------------------------
 

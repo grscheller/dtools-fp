@@ -14,9 +14,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Iterator
+from typing import Any
 from dtools.fp.err_handling import MB
 from dtools.fp.lazy import Lazy, lazy, real_lazy
+
+#-- Test happy and sad paths ---------------------------------------------------
 
 def add2_if_pos(x: int) -> int:
     if x < 1:
@@ -24,12 +26,14 @@ def add2_if_pos(x: int) -> int:
     return x + 2
 
 def evaluate_it(lz: Lazy[int, int]) -> int:
-    if lz.is_exceptional():
-        return -1
+    lz.eval()
+    if lz.got_result().get():            # Opps ... API change needed
+        return lz.get_result().get()
     else:
-        return lz.result().get()
+        return -1
 
-class Test_Lazy:
+class Test_happy_sad_paths:
+
     def test_happy_path(self) -> None:
         assert evaluate_it(Lazy(add2_if_pos, 5)) == 7
 
@@ -51,14 +55,14 @@ def no_hello() -> str:
     while len(hello) > 1:
         if hello == 'hello':
             raise ValueError('failed as expected')
-        else:
-            hello = hello[:-1]
+        hello = hello[:-1]
     return hello
 
 def return_str(lz: Lazy[Any, str]) -> str:
-    if result := lz.result():
+    lz.eval()
+    if result := lz.get_result():
         return result.get()
-    return f'Error: {lz.exception().get()}'
+    return f'Error: {lz.get_exception().get()}'
 
 class Test_Lazy_0_1:
     def test_happy_path(self) -> None:
@@ -85,91 +89,118 @@ class Counter():
         self._cnt = n
 
 class TestLazy00:
-    def test_pure(self) -> None:
+    """Test for a function that
+
+    - takes no arguments
+    - throws no exceptions
+    - has only side effects
+
+    """
+    def test_pure_vs_impure(self) -> None:
         cnt1 = Counter(0)
 
-        lz_pure = real_lazy(cnt1.inc)
-        lz_impure = lazy(cnt1.inc)
+        pure = real_lazy(cnt1.inc)
+        impure = lazy(cnt1.inc)
 
-        if lz_pure:
-            assert False
-        if lz_pure.is_exceptional():
-            assert False
-        if lz_impure:
-            assert False
-        if lz_impure.is_exceptional():
-            assert False
+        # first check if counter works as expected
         assert cnt1.get() == 0
-        lz_impure.eval()
+        assert cnt1.get() == 0
+        cnt1.inc()
+        cnt1.inc()
+        assert cnt1.get() == 2
+        cnt1.set(0)
+        cnt1.inc()
         assert cnt1.get() == 1
-        if lz_pure:
-            assert False
-        if lz_pure.is_exceptional():
-            assert False
-        if lz_impure:
-            assert True
-        if lz_impure.is_exceptional():
-            assert False
-        lz_pure.eval()
+
+        # test not yet evaluated
+        assert pure.got_exception() == MB()
+        assert impure.got_exception() == MB()
+        assert pure.got_result() == MB()
+        assert impure.got_result() == MB()
+
+        # evaluate each and check side effect
+        cnt1.set(0)
+        impure.eval()
+        assert cnt1.get() == 1
+        impure.eval()
         assert cnt1.get() == 2
-        if lz_pure:
-            assert True
-        if lz_pure.is_exceptional():
-            assert False
-        lz_pure.eval()
-        assert cnt1.get() == 2
-        lz_impure.eval()
+        pure.eval()
         assert cnt1.get() == 3
-        lz_pure.eval()
+        pure.eval()
         assert cnt1.get() == 3
-        lz_impure.eval()
+        impure.eval()
         assert cnt1.get() == 4
-        lz_impure.eval()
+        impure.eval()
         assert cnt1.get() == 5
-        lz_pure.eval()
+        pure.eval()
         assert cnt1.get() == 5
+        pure.eval()
+        assert cnt1.get() == 5
+
+        # test if evaluated
+        assert pure.got_exception() == MB(False)
+        assert impure.got_exception() == MB(False)
+        assert pure.got_result() == MB(True)
+        assert impure.got_result() == MB(True)
+
 
 class TestLazy10:
+    """Test for a function that
+
+    - takes one argument
+    - throws no exceptions
+    - has only side effects
+
+    """
     def test_pure(self) -> None:
         cnt2 = Counter(0)
 
-        lz_p = real_lazy(cnt2.set, 2)
-        lz_n = lazy(cnt2.set, 5)
+        pure = real_lazy(cnt2.set, 2)
+        impure = lazy(cnt2.set, 5)
 
-        if lz_p:
-            assert False
-        if lz_p.is_evaluated():
-            assert False
-        if lz_p.is_exceptional():
-            assert False
-        if lz_n:
-            assert False
-        if lz_n.is_evaluated():
-            assert False
-        if lz_n.is_exceptional():
-            assert False
-        assert lz_p.eval() is True
+        # test not yet evaluated
+        assert pure.got_exception() == MB()
+        assert impure.got_exception() == MB()
+        assert pure.got_result() == MB()
+        assert impure.got_result() == MB()
+
+        # evaluate each and check side effect
+        assert cnt2.get() == 0
+        impure.eval()
+        assert cnt2.get() == 5
+        pure.eval()
         assert cnt2.get() == 2
-        assert lz_n.eval()
+        impure.eval()
         assert cnt2.get() == 5
-        assert lz_p.eval()
+        impure.eval()
         assert cnt2.get() == 5
-        cnt2.inc()
-        assert cnt2.get() == 6
-        assert lz_p.eval()
-        assert cnt2.get() == 6
-        assert lz_n.eval()
+        pure.eval()
         assert cnt2.get() == 5
 
-#---------------------------------------------------------------
+        # test if evaluated
+        assert pure.got_exception() == MB(False)
+        assert impure.got_exception() == MB(False)
+        assert pure.got_result() == MB(True)
+        assert impure.got_result() == MB(True)
 
-class TestLazy:
-    def test_lazy_0(self) -> None:
+
+class TestLazy01:
+    """Test for functions or methods that
+
+    - take no arguments
+    - can throw exceptions
+    - returns one value
+
+    """
+    def test_lazy_01(self) -> None:
+        state = []
+
         def foo42() -> int:
             return 42
 
         def bar42() -> int:
-            raise RuntimeError('not 42')
+            state.append (42)
+            raise TypeError('not 42')
 
         class FooBar():
             def __init__(self, secret: int):
@@ -181,97 +212,75 @@ class TestLazy:
                 else:
                     raise RuntimeError(13)
 
-        lz_42 = real_lazy(foo42)
-        if lz_42.eval():
-            assert lz_42.result().get(-1) == 42
-            assert lz_42.exception() == MB()
+        foo = lazy(foo42)
+        bar = lazy(bar42)
+        lz_foo = real_lazy(foo42)
+        lz_bar = real_lazy(bar42)
+
+        # test not yet evaluated
+        assert foo.got_result() == MB()
+        assert bar.got_result() == MB()
+        assert foo.got_exception() == MB()
+        assert bar.got_exception() == MB()
+        assert lz_foo.got_result() == MB()
+        assert lz_bar.got_result() == MB()
+        assert lz_foo.got_exception() == MB()
+        assert lz_bar.got_exception() == MB()
+
+        foo.eval()
+        if foo.got_result():
+            assert foo.get_result() == MB(42)
+            assert foo.get() == 42
+            assert foo.get(100) == 42
         else:
             assert False
 
-        lz_not_42 = real_lazy(bar42)
-        if lz_not_42.eval():
-            assert False
-        else:
-            assert lz_not_42.result().get(-1) == -1
-            assert str(lz_not_42.exception().get()) == 'not 42'
-
-        fb7 = FooBar(7)
-        lz_fb7 = real_lazy(fb7.get_secret)
-        if lz_fb7.eval():
-            assert lz_fb7.result().get(-1) == 7
-            assert lz_fb7.exception() == MB()
+        if foo.got_exception():     # Confusing! API change needed
+            assert foo.get_exception() == MB()
         else:
             assert False
 
-        fb13 = FooBar(13)
-        lz_fb13 = real_lazy(fb13.get_secret)
-        if lz_fb13.eval():
-            assert False
-        else:
-            assert lz_fb13.result().get(-1) == -1
-            assert str(lz_fb13.exception().get()) == '13'
-
-    def test_lazy_mixed_and_shared_state(self) -> None:
-        it5 = iter((6,5,4,3,2,1))
-
-        def foo(name: str, it: Iterator[int]) -> str:
-            try:
-                ii = next(it)
-            except StopIteration:
-                ii = 0
-            return name*ii
-
-        lz_foo = lazy(foo, 'foo', it5)
-        assert next(it5) == 6
-        assert not lz_foo.is_evaluated()
-        assert lz_foo.eval()
-        assert lz_foo.is_evaluated()
-        assert lz_foo.result().get('boobooboobooboo') == 'foofoofoofoofoo'
-        assert lz_foo.is_evaluated()
-        assert next(it5) == 4
-        assert lz_foo.eval()
-        assert lz_foo.exception() == MB()
-        assert lz_foo.result() == MB('foofoofoo')
-
-        lz_foo_pure = real_lazy(foo, 'foo', it5)
-        if lz_foo_pure.eval():
-            assert lz_foo_pure.result().get() == 'foofoo'
+        assert len(state) == 0
+        bar.eval()
+        if bar.got_result():        # Confusing! MB(x: bool) always True 
+            assert bar.get_result() == MB()
         else:
             assert False
 
-        if lz_foo_pure.eval():
-            assert lz_foo_pure.result().get() == 'foofoo'
+        if bar.got_exception():
+            exc = bar.get_exception().get()    # a bit verbose
+            assert isinstance(exc, TypeError)
+        else:
+            assert False
+        assert len(state) == 1
+
+        lz_foo.eval()
+        if lz_foo.got_result().get():
+            assert lz_foo.get_result() == MB(42)
         else:
             assert False
 
-        if lz_foo.eval():
-            assert lz_foo.result().get() == 'foo'
-        else:
-            assert False
-
-        if lz_foo.eval():
-            assert lz_foo.result().get() == ''
-        else:
-            assert False
-
-        if lz_foo.eval():
-            assert lz_foo.result().get() == ''
-        else:
-            assert False
-
-    def test_lazy_failures(self) -> None:
-
-        lz_add2_42 = real_lazy(add2_if_pos, 40)
-        lz_add2_2 = real_lazy(add2_if_pos, 0)
-
-        if lz_add2_42.eval():
-            assert lz_add2_42.result() == MB(42)
-        else:
-            assert False
-
-        if lz_add2_2.eval():
+        if lz_foo.got_exception().get():
             assert False
         else:
-            mb_exception = lz_add2_2.exception()
-            if mb_exception:
-                assert isinstance(mb_exception.get(), ValueError)
+            assert lz_foo.get_result() == MB(42)
+
+        bar.eval()
+        if bar.got_result().get():
+            assert False
+        else:
+            assert bar.get_result() == MB()
+        assert len(state) == 2
+
+        if lz_bar.got_exception():
+            assert False
+        assert len(state) == 2
+
+        lz_bar.eval()
+        assert len(state) == 3
+        lz_bar.eval()
+        assert len(state) == 3
+        bar.eval()
+        assert len(state) == 4
+        lz_bar.eval()
+        assert len(state) == 4

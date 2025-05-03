@@ -28,14 +28,14 @@ Useful to delay a function's evaluation until some inner scope.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Final, TypeVar, ParamSpec
+from typing import Any, Final, Never, TypeVar, ParamSpec
 from .err_handling import MB, XOR, LEFT, RIGHT
 from .function import sequenced
 
 __all__ = ['Lazy', 'lazy', 'real_lazy']
 
-D = TypeVar('D')    # Needed only for pdoc documentation generation. When
-R = TypeVar('R')    # used on function and method signatures, linters will
+D = TypeVar('D')  # Needed only for pdoc documentation generation. When
+R = TypeVar('R')  # used on function and method signatures, linters will
 P = ParamSpec('P')  # show "redefined-outer-name" warnings.
 
 
@@ -57,61 +57,76 @@ class Lazy[D, R]:
     arguments wrapped in Lazy instances.
     """
 
-    __slots__ = ('_f', '_d', '_result', '_pure')
+    __slots__ = ('_f', '_d', '_result', '_pure', '_evaluated', '_exceptional')
 
     def __init__(self, f: Callable[[D], R], d: D, pure: bool = True) -> None:
         self._f: Final[Callable[[D], R]] = f
         self._d: Final[D] = d
         self._pure: bool = pure
-        self._result: XOR[R, MB[Exception]] = XOR(MB(), RIGHT)
+        self._evaluated: bool = False
+        self._exceptional: MB[bool] = MB()
+        self._result: XOR[R, Exception]
 
     def __bool__(self) -> bool:
-        if self._result:
-            return True
-        return self._result != XOR(MB(), RIGHT)
+        return self._evaluated
 
     def eval(self) -> None:
         """Evaluate function with its argument.
 
         - evaluate function
-        - cache results or exceptions if `pure == True`
+        - cache result or exception if `pure == True`
         - reevaluate if `pure == False`
 
         """
-        if not self._pure or not self:
+        if not (self._pure and self._evaluated):
             try:
                 result = self._f(self._d)
             except Exception as exc:
-                self._result = XOR(MB(exc), RIGHT)
-            self._result = XOR(result, LEFT)
+                self._result, self._evaluated, self._exceptional = (
+                    XOR(exc, RIGHT),
+                    True,
+                    MB(True),
+                )
+            else:
+                self._result, self._evaluated, self._exceptional = (
+                    XOR(result, LEFT),
+                    True,
+                    MB(False),
+                )
 
     def got_result(self) -> MB[bool]:
-        """Return true if Lazy did not raised exception."""
-        if self:
-            return MB(False) if self._result.get_right() else MB(True)
-        return MB()
+        """Return true if an evaluated Lazy did not raise an exception."""
+        return self._exceptional.bind(lambda x: MB(not x))
 
     def got_exception(self) -> MB[bool]:
         """Return true if Lazy raised exception."""
-        if self:
-            return MB(True) if self._result.get_right() else MB(False)
-        return MB()
+        return self._exceptional
+
+    def get(self, alt: R | None = None) -> R | Never:
+        """Get result only if evaluated and no exceptions occurred, otherwise
+        return an alternate value.
+
+        A possible use case would be if the calculation is expensive, but if it
+        has already been done, its result is better than the alternate value.
+        """
+        if self._evaluated and self._result:
+            return self._result.get()
+        if alt is not None:
+            return alt
+        msg = 'Lazy: method get needed an alternate value but none given.'
+        raise ValueError(msg)
 
     def get_result(self) -> MB[R]:
-        """Get result if evaluate."""
-        if self:
-            if self._result:
-                return MB(self._result.get())
+        """Get result only if evaluate and not exceptional."""
+        if self._evaluated and self._result:
+            return self._result.get_left()
         return MB()
 
     def get_exception(self) -> MB[Exception]:
-        """Get exception if exceptional, evaluate if necessary"""
-        if self:
-            if self._result:
-                return MB()
-
-
-        return self._result.get_right()
+        """Get result only if evaluate and exceptional."""
+        if self._evaluated and not self._result:
+            return self._result.get_right()
+        return MB()
 
 
 def lazy[**P, R](

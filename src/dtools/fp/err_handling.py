@@ -307,42 +307,31 @@ class XOR[L, R]:
 
         return False
 
-    @overload
-    def get(self) -> L: ...
-    @overload
-    def get(self, alt: L) -> L: ...
-    @overload
-    def get(self, alt: MB[L]) -> L: ...
+    def get(self) -> L | Never:
+        """Get value if a left. Unsafe convenience function.
 
-    def get(self, alt: L | MB[L] = MB()) -> L | Never:
-        """Get value if a left.
-
-        - if the `XOR` is a left, return its value
-        - if a right, return an alternate value of type `~L`
-          - alternate value can be provided directly or wrapped in a MB
-
-        - raises `ValueError` for when an alt value is needed but not provided
-          - best practice check self in a boolean context first
+        - if the `XOR` is a "left" XOR
+          - return its value
+        - if the `XOR` contains a right value
+          - raises `ValueError`
+          - best practice is to first check the `XOR` in a boolean context
 
         """
-        value: L | Sentinel = Sentinel('MB')
-
-        match alt:
-            case MB(item):
-                if self:
-                    value = cast(L, self._value)
-                elif alt:
-                    value = item
-                else:
-                    msg = 'XOR: get method not provided a valid alternate value'
-                    raise ValueError(msg)
-            case item:
-                if self:
-                    value = cast(L, self._value)
-                else:
-                    value = item
-
+        if (value := self._value) == Sentinel('MB'):
+            msg = 'XOR: get method called on a right XOR'
+            raise ValueError(msg)
         return cast(L, value)
+
+    def get_left(self) -> MB[L]:
+        """Get value of `XOR` if a left. Safer version of `get` method.
+
+        - if `XOR` contains a left value, return it wrapped in a MB
+        - if `XOR` contains a tight value, return MB()
+
+        """
+        if self:
+            return MB(cast(L, self._value))
+        return MB()
 
     def get_right(self) -> MB[R]:
         """Get value of `XOR` if a right

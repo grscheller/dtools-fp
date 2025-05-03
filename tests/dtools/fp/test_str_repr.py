@@ -89,11 +89,74 @@ class Test_repr:
         assert repr(mb7) ==  'MB(3)'
         assert repr(mb8) == repr(mb9) ==  'MB()'
 
-        foofoo = MB(MB('foo'))
-        foofoo2 = eval(repr(foofoo))
-        assert foofoo2 == foofoo
-        assert repr(foofoo2) == repr(foofoo) =="MB('foo')"
-        if foofoo:
+        mb_str = MB('foo')
+        mb_str_2 = eval(repr(mb_str))
+        assert mb_str_2 == mb_str
+        assert repr(mb_str_2) == repr(mb_str) =="MB('foo')"
+        if mb_str:
+            assert True
+        else:
+            assert False
+
+        mb_str0 = MB('')
+        mb_str0_2 = eval(repr(mb_str0))
+        assert mb_str0_2 == mb_str0
+        assert repr(mb_str0_2) == repr(mb_str0) =="MB('')"
+        if mb_str0:
+            assert True
+        else:
+            assert False
+
+        mb_none = MB(None)
+        mb_none_2 = eval(repr(mb_none))
+        assert mb_none_2 == mb_none
+        assert repr(mb_none_2) == repr(mb_none_2) =="MB(None)"
+        if mb_none:
+            assert True
+        else:
+            assert False
+
+        mb_never: MB[str] = MB()
+        mb_never_2 = eval(repr(mb_never))
+        assert mb_never_2 == mb_never
+        assert repr(mb_never_2) == repr(mb_never) =="MB()"
+        if mb_never:
+            assert False
+        else:
+            assert True
+
+        mbmb_str = MB(MB('foo'))
+        mbmb_str_2 = eval(repr(mbmb_str))
+        assert mbmb_str_2 == mbmb_str
+        assert repr(mbmb_str_2) == repr(mbmb_str) =="MB(MB('foo'))"
+        if mbmb_str:
+            assert True
+        else:
+            assert False
+
+        mbmb_str0 = MB(MB(''))
+        mbmb_str0_2 = eval(repr(mbmb_str0))
+        assert mbmb_str0_2 == mbmb_str0
+        assert repr(mbmb_str0_2) == repr(mbmb_str0) =="MB(MB(''))"
+        if mbmb_str0:
+            assert True
+        else:
+            assert False
+
+        mbmb_none = MB(MB(None))
+        mbmb_none_2 = eval(repr(mbmb_none))
+        assert mbmb_none_2 == mbmb_none
+        assert repr(mbmb_none_2) == repr(mbmb_none_2) =="MB(MB(None))"
+        if mbmb_none:
+            assert True
+        else:
+            assert False
+
+        mbmb_never: MB[MB[str]] = MB(MB())
+        mbmb_never_2 = eval(repr(mbmb_never))
+        assert mbmb_never_2 == mbmb_never
+        assert repr(mbmb_never_2) == repr(mbmb_never) =="MB(MB())"
+        if mbmb_never:
             assert True
         else:
             assert False
