@@ -19,6 +19,8 @@ from dtools.tuples.ftuple import f_tuple as ft
 from dtools.fp.err_handling import MB, XOR, LEFT, RIGHT
 
 
+# -- Simple contrived tests ----------------------------------------------------
+
 def gt42(x: int) -> bool|Never:
     """function that fails for 42, returns a bool"""
     if x > 42:
@@ -53,60 +55,8 @@ def fail_str(s: str) -> str|Never:
         raise ValueError
     return s
 
-class TestXOR:
-    def test_usecase(self) -> None:
-        """Non-systematic tests for ease of use"""
-        xor_99 = XOR[int, str](99, LEFT)
-        xor_86 = XOR[int, str]('Max', RIGHT)
-        xor_49 = XOR[int, str](49)
-        xor_42 = XOR[int, str](42)
-        xor_42_clone = XOR[int, str](42)
-        xor_21 = XOR[int, str](21)
-        xor_12 = XOR[int, str](12)
-        xor_01 = XOR[int, str](1)
-
-        assert xor_99.get() == 99
-        assert xor_99.get_right() == MB()
-        try:
-            assert xor_86.get() == 86
-        except AssertionError:
-            assert False
-        except ValueError:
-            assert True
-        else:
-            assert False
-        assert xor_86.get_right() == MB('Max')
-
-        assert            XOR(True, LEFT) == xor_99.map(gt42, 'left 99')            == xor_49.map(gt42, 'left 49')
-        assert           XOR(False, LEFT) == xor_01.map(gt42, 'map failed')         != xor_86.map(gt42, 'map failed') == XOR('Max', RIGHT)
-        assert           XOR(False, LEFT) == xor_12.map(gt42, 'map failed')         == xor_21.map(gt42, 'map failed')
-        assert       XOR('failed', RIGHT) == xor_42.map(gt42, 'failed')             == xor_42_clone.map(gt42, 'failed')
-        assert XOR('clone failed', RIGHT) == xor_42_clone.map(gt42, 'clone failed') != xor_42.map(gt42, 'failed')     == XOR('failed', RIGHT)
-
-        chief1 = xor_86.map_right(
-            (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
-        )
-        chief2 = xor_42.map(gt42, 'Smart').map_right(
-            (lambda s: f'{s}, you\'re fired!'), 'Not the dome of silence!'
-        )
-        chief3 = xor_86.map_right(fail_str, 'Not the dome of silence!')
-        chief4 = xor_99.map_right(fail_str, 'Not the dome of silence!')
-        hymie99 = xor_99.map((lambda s: f'Hello agent {s}!'), 'Got some oil?')
-        hymie21 = xor_21.bind(lt42, 'Seigfried').map(
-            (lambda s: f'Hello agent {s}!'), 'Got some oil?'
-        )
-        hymie42 = xor_42.bind(lt42, 'Ratton').map_right(fail_str, 'Got some oil?')
-
-        assert chief1 != chief2
-        assert chief3 != chief4
-        assert chief1 == XOR('Max, you idiot!', RIGHT)
-        assert chief2 == XOR('Smart, you\'re fired!', RIGHT)
-        assert chief3 == XOR('Not the dome of silence!', RIGHT)
-        assert chief4 == XOR(99, LEFT)
-        assert hymie99 == XOR('Hello agent 99!', LEFT)
-        assert hymie21 == XOR('Hello agent 21!', LEFT)
-        assert hymie42 == XOR('Got some oil?', RIGHT)
-
+class TestSimole:
+    """Simple tests"""
     def test_equal(self) -> None:
         """some non-systematic tests"""
         xor41 = XOR[int, str](40 + 1)
@@ -130,13 +80,6 @@ class TestXOR:
         assert xor42 != xor_str_42
         assert xor42 == xor_42tuple
         assert xor_42tuple != xor42_tuple
-
-        ft_xor_int_str = ft(xor41, xor42, xor43)
-        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42bool, 'bind failed'))
-
-        assert ft_xor_bool_str[0] == XOR[bool, str](True, LEFT)
-        assert ft_xor_bool_str[1] == XOR[bool, str]('bind failed', RIGHT)
-        assert ft_xor_bool_str[2] == XOR[bool, str]('43', RIGHT)
 
     def test_identity(self) -> None:
         e1: XOR[int, str] = XOR(42)
@@ -196,19 +139,78 @@ class TestXOR:
         assert e5 != e6
         assert e6 == e6
 
-    def test_xor_map(self) -> None:
-        def add2ifLT5(x: int) -> int | Never:
-            """Contrived function to fail if given 5"""
-            if x < 5:
-                return x + 2
-            elif x > 5:
-                return x
-            else:
-                raise ValueError
+    def test_MB_XOR(self) -> None:
+        """Proving a nothing can be stored in a something"""
+        mb_42 = MB(42)
+        mb_not: MB[int] = MB()
 
-        s2 = XOR[int, str](2)
-        s5 = XOR[int, str](5)
-        s10 = XOR[int, str](10)
+        left_mb_42: XOR[MB[int], str] = XOR(mb_42, LEFT)
+        left_mb_not: XOR[MB[int], str] = XOR(mb_not, LEFT)
+        assert left_mb_42 == XOR(MB(42), LEFT)
+        assert left_mb_not == XOR(MB(), LEFT)
+
+        phNot1: MB[XOR[MB[int], str]] = MB(XOR(MB[int](), LEFT))
+        phNot2 = MB(XOR[int, str]('', RIGHT))
+        assert phNot1 != phNot2
+
+        none_to_the_left_1: XOR[None, None] = XOR(None, LEFT)
+        none_to_the_left_2: XOR[None, None] = XOR(None, LEFT)
+        none_to_the_right_1: XOR[None, None] = XOR(None, RIGHT)
+        none_to_the_right_2: XOR[None, None] = XOR(None, RIGHT)
+
+        assert none_to_the_left_1 == none_to_the_left_1
+        assert none_to_the_left_2 == none_to_the_left_2
+        assert none_to_the_left_1 == none_to_the_left_2
+        assert none_to_the_right_1 == none_to_the_right_1
+        assert none_to_the_right_2 == none_to_the_right_2
+        assert none_to_the_right_1 == none_to_the_right_2
+        assert none_to_the_left_1 != none_to_the_right_1
+        assert none_to_the_left_2 != none_to_the_right_2
+
+# -- Test map and map_right ----------------------------------------------------------
+
+def add2ifLT5(x: int) -> int | Never:
+    """Contrived function to fail if given 5"""
+    if x < 5:
+        return x + 2
+    elif x > 5:
+        return x
+    else:
+        raise ValueError
+
+def add_1_if_gt_5(x: int) -> int:
+    """Contrived function to fail if given 5"""
+    if x == 5:
+        raise ValueError
+    if x > 5:
+        return x + 1
+    return x
+
+def chk_str_starts_map(s: str) -> str|Never:
+    """Contrived function to fail if str given does not start 'map'"""
+    if s[0:3] == 'map':
+        return f'{s}'
+    else:
+        raise ValueError
+
+class TestMapAndNapRight:
+    """Test map and map_right together"""
+    def test_xor_map(self) -> None:
+        """Test map by itself"""
+        s2 = XOR[int, str](2, LEFT)
+        s5 = XOR[int, str](5, LEFT)
+        s10 = XOR[int, str](10, LEFT)
+        s_foo = XOR[int, str]('foo', RIGHT)
+
+        assert s2.get_left() == MB(2)
+        assert s5.get_left() == MB(5)
+        assert s10.get_left() == MB(10)
+        assert s_foo.get_left() == MB()
+        assert s2.get_right() == MB()
+        assert s5.get_right() == MB('The map failed.')
+        assert s10.get_right() == MB('foo')
+        assert s_foo.get_right() == MB('foo')
+
         s2 = s2.map(add2ifLT5, 'map failed').map_right(
             (lambda s: 'The ' + s + '.'), 'The map.right failed!'
         )
@@ -218,16 +220,18 @@ class TestXOR:
         s10 = s10.map(add2ifLT5, 'map failed').map_right(
             (lambda s: 'The ' + s + '.'), 'The map.right failed!'
         )
+        s_foo = s_foo.map(add2ifLT5, 'map failed').map_right(
+            (lambda s: 'The ' + s + '.'), 'The map.right failed!'
+        )
 
-        assert s2.get(42) == 4
-        assert s5.get(42) == 42
-        assert s10.get(42) == 10
-        assert s2.get(MB(42)) == 4
-        assert s5.get(MB(42)) == 42
-        assert s10.get(MB(42)) == 10
+        assert s2.get_left() == MB(4)
+        assert s5.get_left() == MB(42)
+        assert s10.get_left() == MB(10)
+        assert s_foo.get_left() == MB()
         assert s2.get_right() == MB()
         assert s5.get_right() == MB('The map failed.')
         assert s10.get_right() == MB()
+        assert s_foo.get_right() == MB('foo')
 
         try:
             assert s2.get() == 4
@@ -255,25 +259,25 @@ class TestXOR:
         else:
             assert False
 
-    def test_xor_map_right(self) -> None:
-        def add_1_if_gt_5(x: int) -> int:
-            """Contrived function to fail if given 5"""
-            if x == 5:
-                raise ValueError
-            if x > 5:
-                return x + 1
-            return x
+    def test_xor_maps(self) -> None:
+        """Test map and map_right together"""
 
-        def chk_str_starts_map(s: str) -> str|Never:
-            """Contrived function to fail if str given does not start 'map'"""
-            if s[0:3] == 'map':
-                return 's'
-            else:
-                raise ValueError
+        s2 = XOR[int, str](2, LEFT)
+        s5 = XOR[int, str](5, LEFT)
+        s10 = XOR[int, str](10, LEFT)
+        s_bar = XOR[int, str]('bar', RIGHT)
 
-        s2 = XOR[int, str](2)
-        s5 = XOR[int, str](5)
-        s10 = XOR[int, str](10)
+        assert s2.get() == 2
+        assert s10.get() == 10
+        assert s2.get_left() == MB(2)
+        assert s5.get_left() == MB(5)
+        assert s10.get_left() == MB(10)
+        assert s_bar.get_left() == MB()
+        assert s2.get_right() == MB()
+        assert s5.get_right() == MB()
+        assert s10.get_right() == MB()
+        assert s_bar.get_right() == MB('bar')
+
         s2 = s2.map(add_1_if_gt_5, 'map failed').map_right(
             chk_str_starts_map, 'The map_right failed!'
         )
@@ -283,57 +287,83 @@ class TestXOR:
         s10 = s10.map(add_1_if_gt_5, 'my map failed').map_right(
             chk_str_starts_map, 'The map_right failed!'
         )
+        s_bar = s_bar.map(add_1_if_gt_5, 'my map failed').map_right(
+            chk_str_starts_map, 'The map_right failed!'
+        )
 
-        assert s2.get(42) == 2
-        assert s5.get(42) == 42
-        assert s10.get(42) == 11
-        assert s2.get(MB(42)) == 2
-        assert s5.get(MB(42)) == 42
-        assert s10.get(MB(42)) == 11
+        assert s2.get() == 2
+        assert s10.get() == 11
+        assert s2.get_left() == MB(2)
+        assert s5.get_left() == MB()
+        assert s10.get_left() == MB(11)
+        assert s_bar.get_left() == MB()
         assert s2.get_right() == MB()
         assert s5.get_right() == MB('The map_right failed!')
         assert s10.get_right() == MB()
+        assert s_bar.get_right() == MB('bar')
 
         try:
-            assert s2.get() == 2
-            assert s10.get() == 11
+            s2g = s2.get()
+            s10g = s10.get()
+            assert s2g == 2
+            assert s10g == 11
         except AssertionError:
             assert False
-        else:
-            assert True
+        except ValueError:
+            assert False
 
         try:
-            assert int(s5.get()) > 0
+            s5g = s5.get()
+            assert s5g > 0
         except AssertionError:
             assert False
         except ValueError:
             assert True
-        else:
-            assert False
 
         try:
-            assert s2.get() != 2
+            s2g = s2.get()
+            assert s2g != 2
         except AssertionError:
             assert True
         except ValueError:
             assert False
-        else:
+
+        try:
+            s_bar_g = s_bar.get()
+            assert s_bar_g != 2
+        except AssertionError:
+            assert True
+        except ValueError:
             assert False
 
+
+# -- Test map and map_right ----------------------------------------------------------
+
+def lessThan2(x: int) -> XOR[int, str]:
+    if x < 2:
+        return XOR(x, LEFT)
+    else:
+        return XOR(f'{x} >= 2', RIGHT)
+
+def lessThan5(x: int) -> XOR[int, str]:
+    if x < 5:
+        return XOR(x, LEFT)
+    else:
+        return XOR(f'{x} >= 5', RIGHT)
+
+
+class TestBind:
+    """Test map and map_right together"""
+    def test_bind_simple(self) -> None:
+        """Simple bind tests"""
+        ft_xor_int_str = ft(xor41, xor42, xor43)
+        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42bool, 'bind failed'))
+
+        assert ft_xor_bool_str[0] == XOR[bool, str](True, LEFT)
+        assert ft_xor_bool_str[1] == XOR[bool, str]('bind failed', RIGHT)
+        assert ft_xor_bool_str[2] == XOR[bool, str]('43', RIGHT)
 
     def test_xor_bind(self) -> None:
-        def lessThan2(x: int) -> XOR[int, str]:
-            if x < 2:
-                return XOR(x, LEFT)
-            else:
-                return XOR(f'{x} >= 2', RIGHT)
-
-        def lessThan5(x: int) -> XOR[int, str]:
-            if x < 5:
-                return XOR(x, LEFT)
-            else:
-                return XOR(f'{x} >= 5', RIGHT)
-
         left1 = XOR[int, str](1, LEFT)
         left4 = XOR[int, str](4, LEFT)
         left7 = XOR[int, str](7, LEFT)
@@ -381,16 +411,60 @@ class TestXOR:
         assert lt2 == XOR('greater than or equal 2', RIGHT)
         assert lt5 == XOR('7 >= 5, greater than or equal 5', RIGHT)
 
-    def test_MB_XOR(self) -> None:
-        """Proving a nothing can be stored in a something."""
-        mb_42 = MB(42)
-        mb_not: MB[int] = MB()
+class TestXorUsecases:
+    """Non-systematic tests for ease of use"""
+    def test_usecase(self) -> None:
+        ""
+        xor_99 = XOR[int, str](99, LEFT)
+        xor_86 = XOR[int, str]('Max', RIGHT)
+        xor_49 = XOR[int, str](49)
+        xor_42 = XOR[int, str](42)
+        xor_42_clone = XOR[int, str](42)
+        xor_21 = XOR[int, str](21)
+        xor_12 = XOR[int, str](12)
+        xor_01 = XOR[int, str](1)
 
-        left_mb_42: XOR[MB[int], str] = XOR(mb_42, LEFT)
-        left_mb_not: XOR[MB[int], str] = XOR(mb_not, LEFT)
-        assert left_mb_42 == XOR(MB(42), LEFT)
-        assert left_mb_not == XOR(MB(), LEFT)
+        assert xor_99.get() == 99
+        assert xor_99.get_right() == MB()
+        agent = xor_86.get()
+        assert agent == 1000
+        try:
+            assert agent == 86
+        except AssertionError:
+            assert False
+        except ValueError:
+            assert True
+        else:
+            assert False
+        assert xor_86.get_right() == MB('Max')
 
-        phNot1: MB[XOR[MB[int], str]] = MB(XOR(MB[int](), LEFT))
-        phNot2 = MB(XOR[int, str]('', RIGHT))
-        assert phNot1 != phNot2
+        assert            XOR(True, LEFT) == xor_99.map(gt42, 'left 99')            == xor_49.map(gt42, 'left 49')
+        assert           XOR(False, LEFT) == xor_01.map(gt42, 'map failed')         != xor_86.map(gt42, 'map failed') == XOR('Max', RIGHT)
+        assert           XOR(False, LEFT) == xor_12.map(gt42, 'map failed')         == xor_21.map(gt42, 'map failed')
+        assert       XOR('failed', RIGHT) == xor_42.map(gt42, 'failed')             == xor_42_clone.map(gt42, 'failed')
+        assert XOR('clone failed', RIGHT) == xor_42_clone.map(gt42, 'clone failed') != xor_42.map(gt42, 'failed')     == XOR('failed', RIGHT)
+
+        chief1 = xor_86.map_right(
+            (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
+        )
+        chief2 = xor_42.map(gt42, 'Smart').map_right(
+            (lambda s: f'{s}, you\'re fired!'), 'Not the dome of silence!'
+        )
+        chief3 = xor_86.map_right(fail_str, 'Not the dome of silence!')
+        chief4 = xor_99.map_right(fail_str, 'Not the dome of silence!')
+        hymie99 = xor_99.map((lambda s: f'Hello agent {s}!'), 'Got some oil?')
+        hymie21 = xor_21.bind(lt42, 'Seigfried').map(
+            (lambda s: f'Hello agent {s}!'), 'Got some oil?'
+        )
+        hymie42 = xor_42.bind(lt42, 'Ratton').map_right(fail_str, 'Got some oil?')
+
+        assert chief1 != chief2
+        assert chief3 != chief4
+        assert chief1 == XOR('Max, you idiot!', RIGHT)
+        assert chief2 == XOR('Smart, you\'re fired!', RIGHT)
+        assert chief3 == XOR('Not the dome of silence!', RIGHT)
+        assert chief4 == XOR(99, LEFT)
+        assert hymie99 == XOR('Hello agent 99!', LEFT)
+        assert hymie21 == XOR('Hello agent 21!', LEFT)
+        assert hymie42 == XOR('Got some oil?', RIGHT)
+

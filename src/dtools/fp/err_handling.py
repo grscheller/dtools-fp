@@ -149,14 +149,14 @@ class MB[D]:
             return cast(MB[U], self)
         try:
             return MB(f(cast(D, self._value)))
-        except Exception:
+        except RuntimeError:
             return MB()
 
     def bind[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map `MB` with function `f` and flatten."""
         try:
             return f(cast(D, self._value)) if self else MB()
-        except Exception:
+        except RuntimeError:
             return MB()
 
     @staticmethod
@@ -164,7 +164,7 @@ class MB[D]:
         """Return MB wrapped result of a function call that can fail"""
         try:
             return MB(f(u))
-        except Exception:
+        except RuntimeError:
             return MB()
 
     @staticmethod
@@ -273,7 +273,7 @@ class XOR[L, R]:
         self._side = side
 
     def __bool__(self) -> bool:
-        return bool(self._side)
+        return self._side == LEFT
 
     def __iter__(self) -> Iterator[L]:
         if self:
@@ -317,10 +317,10 @@ class XOR[L, R]:
           - best practice is to first check the `XOR` in a boolean context
 
         """
-        if (value := self._value) == Sentinel('MB'):
-            msg = 'XOR: get method called on a right XOR'
+        if self._side == RIGHT:
+            msg = 'XOR: get method called on a right valued XOR'
             raise ValueError(msg)
-        return cast(L, value)
+        return cast(L, self._value)
 
     def get_left(self) -> MB[L]:
         """Get value of `XOR` if a left. Safer version of `get` method.
@@ -329,7 +329,7 @@ class XOR[L, R]:
         - if `XOR` contains a tight value, return MB()
 
         """
-        if self:
+        if self._side == LEFT:
             return MB(cast(L, self._value))
         return MB()
 
@@ -340,18 +340,15 @@ class XOR[L, R]:
         - if `XOR` contains a left value, return MB()
 
         """
-        if self:
-            return MB()
-        return MB(cast(R, self._value))
+        if self._side == RIGHT:
+            return MB(cast(R, self._value))
+        return MB()
 
-    def map[U](self, f: Callable[[L], U], failed_map: R) -> XOR[U, R]:
+    def map[U](self, f: Callable[[L], U], fail: R) -> XOR[U, R]:
         """Map over if a left value.
 
-        TODO: Change to make a right value the exception?
-
         - if `XOR` is a left then map `f` over its value
-
-          - if `f` successful return a left `XOR[S, R]`
+          - if `f` successful return a left `XOR[U, R]`
           - if `f` unsuccessful return right `XOR[S, R]`
             - swallows any exceptions `f` may throw
         - if `XOR` is a right
@@ -359,26 +356,33 @@ class XOR[L, R]:
           - use method `map_right` to adjust the returned value
 
         """
-        if not self:
+        if self._side == RIGHT:
             return cast(XOR[U, R], self)
         try:
             applied = f(cast(L, self._value))
-        except Exception:
-            return cast(XOR[U, R], XOR(failed_map, side=RIGHT))
+        except RuntimeError:
+            return cast(XOR[U, R], XOR(fail, side=RIGHT))
 
         return XOR(applied)
 
     def map_right(self, g: Callable[[R], R], alt_right: R) -> XOR[L, R]:
         """Map over a right value."""
-        if self:
+        if self._side == LEFT:
             return self
 
         try:
             value = g(cast(R, self._value))
-        except Exception:
+        except RuntimeError:
             value = alt_right
 
         return XOR(value, RIGHT)
+
+    def change_right[V](self, right: V) -> XOR[L, V]:
+        """Change a right value's type and value."""
+        if self._side == LEFT:
+            return cast(XOR[L, V], self)
+
+        return XOR[L, V](right, RIGHT)
 
     def bind[U](self, f: Callable[[L], XOR[U, R]], alt_right: R) -> XOR[U, R]:
         """Flatmap over the left value
@@ -386,45 +390,53 @@ class XOR[L, R]:
         - map over and then trivially "flatten" the left value
         - propagate right values
         - if bind fails, return alt_right wrapped in an right XOR
+          - WARNING: swallows RuntimeErrors
 
         """
         if self:
             try:
                 return f(cast(L, self._value))
-            except Exception:
+            except RuntimeError:
                 return XOR(alt_right, RIGHT)
+
         return cast(XOR[U, R], self)
 
     @staticmethod
-    def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, Exception]:
+    def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, RuntimeError]:
         """Return XOR wrapped result of a function call that can fail"""
         try:
-            return XOR(f(left))
-        except Exception as esc:
-            return XOR(esc, side=RIGHT)
+            xor = XOR[V, RuntimeError](f(left), LEFT)
+        except RuntimeError as exc:
+            xor = XOR(exc, side=RIGHT)
+
+        return xor
 
     @staticmethod
-    def lz_call[U, V](f: Callable[[U], V], left: U) -> Callable[[], XOR[V, Exception]]:
+    def lz_call[U, V](
+        f: Callable[[U], V], arg: U
+    ) -> Callable[[], XOR[V, RuntimeError]]:
         """Return an XOR of a delayed evaluation of a function"""
 
-        def ret() -> XOR[V, Exception]:
-            return XOR.call(f, left)
+        def ret() -> XOR[V, RuntimeError]:
+            return XOR.call(f, arg)
 
         return ret
 
     @staticmethod
-    def idx[V](v: Sequence[V], ii: int) -> XOR[V, MB[Exception]]:
+    def idx[V](v: Sequence[V], ii: int) -> XOR[V, IndexError]:
         """Return an XOR of an indexed value that can fail"""
         try:
-            return XOR(v[ii])
-        except Exception as esc:
-            return XOR(MB(esc), side=RIGHT)
+            xor = XOR[V, IndexError](v[ii], LEFT)
+        except IndexError as exc:
+            xor = XOR(exc, side=RIGHT)
+
+        return xor
 
     @staticmethod
-    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], XOR[V, MB[Exception]]]:
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[int], XOR[V, IndexError]]:
         """Return an XOR of a delayed indexing of a sequenced type that can fail"""
 
-        def ret() -> XOR[V, MB[Exception]]:
+        def ret(ii: int) -> XOR[V, IndexError]:
             return XOR.idx(v, ii)
 
         return ret
