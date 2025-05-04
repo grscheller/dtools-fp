@@ -51,6 +51,7 @@ class MB[D]:
     - stateful methods `put` and `pop`
       - useful to treat a `MB` as a stateful object
       - basically a container that can contain 1 or 0 objects
+      - TODO: remove these, create a stateful object for this usecase
 
     """
 
@@ -149,14 +150,30 @@ class MB[D]:
             return cast(MB[U], self)
         try:
             return MB(f(cast(D, self._value)))
-        except RuntimeError:
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ):
             return MB()
 
     def bind[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
         """Map `MB` with function `f` and flatten."""
         try:
             return f(cast(D, self._value)) if self else MB()
-        except RuntimeError:
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ):
             return MB()
 
     @staticmethod
@@ -164,7 +181,15 @@ class MB[D]:
         """Return MB wrapped result of a function call that can fail"""
         try:
             return MB(f(u))
-        except RuntimeError:
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ):
             return MB()
 
     @staticmethod
@@ -181,7 +206,15 @@ class MB[D]:
         """Return a MB of an indexed value that can fail"""
         try:
             return MB(v[ii])
-        except IndexError:
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ):
             return MB()
 
     @staticmethod
@@ -344,7 +377,7 @@ class XOR[L, R]:
             return MB(cast(R, self._value))
         return MB()
 
-    def map[U](self, f: Callable[[L], U], fail: R) -> XOR[U, R]:
+    def map[U](self, f: Callable[[L], U], right: R) -> XOR[U, R]:
         """Map over if a left value.
 
         - if `XOR` is a left then map `f` over its value
@@ -358,12 +391,25 @@ class XOR[L, R]:
         """
         if self._side == RIGHT:
             return cast(XOR[U, R], self)
-        try:
-            applied = f(cast(L, self._value))
-        except RuntimeError:
-            return cast(XOR[U, R], XOR(fail, side=RIGHT))
 
-        return XOR(applied)
+        applied: MB[XOR[U, R]] = MB()
+        fallback: MB[XOR[U, R]] = MB()
+        try:
+            applied = MB(XOR(f(cast(L, self._value)), LEFT))
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ):
+            fallback = MB(cast(XOR[U, R], XOR(right, RIGHT)))
+
+        if fallback:
+            return fallback.get()
+        return applied.get()
 
     def map_right(self, g: Callable[[R], R], alt_right: R) -> XOR[L, R]:
         """Map over a right value."""
@@ -371,20 +417,27 @@ class XOR[L, R]:
             return self
 
         try:
-            value = g(cast(R, self._value))
-        except RuntimeError:
-            value = alt_right
+            right = g(cast(R, self._value))
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ):
+            right = alt_right
 
-        return XOR(value, RIGHT)
+        return XOR(right, RIGHT)
 
     def change_right[V](self, right: V) -> XOR[L, V]:
         """Change a right value's type and value."""
         if self._side == LEFT:
             return cast(XOR[L, V], self)
-
         return XOR[L, V](right, RIGHT)
 
-    def bind[U](self, f: Callable[[L], XOR[U, R]], alt_right: R) -> XOR[U, R]:
+    def bind[U](self, f: Callable[[L], XOR[U, R]], fallback_right: R) -> XOR[U, R]:
         """Flatmap over the left value
 
         - map over and then trivially "flatten" the left value
@@ -396,47 +449,64 @@ class XOR[L, R]:
         if self:
             try:
                 return f(cast(L, self._value))
-            except RuntimeError:
-                return XOR(alt_right, RIGHT)
-
+            except (
+                LookupError,
+                ValueError,
+                TypeError,
+                BufferError,
+                ArithmeticError,
+                RecursionError,
+                ReferenceError,
+            ):
+                return XOR(fallback_right, RIGHT)
         return cast(XOR[U, R], self)
 
     @staticmethod
-    def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, RuntimeError]:
+    def call[U, V](f: Callable[[U], V], left: U) -> XOR[V, Exception]:
         """Return XOR wrapped result of a function call that can fail"""
         try:
-            xor = XOR[V, RuntimeError](f(left), LEFT)
-        except RuntimeError as exc:
+            xor = XOR[V, Exception](f(left), LEFT)
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+        ) as exc:
             xor = XOR(exc, side=RIGHT)
-
         return xor
 
     @staticmethod
     def lz_call[U, V](
         f: Callable[[U], V], arg: U
-    ) -> Callable[[], XOR[V, RuntimeError]]:
+    ) -> Callable[[], XOR[V, Exception]]:
         """Return an XOR of a delayed evaluation of a function"""
 
-        def ret() -> XOR[V, RuntimeError]:
+        def ret() -> XOR[V, Exception]:
             return XOR.call(f, arg)
 
         return ret
 
     @staticmethod
-    def idx[V](v: Sequence[V], ii: int) -> XOR[V, IndexError]:
+    def idx[V](v: Sequence[V], ii: int) -> XOR[V, Exception]:
         """Return an XOR of an indexed value that can fail"""
         try:
-            xor = XOR[V, IndexError](v[ii], LEFT)
-        except IndexError as exc:
+            xor = XOR[V, Exception](v[ii], LEFT)
+        except (
+            IndexError,
+            TypeError,
+            ArithmeticError,
+        ) as exc:
             xor = XOR(exc, side=RIGHT)
-
         return xor
 
     @staticmethod
-    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[int], XOR[V, IndexError]]:
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[int], XOR[V, Exception]]:
         """Return an XOR of a delayed indexing of a sequenced type that can fail"""
 
-        def ret(ii: int) -> XOR[V, IndexError]:
+        def ret(ii: int) -> XOR[V, Exception]:
             return XOR.idx(v, ii)
 
         return ret
