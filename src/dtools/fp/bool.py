@@ -19,7 +19,6 @@
 Python (at least CPython for Python 3.13) does not permit bool to be subclassed.
 
 - under-the-hood a bool is just an int
-- useful for typing situations (see dtools.fp.err_handling.XOR)
 - using the "truthiness" of 1 and "falsiness" of 0
 - kept very simple to avoid performance hits, so
   - can be compared with `==` to a boolean

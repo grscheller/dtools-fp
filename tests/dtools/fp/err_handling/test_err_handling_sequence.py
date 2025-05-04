@@ -14,13 +14,17 @@
 
 from __future__ import annotations
 
+from typing import Final, reveal_type
 from dtools.tuples.ftuple import FTuple as FT, f_tuple as ft
 from dtools.queues.types import DoubleQueue as DQ, double_queue as dq
-from dtools.fp.err_handling import MB, XOR, LEFT, RIGHT
+from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
 
 
-class TestMB_sequence:
+class Test_MB_sequence:
+    """Test MayBe sequence class function"""
+
     def test_no_empties(self) -> None:
+        """Test without empty MayBe values"""
         list_mb_int = list(map(MB, range(1, 2501)))
         tuple_mb_int = tuple(map(MB, range(1, 2501)))
         ftuple_mb_int = FT(map(MB, range(1, 2501)))
@@ -37,6 +41,7 @@ class TestMB_sequence:
         assert mb_dqueue_int == MB(DQ(range(1, 2501)))
 
     def test_with_empties(self) -> None:
+        """Test with empty MayBe values"""
         list_of_mb_int = [MB[int](), MB(2), MB(3), MB(4)]
         tuple_of_mb_int = MB(1), MB[int](), MB(3), MB(4)
         ftuple_of_mb_int = ft(MB(1), MB(2), MB[int](), MB(4))
@@ -53,66 +58,126 @@ class TestMB_sequence:
         assert mb_dqueue_int == MB()
 
 
-class TestXOR_sequence:
+class Test_Xor_sequence:
+    """Test Xor sequence class function"""
+
     def test_no_rights(self) -> None:
-        list_of_xor_int_str: list[XOR[int, str]] = list(
-            map(lambda x: XOR(x, LEFT), range(1, 2501))
+        """Test with omly left values"""
+        list_of_xor_int_str: list[Xor[int, str]] = list(
+            map(lambda x: Xor(x, LEFT), range(1, 2501))
         )
-        tuple_of_xor_int_str: tuple[XOR[int, str], ...] = tuple(
-            map(lambda x: XOR(x, LEFT), range(1, 2501))
+        tuple_of_xor_int_str: tuple[Xor[int, str], ...] = tuple(
+            map(lambda x: Xor(x, LEFT), range(1, 2501))
         )
-        ftuple_of_xor_int_str: FT[XOR[int, str]] = FT(
-            map(lambda x: XOR(x, LEFT), range(1, 2501))
+        ftuple_of_xor_int_str: FT[Xor[int, str]] = FT(
+            map(lambda x: Xor(x, LEFT), range(1, 2501))
         )
-        dqueue_of_xor_int_str: DQ[XOR[int, str]] = DQ(
-            map(lambda x: XOR(x, LEFT), range(1, 2501))
+        dqueue_of_xor_int_str: DQ[Xor[int, str]] = DQ(
+            map(lambda x: Xor(x, LEFT), range(1, 2501))
         )
 
-        xor_listInt_str: XOR[list[int], str] = XOR.sequence(
+        xor_listInt_str: Xor[list[int], str] = Xor.sequence(
             list_of_xor_int_str, 'OK'
         ).map(list, '')
-        xor_tupleInt_str: XOR[tuple[int, ...], str] = XOR.sequence(
+        xor_tupleInt_str: Xor[tuple[int, ...], str] = Xor.sequence(
             tuple_of_xor_int_str, 'OK'
         ).map(tuple, '')
-        xor_ftuple_int_str: XOR[FT[int], str] = XOR.sequence(
+        xor_ftuple_int_str: Xor[FT[int], str] = Xor.sequence(
             ftuple_of_xor_int_str, 'OK'
         ).map(FT, '')
-        xor_dqueue_int_str: XOR[DQ[int], str] = XOR.sequence(
+        xor_dqueue_int_str: Xor[DQ[int], str] = Xor.sequence(
             dqueue_of_xor_int_str, 'OK'
         ).map(DQ, '')
 
-        assert xor_listInt_str == XOR(list(range(1, 2501)), LEFT)
-        assert xor_tupleInt_str == XOR(tuple(range(1, 2501)), LEFT)
-        assert xor_ftuple_int_str == XOR(FT(range(1, 2501)), LEFT)
-        assert xor_dqueue_int_str == XOR(DQ(range(1, 2501)), LEFT)
+        assert xor_listInt_str == Xor(list(range(1, 2501)), LEFT)
+        assert xor_tupleInt_str == Xor(tuple(range(1, 2501)), LEFT)
+        assert xor_ftuple_int_str == Xor(FT(range(1, 2501)), LEFT)
+        assert xor_dqueue_int_str == Xor(DQ(range(1, 2501)), LEFT)
 
-    def test_with_rights(self) -> None:
-        list_of_xor_int_str: list[XOR[int, str]] = [
-            XOR('1', RIGHT),
-            XOR(2, LEFT),
-            XOR(3, LEFT),
-            XOR(4, LEFT),
+    def test_with_a_right(self) -> None:
+        """Test with a single right value, use multiple data structures"""
+        list_of_xor_int_str: list[Xor[int, str]] = [
+            Xor('1', RIGHT),
+            Xor(2, LEFT),
+            Xor(3, LEFT),
+            Xor(4, LEFT),
         ]
-        tuple_of_xor_int_str: tuple[XOR[int, str], ...] = (
-            XOR(1, LEFT),
-            XOR('2', RIGHT),
-            XOR(3, LEFT),
-            XOR(4, LEFT),
+        tuple_of_xor_int_str: tuple[Xor[int, str], ...] = (
+            Xor(1, LEFT),
+            Xor('2', RIGHT),
+            Xor(3, LEFT),
+            Xor(4, LEFT),
         )
         ftuple_of_xor_int_str = ft(
-            XOR(1, LEFT), XOR(2, LEFT), XOR('3', RIGHT), XOR(4, LEFT)
+            Xor(1, LEFT), Xor(2, LEFT), Xor('3', RIGHT), Xor(4, LEFT)
         )
         dqueue_of_xor_int_str = dq(
-            XOR(1, LEFT), XOR(2, LEFT), XOR(3, LEFT), XOR('4', RIGHT)
+            Xor(1, LEFT), Xor(2, LEFT), Xor(3, LEFT), Xor('4', RIGHT)
         )
 
-        xor_list_int = XOR.sequence(list_of_xor_int_str, 'no').map(list, 'No!')
-        xor_tuple_int = XOR.sequence(tuple_of_xor_int_str, 'nope').map(tuple, 'No!')
-        xor_ftuple_int = XOR.sequence(ftuple_of_xor_int_str, 'no way').map(FT, 'No!')
-        xor_dqueue_int = XOR.sequence(dqueue_of_xor_int_str, 'not').map(DQ, 'No!')
+        xor_list_int = Xor.sequence(list_of_xor_int_str, 'no').map(list, 'No!')
+        xor_tuple_int = Xor.sequence(tuple_of_xor_int_str, 'nope').map(tuple, 'No!')
+        xor_ftuple_int = Xor.sequence(ftuple_of_xor_int_str, 'no way').map(FT, 'No!')
+        xor_dqueue_int = Xor.sequence(dqueue_of_xor_int_str, 'not').map(DQ, 'No!')
 
-        assert xor_list_int == XOR('no', RIGHT)
-        assert xor_tuple_int == XOR('nope', RIGHT)
-        assert xor_ftuple_int == XOR('no way', RIGHT)
-        assert xor_dqueue_int == XOR('not', RIGHT)
-        assert xor_dqueue_int != XOR('yes', RIGHT)
+        assert xor_list_int == Xor('no', RIGHT)
+        assert xor_tuple_int == Xor('nope', RIGHT)
+        assert xor_ftuple_int == Xor('no way', RIGHT)
+        assert xor_dqueue_int == Xor('not', RIGHT)
+        assert xor_dqueue_int != Xor('yes', RIGHT)
+
+    def test_with_multiple_rights(self) -> None:
+        """Test with a multiple right value"""
+
+        type Letter = Xor[str, int]
+        type Letters = Xor[tuple[str, ...], int]
+
+        ALPHABET: Final[str] = ' abcdefghijklmnopqrstuvwxyz'
+
+        def alphabet_position(char_str: str) -> int:
+            """Letter position in ALPHABET"""
+            char = ' '
+            if len(char_str):
+                char = char_str[0]
+            if 0 < (pos := ord(char) - 96) < 27:
+                return pos
+            return 0
+
+        def letter_left(letter: str) -> Letter:
+            pos = alphabet_position(letter)
+            return Xor(ALPHABET[pos], LEFT)
+
+        def letter_right(letter: str) -> Letter:
+            pos = alphabet_position(letter)
+            return Xor(pos, RIGHT)
+
+        letter_set_0 = tuple[str]()
+        letter_set_1 = ('a', 'w', 's', 's', 'b', 'm', 'j')
+        letter_set_2 = ('w', 'x', 'y', 'z', ' ')
+        letter_set_3 = ('waldo', 'x', 'y', 'zebra', '')
+
+        data0 = list(map(letter_left, letter_set_0))
+
+        assert data0 == data0
+        reveal_type(data0)
+
+        data1 = list(map(letter_left, letter_set_1))
+        data2 = data1.copy()
+
+        assert data0 != data1
+        assert data1 is not data2
+        assert data1 == data2
+
+        sequenced_data1: tuple[Letters, int] = Xor.sequence(data1, 0).map(tuple, 0)
+
+        assert sequenced_data1 == Xor[tuple[str, ...], int](letter_set_1, LEFT)
+
+        data1[2] = data1[2].bind(letter_right, 0)  # 0 is distracting
+
+        assert data1 != data2
+
+        sequenced_data1: Letters = Xor.sequence(data1, 0).map(tuple, 0)
+
+        assert sequenced_data1 == Xor(0, RIGHT)
+
+

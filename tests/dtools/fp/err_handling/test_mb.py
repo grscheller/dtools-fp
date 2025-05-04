@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Any, Never
 from dtools.tuples.ftuple import f_tuple as ft
-from dtools.fp.err_handling import MB, XOR, LEFT, RIGHT
+from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
 
 
 def add2(x: int) -> int:

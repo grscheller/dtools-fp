@@ -29,7 +29,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any, Final, Never, TypeVar, ParamSpec
-from .err_handling import MB, XOR, LEFT, RIGHT
+from .err_handling import MB, Xor, LEFT, RIGHT
 from .function import sequenced
 
 __all__ = ['Lazy', 'lazy', 'real_lazy']
@@ -65,7 +65,7 @@ class Lazy[D, R]:
         self._pure: bool = pure
         self._evaluated: bool = False
         self._exceptional: MB[bool] = MB()
-        self._result: XOR[R, Exception]
+        self._result: Xor[R, Exception]
 
     def __bool__(self) -> bool:
         return self._evaluated
@@ -83,13 +83,13 @@ class Lazy[D, R]:
                 result = self._f(self._d)
             except Exception as exc:
                 self._result, self._evaluated, self._exceptional = (
-                    XOR(exc, RIGHT),
+                    Xor(exc, RIGHT),
                     True,
                     MB(True),
                 )
             else:
                 self._result, self._evaluated, self._exceptional = (
-                    XOR(result, LEFT),
+                    Xor(result, LEFT),
                     True,
                     MB(False),
                 )
