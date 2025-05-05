@@ -117,29 +117,6 @@ class MB[D]:
             raise ValueError(msg)
         return cast(D, alt)
 
-    def put(self, value: D) -> None:
-        """Put a value in the MB if empty, if not empty do nothing.
-
-        - warning: method will invalidate hashability if used
-
-        """
-        if self._value is Sentinel('MB'):
-            self._value = value
-
-    def pop(self) -> D | Never:
-        """Pop the value if the MB is not empty, otherwise fail.
-
-        - warning: method will invalidate hashability if used
-
-        """
-        _sentinel: Final[Sentinel] = Sentinel('MB')
-        if self._value is _sentinel:
-            msg = 'MB: Popping from an empty MB'
-            raise ValueError(msg)
-        popped = cast(D, self._value)
-        self._value = _sentinel
-        return popped
-
     def map[U](self, f: Callable[[D], U]) -> MB[U]:
         """Map function `f` over contents.
 
@@ -512,7 +489,7 @@ class Xor[L, R]:
         return ret
 
     @staticmethod
-    def sequence(itab_xor_lr: Iterable[Xor[L, R]], right: R) -> Xor[Iterator[L], R]:
+    def sequence(itab_xor_lr: Iterable[Xor[L, R]]) -> Xor[Iterator[L], R]:
         """Sequence an indexable of type `Xor[~L, ~R]`
 
         - if the iterated `Xor` values are all lefts, then
@@ -526,6 +503,6 @@ class Xor[L, R]:
             if xor_lr:
                 ts.append(xor_lr.get())
             else:
-                return Xor(right, RIGHT)
+                return Xor(xor_lr.get_right().get(), RIGHT)
 
         return Xor(iter(ts))

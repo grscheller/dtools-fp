@@ -14,9 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Never
-from dtools.tuples.ftuple import f_tuple as ft
-from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
+from dtools.fp.err_handling import MB
 
 
 def add2(x: int) -> int:
@@ -77,9 +75,9 @@ class TestMB:
             foo = 42
             foo = n1.get()
         except ValueError:
-            assert LEFT
+            assert True
         else:
-            assert RIGHT
+            assert False
         finally:
             assert foo == 42
         assert n1.get(13) == (10 + 3)

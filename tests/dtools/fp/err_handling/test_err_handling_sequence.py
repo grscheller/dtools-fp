@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Final, reveal_type
-from dtools.tuples.ftuple import FTuple as FT, f_tuple as ft
+from dtools.containers.tuples.ftuple import FTuple as FT, f_tuple as ft
 from dtools.queues.types import DoubleQueue as DQ, double_queue as dq
 from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
 
@@ -130,7 +130,7 @@ class Test_Xor_sequence:
         """Test with a multiple right value"""
 
         type Letter = Xor[str, int]
-        type Letters = Xor[tuple[str, ...], int]
+        type Letters = Xor[list[str], int]
 
         ALPHABET: Final[str] = ' abcdefghijklmnopqrstuvwxyz'
 
@@ -151,33 +151,24 @@ class Test_Xor_sequence:
             pos = alphabet_position(letter)
             return Xor(pos, RIGHT)
 
-        letter_set_0 = tuple[str]()
-        letter_set_1 = ('a', 'w', 's', 's', 'b', 'm', 'j')
-        letter_set_2 = ('w', 'x', 'y', 'z', ' ')
-        letter_set_3 = ('waldo', 'x', 'y', 'zebra', '')
+        letter_set_0 = list[str]()
+        letter_set_1 = ['a', 'w', 's', 's', 'b', 'm', 'j']
+#       letter_set_2 = ['w', 'x', 'y', 'z', ' ']
+#       letter_set_3 = ['waldo', 'x', 'y', 'zebra', '']
 
         data0 = list(map(letter_left, letter_set_0))
-
-        assert data0 == data0
-        reveal_type(data0)
-
         data1 = list(map(letter_left, letter_set_1))
-        data2 = data1.copy()
+        data2 = list(data1)
+        data2[5] = data2[5].bind(letter_right, 0)
 
-        assert data0 != data1
-        assert data1 is not data2
-        assert data1 == data2
+        sequenced_data0 = Xor.sequence(data0).map(list, 2)
+        sequenced_data1 = Xor.sequence(data1).map(list, 0)
+        sequenced_data2: Letters = Xor.sequence(data2).map(list, -2)
 
-        sequenced_data1: tuple[Letters, int] = Xor.sequence(data1, 0).map(tuple, 0)
+        result0: Letters = Xor([], LEFT)
+        result1: Letters = Xor(letter_set_1, LEFT)
+        result2: Letters = Xor(13, RIGHT)
 
-        assert sequenced_data1 == Xor[tuple[str, ...], int](letter_set_1, LEFT)
-
-        data1[2] = data1[2].bind(letter_right, 0)  # 0 is distracting
-
-        assert data1 != data2
-
-        sequenced_data1: Letters = Xor.sequence(data1, 0).map(tuple, 0)
-
-        assert sequenced_data1 == Xor(0, RIGHT)
-
-
+        assert sequenced_data0 == result0
+        assert sequenced_data1 == result1
+        assert sequenced_data2 == result2

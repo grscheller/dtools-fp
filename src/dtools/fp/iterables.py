@@ -32,6 +32,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Iterator
 from enum import auto, Enum
 from typing import cast, Never, TypeVar
+from dtools.containers.boxes.box import Box
 from .err_handling import MB
 from .function import negate, swap
 from .singletons import NoValue
@@ -229,7 +230,7 @@ def take_while_split[D](
     """
 
     def _take_while(
-        it: Iterator[D], pred: Callable[[D], bool], val: MB[D]
+        it: Iterator[D], pred: Callable[[D], bool], val: Box[D]
     ) -> Iterator[D]:
         while True:
             try:
@@ -242,7 +243,7 @@ def take_while_split[D](
                 break
 
     it = iter(iterable)
-    value: MB[D] = MB()
+    value: Box[D] = Box()
     it_pred = _take_while(it, pred, value)
 
     return (it_pred, concat(value, it))

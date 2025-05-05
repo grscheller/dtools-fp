@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 
-from typing import Never, reveal_type
-from dtools.tuples.ftuple import f_tuple as ft
+from typing import Never
+from dtools.containers.tuples.ftuple import f_tuple as ft
 from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
 
 
