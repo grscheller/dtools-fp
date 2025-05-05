@@ -14,7 +14,7 @@
 
 from collections.abc import Callable
 from dtools.fp.iterables import reducel, foldl, mb_fold_left, sc_reducel, sc_reducer
-from dtools.fp.err_handling import MB
+from dtools.fp.err_handling import MayBe as MB
 from dtools.fp.function import swap, partial
 
 add: Callable[[int, int], int] = lambda a, b: a+b

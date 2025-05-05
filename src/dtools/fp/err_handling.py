@@ -16,14 +16,14 @@
 
 Functional data types to use in lieu of exceptions.
 
-- *class* MB: maybe (optional) monad
+- *class* MayBe: maybe (optional) monad
 - *class* Xor: left biased either monad
 
 """
 
 from __future__ import annotations
 
-__all__ = ['MB', 'Xor', 'LEFT', 'RIGHT']
+__all__ = ['MayBe', 'Xor', 'LEFT', 'RIGHT']
 
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import cast, Final, Never, overload, TypeVar
@@ -31,25 +31,25 @@ from .bool import _Bool as Both, _True as Left, _False as Right
 from .singletons import Sentinel
 
 
-# -- class MB ------------------------------------------------------------------
+# -- class MayBe ------------------------------------------------------------------
 
 D = TypeVar('D')
 
 
-class MB[D]:
+class MayBe[D]:
     """Maybe monad - class wrapping a potentially missing value.
 
-    - where `MB(value)` contains a possible value of type `~D`
-    - `MB()` semantically represent a non-existent or missing value of type `~D`
+    - where `MayBe(value)` contains a possible value of type `~D`
+    - `MayBe()` semantically represent a non-existent or missing value of type `~D`
     - immutable semantics, map & bind return new instances
       - can store any value of any type with one exception
-        - if `~D` is `Sentinel`, storing `Sentinel(MB)` results in a MB()
+        - if `~D` is `Sentinel`, storing `Sentinel(MayBe)` results in a MayBe()
       - warning: hashability invalidated if contained value is mutated
       - warning: hashed values invalidated if `put` or `pop` methods called
     - unsafe methods `get` and `pop`
-      - could raise `ValueError` if MB is empty and alt values not given
+      - could raise `ValueError` if MayBe is empty and alt values not given
     - stateful methods `put` and `pop`
-      - useful to treat a `MB` as a stateful object
+      - useful to treat a `MayBe` as a stateful object
       - basically a container that can contain 1 or 0 objects
       - TODO: remove these, create a stateful object for this usecase
 
@@ -67,11 +67,11 @@ class MB[D]:
     @overload
     def __init__(self, value: D) -> None: ...
 
-    def __init__(self, value: D | Sentinel = Sentinel('MB')) -> None:
+    def __init__(self, value: D | Sentinel = Sentinel('MayBe')) -> None:
         self._value: D | Sentinel = value
 
     def __bool__(self) -> bool:
-        return self._value is not Sentinel('MB')
+        return self._value is not Sentinel('MayBe')
 
     def __iter__(self) -> Iterator[D]:
         if self:
@@ -79,8 +79,8 @@ class MB[D]:
 
     def __repr__(self) -> str:
         if self:
-            return 'MB(' + repr(self._value) + ')'
-        return 'MB()'
+            return 'MayBe(' + repr(self._value) + ')'
+        return 'MayBe()'
 
     def __len__(self) -> int:
         return 1 if self else 0
@@ -100,31 +100,31 @@ class MB[D]:
     @overload
     def get(self, alt: D) -> D: ...
 
-    def get(self, alt: D | Sentinel = Sentinel('MB')) -> D | Never:
+    def get(self, alt: D | Sentinel = Sentinel('MayBe')) -> D | Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
         - alternate value must be of type `~D`
         - raises `ValueError` if an alternate value is not provided but needed
 
         """
-        _sentinel: Final[Sentinel] = Sentinel('MB')
+        _sentinel: Final[Sentinel] = Sentinel('MayBe')
         if self._value is not _sentinel:
             return cast(D, self._value)
         if alt is _sentinel:
-            msg = 'MB: an alternate return type not provided'
+            msg = 'MayBe: an alternate return type not provided'
             raise ValueError(msg)
         return cast(D, alt)
 
-    def map[U](self, f: Callable[[D], U]) -> MB[U]:
+    def map[U](self, f: Callable[[D], U]) -> MayBe[U]:
         """Map function `f` over contents.
 
-        - if `f` should fail, return a MB()
+        - if `f` should fail, return a MayBe()
 
         """
-        if self._value is Sentinel('MB'):
-            return cast(MB[U], self)
+        if self._value is Sentinel('MayBe'):
+            return cast(MayBe[U], self)
         try:
-            return MB(f(cast(D, self._value)))
+            return MayBe(f(cast(D, self._value)))
         except (
             LookupError,
             ValueError,
@@ -134,12 +134,12 @@ class MB[D]:
             RecursionError,
             ReferenceError,
         ):
-            return MB()
+            return MayBe()
 
-    def bind[U](self, f: Callable[[D], MB[U]]) -> MB[U]:
-        """Map `MB` with function `f` and flatten."""
+    def bind[U](self, f: Callable[[D], MayBe[U]]) -> MayBe[U]:
+        """Map `MayBe` with function `f` and flatten."""
         try:
-            return f(cast(D, self._value)) if self else MB()
+            return f(cast(D, self._value)) if self else MayBe()
         except (
             LookupError,
             ValueError,
@@ -149,13 +149,13 @@ class MB[D]:
             RecursionError,
             ReferenceError,
         ):
-            return MB()
+            return MayBe()
 
     @staticmethod
-    def call[U, V](f: Callable[[U], V], u: U) -> MB[V]:
-        """Return MB wrapped result of a function call that can fail"""
+    def call[U, V](f: Callable[[U], V], u: U) -> MayBe[V]:
+        """Return MayBe wrapped result of a function call that can fail"""
         try:
-            return MB(f(u))
+            return MayBe(f(u))
         except (
             LookupError,
             ValueError,
@@ -165,22 +165,22 @@ class MB[D]:
             RecursionError,
             ReferenceError,
         ):
-            return MB()
+            return MayBe()
 
     @staticmethod
-    def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MB[V]]:
-        """Return a MB of a delayed evaluation of a function"""
+    def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MayBe[V]]:
+        """Return a MayBe of a delayed evaluation of a function"""
 
-        def ret() -> MB[V]:
-            return MB.call(f, u)
+        def ret() -> MayBe[V]:
+            return MayBe.call(f, u)
 
         return ret
 
     @staticmethod
-    def idx[V](v: Sequence[V], ii: int) -> MB[V]:
-        """Return a MB of an indexed value that can fail"""
+    def idx[V](v: Sequence[V], ii: int) -> MayBe[V]:
+        """Return a MayBe of an indexed value that can fail"""
         try:
-            return MB(v[ii])
+            return MayBe(v[ii])
         except (
             LookupError,
             ValueError,
@@ -190,24 +190,24 @@ class MB[D]:
             RecursionError,
             ReferenceError,
         ):
-            return MB()
+            return MayBe()
 
     @staticmethod
-    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MB[V]]:
-        """Return a MB of a delayed indexing of a sequenced type that can fail"""
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MayBe[V]]:
+        """Return a MayBe of a delayed indexing of a sequenced type that can fail"""
 
-        def ret() -> MB[V]:
-            return MB.idx(v, ii)
+        def ret() -> MayBe[V]:
+            return MayBe.idx(v, ii)
 
         return ret
 
     @staticmethod
-    def sequence[T](itab_mb_d: Iterable[MB[T]]) -> MB[Iterator[T]]:
-        """Sequence an indexable of type `MB[~T]`
+    def sequence[T](itab_mb_d: Iterable[MayBe[T]]) -> MayBe[Iterator[T]]:
+        """Sequence an indexable of type `MayBe[~T]`
 
-        * if the iterated `MB` values are not all empty,
-          * return a `MB` of an iterator of the contained values
-          * otherwise return an empty `MB`
+        * if the iterated `MayBe` values are not all empty,
+          * return a `MayBe` of an iterator of the contained values
+          * otherwise return an empty `MayBe`
 
         """
         item: list[T] = []
@@ -216,9 +216,9 @@ class MB[D]:
             if mb_d:
                 item.append(mb_d.get())
             else:
-                return MB()
+                return MayBe()
 
-        return MB(iter(item))
+        return MayBe(iter(item))
 
 
 # -- class Xor -----------------------------------------------------------------
@@ -330,27 +330,27 @@ class Xor[L, R]:
             raise ValueError(msg)
         return cast(L, self._value)
 
-    def get_left(self) -> MB[L]:
+    def get_left(self) -> MayBe[L]:
         """Get value of `Xor` if a left. Safer version of `get` method.
 
-        - if `Xor` contains a left value, return it wrapped in a MB
-        - if `Xor` contains a tight value, return MB()
+        - if `Xor` contains a left value, return it wrapped in a MayBe
+        - if `Xor` contains a tight value, return MayBe()
 
         """
         if self._side == LEFT:
-            return MB(cast(L, self._value))
-        return MB()
+            return MayBe(cast(L, self._value))
+        return MayBe()
 
-    def get_right(self) -> MB[R]:
+    def get_right(self) -> MayBe[R]:
         """Get value of `Xor` if a right
 
-        - if `Xor` contains a right value, return it wrapped in a MB
-        - if `Xor` contains a left value, return MB()
+        - if `Xor` contains a right value, return it wrapped in a MayBe
+        - if `Xor` contains a left value, return MayBe()
 
         """
         if self._side == RIGHT:
-            return MB(cast(R, self._value))
-        return MB()
+            return MayBe(cast(R, self._value))
+        return MayBe()
 
     def map[U](self, f: Callable[[L], U], right: R) -> Xor[U, R]:
         """Map over if a left value.
@@ -367,10 +367,10 @@ class Xor[L, R]:
         if self._side == RIGHT:
             return cast(Xor[U, R], self)
 
-        applied: MB[Xor[U, R]] = MB()
-        fallback: MB[Xor[U, R]] = MB()
+        applied: MayBe[Xor[U, R]] = MayBe()
+        fallback: MayBe[Xor[U, R]] = MayBe()
         try:
-            applied = MB(Xor(f(cast(L, self._value)), LEFT))
+            applied = MayBe(Xor(f(cast(L, self._value)), LEFT))
         except (
             LookupError,
             ValueError,
@@ -380,7 +380,7 @@ class Xor[L, R]:
             RecursionError,
             ReferenceError,
         ):
-            fallback = MB(cast(Xor[U, R], Xor(right, RIGHT)))
+            fallback = MayBe(cast(Xor[U, R], Xor(right, RIGHT)))
 
         if fallback:
             return fallback.get()

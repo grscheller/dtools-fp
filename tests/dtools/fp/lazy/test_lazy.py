@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Any
-from dtools.fp.err_handling import MB
+from dtools.fp.err_handling import MayBe as MB
 from dtools.fp.lazy import Lazy, lazy, real_lazy
 
 #-- Test happy and sad paths ---------------------------------------------------
@@ -27,7 +27,7 @@ def add2_if_pos(x: int) -> int:
 
 def evaluate_it(lz: Lazy[int, int]) -> int:
     lz.eval()
-    if lz.got_result().get():            # Opps ... API change needed
+    if lz.got_result().get():            # Opps ... typing work needed
         return lz.get_result().get()
     else:
         return -1

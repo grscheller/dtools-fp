@@ -16,7 +16,8 @@ from __future__ import annotations
 
 from typing import Final
 from dtools.fp.singletons import NoValue
-from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
+from dtools.fp.err_handling import MayBe as MB
+from dtools.fp.err_handling import Xor, LEFT, RIGHT
 
 _noValue: Final[NoValue] = NoValue()
 
