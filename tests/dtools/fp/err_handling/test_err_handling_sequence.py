@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from typing import Final, reveal_type
+from typing import Final
 from dtools.containers.tuples.ftuple import FTuple as FT, f_tuple as ft
 from dtools.queues.types import DoubleQueue as DQ, double_queue as dq
 from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
@@ -77,16 +77,16 @@ class Test_Xor_sequence:
         )
 
         xor_listInt_str: Xor[list[int], str] = Xor.sequence(
-            list_of_xor_int_str, 'OK'
+            list_of_xor_int_str
         ).map(list, '')
         xor_tupleInt_str: Xor[tuple[int, ...], str] = Xor.sequence(
-            tuple_of_xor_int_str, 'OK'
+            tuple_of_xor_int_str
         ).map(tuple, '')
         xor_ftuple_int_str: Xor[FT[int], str] = Xor.sequence(
-            ftuple_of_xor_int_str, 'OK'
+            ftuple_of_xor_int_str
         ).map(FT, '')
         xor_dqueue_int_str: Xor[DQ[int], str] = Xor.sequence(
-            dqueue_of_xor_int_str, 'OK'
+            dqueue_of_xor_int_str
         ).map(DQ, '')
 
         assert xor_listInt_str == Xor(list(range(1, 2501)), LEFT)
@@ -97,16 +97,10 @@ class Test_Xor_sequence:
     def test_with_a_right(self) -> None:
         """Test with a single right value, use multiple data structures"""
         list_of_xor_int_str: list[Xor[int, str]] = [
-            Xor('1', RIGHT),
-            Xor(2, LEFT),
-            Xor(3, LEFT),
-            Xor(4, LEFT),
+            Xor('1', RIGHT), Xor(2, LEFT), Xor(3, LEFT), Xor(4, LEFT)
         ]
         tuple_of_xor_int_str: tuple[Xor[int, str], ...] = (
-            Xor(1, LEFT),
-            Xor('2', RIGHT),
-            Xor(3, LEFT),
-            Xor(4, LEFT),
+            Xor(1, LEFT), Xor('2', RIGHT), Xor(3, LEFT), Xor(4, LEFT)
         )
         ftuple_of_xor_int_str = ft(
             Xor(1, LEFT), Xor(2, LEFT), Xor('3', RIGHT), Xor(4, LEFT)
@@ -115,16 +109,15 @@ class Test_Xor_sequence:
             Xor(1, LEFT), Xor(2, LEFT), Xor(3, LEFT), Xor('4', RIGHT)
         )
 
-        xor_list_int = Xor.sequence(list_of_xor_int_str, 'no').map(list, 'No!')
-        xor_tuple_int = Xor.sequence(tuple_of_xor_int_str, 'nope').map(tuple, 'No!')
-        xor_ftuple_int = Xor.sequence(ftuple_of_xor_int_str, 'no way').map(FT, 'No!')
-        xor_dqueue_int = Xor.sequence(dqueue_of_xor_int_str, 'not').map(DQ, 'No!')
+        xor_list_int = Xor.sequence(list_of_xor_int_str).map(list, 'No!')
+        xor_tuple_int = Xor.sequence(tuple_of_xor_int_str).map(tuple, 'No!')
+        xor_ftuple_int = Xor.sequence(ftuple_of_xor_int_str).map(FT, 'No!')
+        xor_dqueue_int = Xor.sequence(dqueue_of_xor_int_str).map(DQ, 'No!')
 
-        assert xor_list_int == Xor('no', RIGHT)
-        assert xor_tuple_int == Xor('nope', RIGHT)
-        assert xor_ftuple_int == Xor('no way', RIGHT)
-        assert xor_dqueue_int == Xor('not', RIGHT)
-        assert xor_dqueue_int != Xor('yes', RIGHT)
+        assert xor_list_int == Xor('1', RIGHT)
+        assert xor_tuple_int == Xor('2', RIGHT)
+        assert xor_ftuple_int == Xor('3', RIGHT)
+        assert xor_dqueue_int == Xor('4', RIGHT)
 
     def test_with_multiple_rights(self) -> None:
         """Test with a multiple right value"""
