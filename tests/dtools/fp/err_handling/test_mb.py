@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from dtools.fp.err_handling import MB
+from dtools.fp.err_handling import MayBe as MB
 
 
 def add2(x: int) -> int:

@@ -16,7 +16,8 @@ from __future__ import annotations
 
 from typing import Never
 from dtools.containers.tuples.ftuple import f_tuple as ft
-from dtools.fp.err_handling import MB, Xor, LEFT, RIGHT
+from dtools.fp.err_handling import MayBe as MB
+from dtools.fp.err_handling import Xor, LEFT, RIGHT
 
 
 # -- Simple contrived tests ----------------------------------------------------
