@@ -17,17 +17,16 @@
 Tools to aid with functional programming in Python yet still endeavoring to
 remain Pythonic.
 
-- *module* dtools.fp.bool: boolean with subtypes
-- *module* dtools.fp.err_handling: Monadic maybe and either
-- *module* dtools.fp.function: Tools to combine and partially apply functions
-- *module* dtools.fp.iterables: Tools for iterables
+- *module* dtools.fp.bool: boolean with sub-types
+- *module* dtools.fp.err_handling: maybe and either monads
+- *module* dtools.fp.function: tools to combine and partially apply functions
+- *module* dtools.fp.iterables: tools for iterables
 - *module* dtools.fp.lazy: Lazy (non-strict) function evaluation
-- *module* dtools.fp.singletons: Useful types with but one instance
-- *module* dtools.fp.state: Handle state monadically
+- *module* dtools.fp.singletons: useful types with but one instance
+- *module* dtools.fp.state: classic implementation of the state monad
 
 """
 
-__version__ = '1.8.1.0'
 __author__ = 'Geoffrey R. Scheller'
 __copyright__ = 'Copyright (c) 2023-2025 Geoffrey R. Scheller'
 __license__ = 'Apache License 2.0'

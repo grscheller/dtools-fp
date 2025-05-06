@@ -5,6 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "dtools.fp"
 authors = [{ name = "Geoffrey R. Scheller", email = "geoffrey@scheller.com" }]
+version = "1.8.2"
 license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.12"
@@ -17,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dynamic = ["version", "description"]
+dynamic = ["description"]
 keywords = [
     "functional",
     "functional programming",

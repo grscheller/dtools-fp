@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Final
 from dtools.containers.tuples.ftuple import FTuple as FT, f_tuple as ft
-from dtools.queues.types import DoubleQueue as DQ, double_queue as dq
+from dtools.queues.de import DEQueue as DQ, de_queue as dq
 from dtools.fp.err_handling import MayBe as MB
 from dtools.fp.err_handling import Xor, LEFT, RIGHT
 
