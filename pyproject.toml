@@ -4,8 +4,8 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "dtools.fp"
-authors = [{ name = "Geoffrey R. Scheller", email = "geoffrey@scheller.com" }]
 version = "1.8.2"
+authors = [{ name = "Geoffrey R. Scheller", email = "geoffrey@scheller.com" }]
 license = { file = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.12"
@@ -37,8 +37,8 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest >=8.3.5",
-    "dtools.queues >=1.1.0, < 1.2",
-    "dtools.tuples >=0.28.0, < 0.29",
+    "dtools.queues >=2.0.0, < 2.1",
+    "dtools.containers >=0.28.0, < 0.29",
 ]
 
 [project.urls]
