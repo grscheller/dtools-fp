@@ -21,8 +21,8 @@ namespace project.
 ### Error handling: dtools.fp.err_handling
 
 - monadic tools for handling missing values & unexpected events
-  - *class* MB: Maybe (Optional) monad
-  - *class* XOR: Either monad
+  - *class* MayBe: maybe (Optional) monad
+  - *class* XOR: either monad (left biased)
 
 ______________________________________________________________________
 
@@ -66,4 +66,4 @@ ______________________________________________________________________
 [1]: https://pypi.org/project/dtools.fp/
 [2]: https://github.com/grscheller/dtools-fp/
 [3]: https://grscheller.github.io/dtools-docs/fp/
-[4]: https://github.com/grscheller/dtools-docs/
+[4]: https://github.com/grscheller/dtools-docs/blob/main/README.md
