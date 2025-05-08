@@ -358,7 +358,7 @@ class Xor[L, R]:
         - if `Xor` is a left then map `f` over its value
           - if `f` successful return a left `Xor[U, R]`
           - if `f` unsuccessful return right `Xor[S, R]`
-            - swallows any exceptions `f` may throw
+            - swallows many exceptions `f` may throw at run time
         - if `Xor` is a right
           - return new `Xor(right=self._right): Xor[S, R]`
           - use method `map_right` to adjust the returned value
