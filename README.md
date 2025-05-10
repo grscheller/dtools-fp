@@ -65,5 +65,5 @@ ______________________________________________________________________
 
 [1]: https://pypi.org/project/dtools.fp/
 [2]: https://github.com/grscheller/dtools-fp/
-[3]: https://grscheller.github.io/dtools-docs/fp/
-[4]: https://github.com/grscheller/dtools-docs/blob/main/README.md
+[3]: https://grscheller.github.io/dtools-namespace-projects/fp/
+[4]: https://github.com/grscheller/dtools-namespace-projects/blob/main/README.md
