@@ -42,10 +42,10 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/grscheller/dtools-docs/blob/main/README.md"
+Homepage = "https://github.com/grscheller/dtools-namespace-projects/blob/main/README.md"
 Source = "https://github.com/grscheller/dtools-fp"
 Changelog = "https://github.com/grscheller/dtools-fp/blob/main/CHANGELOG.md"
-Documentation = "https://grscheller.github.io/dtools-docs/fp"
+Documentation = "https://grscheller.github.io/dtools-namespace-projects/fp"
 
 [tool.flit.sdist]
 exclude = ["dist", "tests", ".gitignore", ".mypy_cache", ".pytest_cache"]
