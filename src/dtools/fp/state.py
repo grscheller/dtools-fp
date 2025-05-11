@@ -41,7 +41,7 @@ __all__ = ['State']
 
 from collections.abc import Callable
 from typing import TypeVar
-from dtools.circular_array.ca import CA
+from dtools.circular_array import CA
 
 S = TypeVar('S')    # Needed only for pdoc documentation generation.
 A = TypeVar('A')    # Otherwise, ignored by both MyPy and Python. Makes
@@ -144,5 +144,6 @@ class State[S, A]:
             return ls
 
         return CA(sas).foldl(
-            lambda s1, sa: s1.map2(sa, append_ret), State.unit(list[AA]([]))
+            lambda s1, sa: s1.map2(sa, append_ret),
+            State.unit(list[AA]([]))
         )

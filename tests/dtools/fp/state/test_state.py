@@ -142,8 +142,8 @@ class Test_simple:
         sa4 = State(lambda s: (str(s), s+4))
         sas = [sa1, sa2, sa3, sa4]
         sal = State.sequence(sas)
-        ll, s = sal.run(0)
-        assert s == 10
+        ll, ss = sal.run(0)
+        assert ss == 10
         assert ll == ["0", "1", "3", "6"]
 
         sa1 = State(lambda s: (str(1), s))
@@ -152,6 +152,6 @@ class Test_simple:
         sa4 = State(lambda s: (str(4), s))
         sas = [sa1, sa2, sa3, sa4]
         sal = State.sequence(sas)
-        l, s = sal.run(0)
-        assert s == 0
-        assert l == ["1", "2", "3", "4"]
+        ll, ss = sal.run(0)
+        assert ss == 0
+        assert ll == ["1", "2", "3", "4"]

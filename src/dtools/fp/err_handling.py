@@ -33,7 +33,7 @@ from .singletons import Sentinel
 
 # -- class MayBe ------------------------------------------------------------------
 
-D = TypeVar('D')
+D = TypeVar('D', covariant=True)
 
 
 class MayBe[D]:
@@ -41,17 +41,15 @@ class MayBe[D]:
 
     - where `MayBe(value)` contains a possible value of type `~D`
     - `MayBe()` semantically represent a non-existent or missing value of type `~D`
-    - immutable semantics, map & bind return new instances
+    - immutable semantics
+      - immutable, therefore made covariant
       - can store any value of any type with one exception
         - if `~D` is `Sentinel`, storing `Sentinel(MayBe)` results in a MayBe()
-      - warning: hashability invalidated if contained value is mutated
-      - warning: hashed values invalidated if `put` or `pop` methods called
-    - unsafe methods `get` and `pop`
-      - could raise `ValueError` if MayBe is empty and alt values not given
-    - stateful methods `put` and `pop`
-      - useful to treat a `MayBe` as a stateful object
-      - basically a container that can contain 1 or 0 objects
-      - TODO: remove these, create a stateful object for this usecase
+    - WARNING: hashability invalidated if contained value is not hashable
+      - hash function will fail if `MayBe` contains an unhashable value
+    - WARNING: unsafe method `get`
+      - will raise `ValueError` if MayBe empty and an alt return value not given
+      - best practice is to first check the MayBe in a boolean context
 
     """
 
@@ -116,12 +114,25 @@ class MayBe[D]:
         return cast(D, alt)
 
     def map[U](self, f: Callable[[D], U]) -> MayBe[U]:
+        """Map function `f` over contents."""
+
+        if self:
+            return MayBe(f(cast(D, self._value)))
+        return cast(MayBe[U], self)
+
+    def bind[U](self, f: Callable[[D], MayBe[U]]) -> MayBe[U]:
+        """Flatmap `MayBe` with function `f`."""
+        return f(cast(D, self._value)) if self else cast(MayBe[U], self)
+
+    def map_except[U](self, f: Callable[[D], U]) -> MayBe[U]:
         """Map function `f` over contents.
 
         - if `f` should fail, return a MayBe()
 
+        - WARNING: Swallows exceptions
+
         """
-        if self._value is Sentinel('MayBe'):
+        if not self:
             return cast(MayBe[U], self)
         try:
             return MayBe(f(cast(D, self._value)))
@@ -133,13 +144,18 @@ class MayBe[D]:
             ArithmeticError,
             RecursionError,
             ReferenceError,
+            RuntimeError,
         ):
             return MayBe()
 
-    def bind[U](self, f: Callable[[D], MayBe[U]]) -> MayBe[U]:
-        """Map `MayBe` with function `f` and flatten."""
+    def bind_except[U](self, f: Callable[[D], MayBe[U]]) -> MayBe[U]:
+        """Flatmap `MayBe` with function `f`.
+
+        - WARNING: Swallows exceptions
+
+        """
         try:
-            return f(cast(D, self._value)) if self else MayBe()
+            return f(cast(D, self._value)) if self else cast(MayBe[U], self)
         except (
             LookupError,
             ValueError,
@@ -148,6 +164,7 @@ class MayBe[D]:
             ArithmeticError,
             RecursionError,
             ReferenceError,
+            RuntimeError,
         ):
             return MayBe()
 
@@ -164,6 +181,7 @@ class MayBe[D]:
             ArithmeticError,
             RecursionError,
             ReferenceError,
+            RuntimeError,
         ):
             return MayBe()
 
@@ -189,6 +207,7 @@ class MayBe[D]:
             ArithmeticError,
             RecursionError,
             ReferenceError,
+            RuntimeError,
         ):
             return MayBe()
 
@@ -223,8 +242,8 @@ class MayBe[D]:
 
 # -- class Xor -----------------------------------------------------------------
 
-L = TypeVar('L')
-R = TypeVar('R')
+L = TypeVar('L', covariant=True)
+R = TypeVar('R', covariant=True)
 
 LEFT = Left()
 RIGHT = Right()
@@ -254,10 +273,9 @@ class Xor[L, R]:
     __slots__ = '_value', '_side'
     __match_args__ = ('_value', '_side')
 
+    U = TypeVar('U', covariant=True)
+    V = TypeVar('V', covariant=True)
     T = TypeVar('T')
-    U = TypeVar('U')
-    V = TypeVar('V')
-    E = TypeVar('E')
 
     @overload
     def __new__(cls, value: L) -> Xor[L, R]: ...
@@ -316,7 +334,7 @@ class Xor[L, R]:
         return False
 
     def get(self) -> L | Never:
-        """Get value if a left. Unsafe convenience function.
+        """Get value if a left.
 
         - if the `Xor` is a "left" Xor
           - return its value
@@ -334,7 +352,7 @@ class Xor[L, R]:
         """Get value of `Xor` if a left. Safer version of `get` method.
 
         - if `Xor` contains a left value, return it wrapped in a MayBe
-        - if `Xor` contains a tight value, return MayBe()
+        - if `Xor` contains a right value, return MayBe()
 
         """
         if self._side == LEFT:
@@ -352,23 +370,40 @@ class Xor[L, R]:
             return MayBe(cast(R, self._value))
         return MayBe()
 
-    def map[U](self, f: Callable[[L], U], right: R) -> Xor[U, R]:
-        """Map over if a left value.
+    def change_right[T](self, right: T) -> Xor[L, T]:
+        """Construct new Xor with a different right."""
+        if self._side == LEFT:
+            return cast(Xor[L, T], self)
+        return Xor[L, T](right, RIGHT)
+
+    def map[U](self, f: Callable[[L], U]) -> Xor[U, R]:
+        """Map over if a left value. Return new instance."""
+        if self._side == RIGHT:
+            return cast(Xor[U, R], self)
+        return Xor(f(cast(L, self._value)), LEFT)
+
+    def bind[U](self, f: Callable[[L], Xor[U, R]]) -> Xor[U, R]:
+        """Flatmap over the left value - propagate right values."""
+        if self:
+            return f(cast(L, self._value))
+        return cast(Xor[U, R], self)
+
+    def map_except[U](self, f: Callable[[L], U], fb_right: R) -> Xor[U, R]:
+        """Map over if a left value - with fallback upon exception.
 
         - if `Xor` is a left then map `f` over its value
           - if `f` successful return a left `Xor[U, R]`
           - if `f` unsuccessful return right `Xor[S, R]`
             - swallows many exceptions `f` may throw at run time
         - if `Xor` is a right
-          - return new `Xor(right=self._right): Xor[S, R]`
-          - use method `map_right` to adjust the returned value
+          - return new `Xor(right=self._right): Xor[U, R]`
 
         """
         if self._side == RIGHT:
             return cast(Xor[U, R], self)
 
         applied: MayBe[Xor[U, R]] = MayBe()
-        fallback: MayBe[Xor[U, R]] = MayBe()
+        fall_back: MayBe[Xor[U, R]] = MayBe()
         try:
             applied = MayBe(Xor(f(cast(L, self._value)), LEFT))
         except (
@@ -379,65 +414,16 @@ class Xor[L, R]:
             ArithmeticError,
             RecursionError,
             ReferenceError,
+            RuntimeError,
         ):
-            fallback = MayBe(cast(Xor[U, R], Xor(right, RIGHT)))
+            fall_back = MayBe(cast(Xor[U, R], Xor(fb_right, RIGHT)))
 
-        if fallback:
-            return fallback.get()
+        if fall_back:
+            return fall_back.get()
         return applied.get()
 
-    def map_right(self, g: Callable[[R], R], alt_right: R) -> Xor[L, R]:
-        """Map over a right value."""
-        if self._side == LEFT:
-            return self
-
-        try:
-            right = g(cast(R, self._value))
-        except (
-            LookupError,
-            ValueError,
-            TypeError,
-            BufferError,
-            ArithmeticError,
-            RecursionError,
-            ReferenceError,
-        ):
-            right = alt_right
-
-        return Xor(right, RIGHT)
-
-    def change_right[V](self, right: V) -> Xor[L, V]:
-        """Change a right value's type and value."""
-        if self._side == LEFT:
-            return cast(Xor[L, V], self)
-        return Xor[L, V](right, RIGHT)
-
-    def bind[U](self, f: Callable[[L], Xor[U, R]], fallback_right: R) -> Xor[U, R]:
-        """Flatmap over the left value
-
-        - map over and then trivially "flatten" the left value
-        - propagate right values
-        - if bind fails, return alt_right wrapped in an right Xor
-          - WARNING: swallows RuntimeErrors
-
-        """
-        if self:
-            try:
-                return f(cast(L, self._value))
-            except (
-                LookupError,
-                ValueError,
-                TypeError,
-                BufferError,
-                ArithmeticError,
-                RecursionError,
-                ReferenceError,
-            ):
-                return Xor(fallback_right, RIGHT)
-        return cast(Xor[U, R], self)
-
     @staticmethod
-    def call[U, V](f: Callable[[U], V], left: U) -> Xor[V, Exception]:
+    def call[T, V](f: Callable[[T], V], left: T) -> Xor[V, Exception]:
         """Return Xor wrapped result of a function call that can fail"""
         try:
             xor = Xor[V, Exception](f(left), LEFT)
@@ -449,14 +435,13 @@ class Xor[L, R]:
             ArithmeticError,
             RecursionError,
             ReferenceError,
+            RuntimeError,
         ) as exc:
-            xor = Xor(exc, side=RIGHT)
+            xor = Xor(exc, RIGHT)
         return xor
 
     @staticmethod
-    def lz_call[U, V](
-        f: Callable[[U], V], arg: U
-    ) -> Callable[[], Xor[V, Exception]]:
+    def lz_call[T, V](f: Callable[[T], V], arg: T) -> Callable[[], Xor[V, Exception]]:
         """Return an Xor of a delayed evaluation of a function"""
 
         def ret() -> Xor[V, Exception]:
@@ -473,8 +458,9 @@ class Xor[L, R]:
             IndexError,
             TypeError,
             ArithmeticError,
+            RuntimeError,
         ) as exc:
-            xor = Xor(exc, side=RIGHT)
+            xor = Xor(exc, RIGHT)
         return xor
 
     @staticmethod

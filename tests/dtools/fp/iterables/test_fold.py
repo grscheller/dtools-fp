@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections.abc import Callable
 from dtools.fp.iterables import reducel, foldl, mb_fold_left, sc_reducel, sc_reducer
 from dtools.fp.err_handling import MayBe as MB
 from dtools.fp.function import swap, partial
 
-add: Callable[[int, int], int] = lambda a, b: a+b
+def add(a: int, b: int) -> int:
+    return a + b
 
 def ge_n(a: int, n: int) -> bool:
     return a >= n

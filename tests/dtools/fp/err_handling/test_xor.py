@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Never
-from dtools.containers.tuples.ftuple import f_tuple as ft
+from dtools.containers.immutable_list import immutable_list as ilist
 from dtools.fp.err_handling import MayBe as MB
 from dtools.fp.err_handling import Xor, LEFT, RIGHT
 
@@ -410,12 +410,12 @@ class TestBind:
         xor42: Xor[int, str] = Xor(42)
         xor43: Xor[int, str] = Xor(43)
 
-        ft_xor_int_str = ft(xor41, xor42, xor43)
-        ft_xor_bool_str = ft_xor_int_str.map(lambda x: x.bind(lt42bool, 'bind failed'))
+        ilist_xor_int_str = ilist(xor41, xor42, xor43)
+        ilist_xor_bool_str = ilist_xor_int_str.map(lambda x: x.bind(lt42bool, 'bind failed'))
 
-        assert ft_xor_bool_str[0] == Xor[bool, str](True, LEFT)
-        assert ft_xor_bool_str[1] == Xor[bool, str]('bind failed', RIGHT)
-        assert ft_xor_bool_str[2] == Xor[bool, str]('43', RIGHT)
+        assert ilist_xor_bool_str[0] == Xor[bool, str](True, LEFT)
+        assert ilist_xor_bool_str[1] == Xor[bool, str]('bind failed', RIGHT)
+        assert ilist_xor_bool_str[2] == Xor[bool, str]('43', RIGHT)
 
     def test_xor_bind(self) -> None:
         left1 = Xor[int, str](1, LEFT)

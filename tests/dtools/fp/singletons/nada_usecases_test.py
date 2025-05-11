@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-from dtools.circular_array.ca import ca
+from dtools.circular_array import ca
 from dtools.fp.singletons import Nada
 
 nada = Nada()

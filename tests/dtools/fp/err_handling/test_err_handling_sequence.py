@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Final
-from dtools.containers.tuples.ftuple import FTuple as FT, f_tuple as ft
+from dtools.containers.functional_tuple import FunctionalTuple as FT
 from dtools.queues.de import DEQueue as DQ, de_queue as dq
 from dtools.fp.err_handling import MayBe as MB
 from dtools.fp.err_handling import Xor, LEFT, RIGHT
@@ -28,7 +28,7 @@ class Test_MB_sequence:
         """Test without empty MayBe values"""
         list_mb_int = list(map(MB, range(1, 2501)))
         tuple_mb_int = tuple(map(MB, range(1, 2501)))
-        ftuple_mb_int = FT(map(MB, range(1, 2501)))
+        ftuple_mb_int = FT(*map(MB, range(1, 2501)))
         dqueue_mb_int = DQ(map(MB, range(1, 2501)))
 
         mb_list_int = MB.sequence(list_mb_int).map(list)
@@ -45,7 +45,7 @@ class Test_MB_sequence:
         """Test with empty MayBe values"""
         list_of_mb_int = [MB[int](), MB(2), MB(3), MB(4)]
         tuple_of_mb_int = MB(1), MB[int](), MB(3), MB(4)
-        ftuple_of_mb_int = ft(MB(1), MB(2), MB[int](), MB(4))
+        ftuple_of_mb_int = FT(MB(1), MB(2), MB[int](), MB(4))
         dqueue_of_mb_int = dq(MB(1), MB(2), MB(3), MB[int]())
 
         mb_list_int = MB.sequence(list_of_mb_int)
@@ -71,7 +71,7 @@ class Test_Xor_sequence:
             map(lambda x: Xor(x, LEFT), range(1, 2501))
         )
         ftuple_of_xor_int_str: FT[Xor[int, str]] = FT(
-            map(lambda x: Xor(x, LEFT), range(1, 2501))
+            *map(lambda x: Xor(x, LEFT), range(1, 2501))
         )
         dqueue_of_xor_int_str: DQ[Xor[int, str]] = DQ(
             map(lambda x: Xor(x, LEFT), range(1, 2501))
@@ -85,7 +85,7 @@ class Test_Xor_sequence:
         ).map(tuple, '')
         xor_ftuple_int_str: Xor[FT[int], str] = Xor.sequence(
             ftuple_of_xor_int_str
-        ).map(FT, '')
+            ).map(lambda x: FT(*x), '')
         xor_dqueue_int_str: Xor[DQ[int], str] = Xor.sequence(
             dqueue_of_xor_int_str
         ).map(DQ, '')
@@ -103,7 +103,7 @@ class Test_Xor_sequence:
         tuple_of_xor_int_str: tuple[Xor[int, str], ...] = (
             Xor(1, LEFT), Xor('2', RIGHT), Xor(3, LEFT), Xor(4, LEFT)
         )
-        ftuple_of_xor_int_str = ft(
+        ftuple_of_xor_int_str = FT(
             Xor(1, LEFT), Xor(2, LEFT), Xor('3', RIGHT), Xor(4, LEFT)
         )
         dqueue_of_xor_int_str = dq(

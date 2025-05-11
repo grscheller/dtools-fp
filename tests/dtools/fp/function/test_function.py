@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions anddd
 # limitations under the License.
 
-from dtools.circular_array.ca import ca, CA
+from dtools.circular_array import ca, CA
 from dtools.fp.function import partial, sequenced, swap, it
 from dtools.fp.iterables import mb_fold_left, take
 
