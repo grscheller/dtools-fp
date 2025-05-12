@@ -18,11 +18,12 @@ namespace project.
 
 ## Overview of submodules
 
-### Error handling: dtools.fp.err_handling
+### Error handling: dtools.fp.error_wrapping
 
 - monadic tools for handling missing values & unexpected events
-  - *class* MayBe: maybe (Optional) monad
-  - *class* XOR: either monad (left biased)
+  - sequence and friends
+    - lazy versions should go to dtools.fp.lazy
+    - ...
 
 ______________________________________________________________________
 

@@ -29,8 +29,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from typing import Any, Final, Never, TypeVar, ParamSpec
-from .err_handling import MayBe as MB
-from .err_handling import Xor, LEFT, RIGHT
+from dtools.containers.maybe import MayBe as MB
+from dtools.containers.xor import Xor, LEFT, RIGHT
 from .function import sequenced
 
 __all__ = ['Lazy', 'lazy', 'real_lazy']

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dtools.fp.iterables import reducel, foldl, mb_fold_left, sc_reducel, sc_reducer
-from dtools.fp.err_handling import MayBe as MB
+from dtools.containers.maybe import MayBe as MB
 from dtools.fp.function import swap, partial
 
 def add(a: int, b: int) -> int:

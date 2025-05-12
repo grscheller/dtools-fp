@@ -14,7 +14,7 @@ PyPI dtools.fp project.
   - Moved class MayBe -> module dtools.containers.maybe
   - Moved class Xor -> module dtools.containers.xor
 - Retaining static methods from err_handling.py
-  - have not yet decided new name for library yet
+  - moving to dtools.fp.error_wrapping
   - methods will become functions
 
 ### Version 1.7.0 - PyPI release date 2025-04-22

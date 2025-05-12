@@ -17,8 +17,8 @@ from __future__ import annotations
 from typing import Final
 from dtools.containers.functional_tuple import FunctionalTuple as FT
 from dtools.queues.de import DEQueue as DQ, de_queue as dq
-from dtools.fp.err_handling import MayBe as MB
-from dtools.fp.err_handling import Xor, LEFT, RIGHT
+from dtools.containers.maybe import MayBe as MB
+from dtools.containers.xor import Xor, LEFT, RIGHT
 
 
 class Test_MB_sequence:

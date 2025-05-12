@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from typing import Any
-from dtools.fp.err_handling import MayBe as MB
+from dtools.containers.maybe import MayBe as MB
 from dtools.fp.lazy import Lazy, lazy, real_lazy
 
 #-- Test happy and sad paths ---------------------------------------------------

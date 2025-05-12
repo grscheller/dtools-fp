@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module dtools.fp.err_handling - monadic error handling
+"""### Module dtools.fp.error_wrapping - monadic error handling
 
 Functional data types to use in lieu of exceptions.
 
-- *class* MayBe: maybe (optional) monad
-- *class* Xor: left biased either monad
+- *class* MayBe2: maybe (optional) monad
+- *class* Xor2: left biased either monad
 
 """
 
 from __future__ import annotations
 
-__all__ = ['MayBe', 'Xor', 'LEFT', 'RIGHT']
+__all__ = ['MayBe2', 'Xor2', 'LEFT2', 'RIGHT2']
 
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import cast, Final, Never, overload, TypeVar
@@ -31,25 +31,25 @@ from .bool import _Bool as Both, _True as Left, _False as Right
 from .singletons import Sentinel
 
 
-# -- class MayBe ------------------------------------------------------------------
+# -- class MayBe2 ------------------------------------------------------------------
 
 D = TypeVar('D', covariant=True)
 
 
-class MayBe[D]:
+class MayBe2[D]:
     """Maybe monad - class wrapping a potentially missing value.
 
-    - where `MayBe(value)` contains a possible value of type `~D`
-    - `MayBe()` semantically represent a non-existent or missing value of type `~D`
+    - where `MayBe2(value)` contains a possible value of type `~D`
+    - `MayBe2()` semantically represent a non-existent or missing value of type `~D`
     - immutable semantics
       - immutable, therefore made covariant
       - can store any value of any type with one exception
-        - if `~D` is `Sentinel`, storing `Sentinel(MayBe)` results in a MayBe()
+        - if `~D` is `Sentinel`, storing `Sentinel(MayBe2)` results in a MayBe2()
     - WARNING: hashability invalidated if contained value is not hashable
-      - hash function will fail if `MayBe` contains an unhashable value
+      - hash function will fail if `MayBe2` contains an unhashable value
     - WARNING: unsafe method `get`
-      - will raise `ValueError` if MayBe empty and an alt return value not given
-      - best practice is to first check the MayBe in a boolean context
+      - will raise `ValueError` if MayBe2 empty and an alt return value not given
+      - best practice is to first check the MayBe2 in a boolean context
 
     """
 
@@ -65,14 +65,14 @@ class MayBe[D]:
     @overload
     def __init__(self, value: D) -> None: ...
 
-    def __init__(self, value: D | Sentinel = Sentinel('MayBe')) -> None:
+    def __init__(self, value: D | Sentinel = Sentinel('MayBe2')) -> None:
         self._value: D | Sentinel = value
 
     def __hash__(self) -> int:
-        return hash((Sentinel('MayBe'), self._value))
+        return hash((Sentinel('MayBe2'), self._value))
 
     def __bool__(self) -> bool:
-        return self._value is not Sentinel('MayBe')
+        return self._value is not Sentinel('MayBe2')
 
     def __iter__(self) -> Iterator[D]:
         if self:
@@ -80,8 +80,8 @@ class MayBe[D]:
 
     def __repr__(self) -> str:
         if self:
-            return 'MayBe(' + repr(self._value) + ')'
-        return 'MayBe()'
+            return 'MayBe2(' + repr(self._value) + ')'
+        return 'MayBe2()'
 
     def __len__(self) -> int:
         return 1 if self else 0
@@ -101,44 +101,44 @@ class MayBe[D]:
     @overload
     def get(self, alt: D) -> D: ...
 
-    def get(self, alt: D | Sentinel = Sentinel('MayBe')) -> D | Never:
+    def get(self, alt: D | Sentinel = Sentinel('MayBe2')) -> D | Never:
         """Return the contained value if it exists, otherwise an alternate value.
 
         - alternate value must be of type `~D`
         - raises `ValueError` if an alternate value is not provided but needed
 
         """
-        _sentinel: Final[Sentinel] = Sentinel('MayBe')
+        _sentinel: Final[Sentinel] = Sentinel('MayBe2')
         if self._value is not _sentinel:
             return cast(D, self._value)
         if alt is _sentinel:
-            msg = 'MayBe: an alternate return type not provided'
+            msg = 'MayBe2: an alternate return type not provided'
             raise ValueError(msg)
         return cast(D, alt)
 
-    def map[U](self, f: Callable[[D], U]) -> MayBe[U]:
+    def map[U](self, f: Callable[[D], U]) -> MayBe2[U]:
         """Map function `f` over contents."""
 
         if self:
-            return MayBe(f(cast(D, self._value)))
-        return cast(MayBe[U], self)
+            return MayBe2(f(cast(D, self._value)))
+        return cast(MayBe2[U], self)
 
-    def bind[U](self, f: Callable[[D], MayBe[U]]) -> MayBe[U]:
-        """Flatmap `MayBe` with function `f`."""
-        return f(cast(D, self._value)) if self else cast(MayBe[U], self)
+    def bind[U](self, f: Callable[[D], MayBe2[U]]) -> MayBe2[U]:
+        """Flatmap `MayBe2` with function `f`."""
+        return f(cast(D, self._value)) if self else cast(MayBe2[U], self)
 
-    def map_except[U](self, f: Callable[[D], U]) -> MayBe[U]:
+    def map_except[U](self, f: Callable[[D], U]) -> MayBe2[U]:
         """Map function `f` over contents.
 
-        - if `f` should fail, return a MayBe()
+        - if `f` should fail, return a MayBe2()
 
         - WARNING: Swallows exceptions
 
         """
         if not self:
-            return cast(MayBe[U], self)
+            return cast(MayBe2[U], self)
         try:
-            return MayBe(f(cast(D, self._value)))
+            return MayBe2(f(cast(D, self._value)))
         except (
             LookupError,
             ValueError,
@@ -149,16 +149,16 @@ class MayBe[D]:
             ReferenceError,
             RuntimeError,
         ):
-            return MayBe()
+            return MayBe2()
 
-    def bind_except[U](self, f: Callable[[D], MayBe[U]]) -> MayBe[U]:
-        """Flatmap `MayBe` with function `f`.
+    def bind_except[U](self, f: Callable[[D], MayBe2[U]]) -> MayBe2[U]:
+        """Flatmap `MayBe2` with function `f`.
 
         - WARNING: Swallows exceptions
 
         """
         try:
-            return f(cast(D, self._value)) if self else cast(MayBe[U], self)
+            return f(cast(D, self._value)) if self else cast(MayBe2[U], self)
         except (
             LookupError,
             ValueError,
@@ -169,13 +169,13 @@ class MayBe[D]:
             ReferenceError,
             RuntimeError,
         ):
-            return MayBe()
+            return MayBe2()
 
     @staticmethod
-    def call[U, V](f: Callable[[U], V], u: U) -> MayBe[V]:
-        """Return MayBe wrapped result of a function call that can fail"""
+    def call[U, V](f: Callable[[U], V], u: U) -> MayBe2[V]:
+        """Return MayBe2 wrapped result of a function call that can fail"""
         try:
-            return MayBe(f(u))
+            return MayBe2(f(u))
         except (
             LookupError,
             ValueError,
@@ -186,22 +186,22 @@ class MayBe[D]:
             ReferenceError,
             RuntimeError,
         ):
-            return MayBe()
+            return MayBe2()
 
     @staticmethod
-    def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MayBe[V]]:
-        """Return a MayBe of a delayed evaluation of a function"""
+    def lz_call[U, V](f: Callable[[U], V], u: U) -> Callable[[], MayBe2[V]]:
+        """Return a MayBe2 of a delayed evaluation of a function"""
 
-        def ret() -> MayBe[V]:
-            return MayBe.call(f, u)
+        def ret() -> MayBe2[V]:
+            return MayBe2.call(f, u)
 
         return ret
 
     @staticmethod
-    def idx[V](v: Sequence[V], ii: int) -> MayBe[V]:
-        """Return a MayBe of an indexed value that can fail"""
+    def idx[V](v: Sequence[V], ii: int) -> MayBe2[V]:
+        """Return a MayBe2 of an indexed value that can fail"""
         try:
-            return MayBe(v[ii])
+            return MayBe2(v[ii])
         except (
             LookupError,
             ValueError,
@@ -212,24 +212,24 @@ class MayBe[D]:
             ReferenceError,
             RuntimeError,
         ):
-            return MayBe()
+            return MayBe2()
 
     @staticmethod
-    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MayBe[V]]:
-        """Return a MayBe of a delayed indexing of a sequenced type that can fail"""
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[], MayBe2[V]]:
+        """Return a MayBe2 of a delayed indexing of a sequenced type that can fail"""
 
-        def ret() -> MayBe[V]:
-            return MayBe.idx(v, ii)
+        def ret() -> MayBe2[V]:
+            return MayBe2.idx(v, ii)
 
         return ret
 
     @staticmethod
-    def sequence[T](itab_mb_d: Iterable[MayBe[T]]) -> MayBe[Iterator[T]]:
-        """Sequence an indexable of type `MayBe[~T]`
+    def sequence[T](itab_mb_d: Iterable[MayBe2[T]]) -> MayBe2[Iterator[T]]:
+        """Sequence an indexable of type `MayBe2[~T]`
 
-        * if the iterated `MayBe` values are not all empty,
-          * return a `MayBe` of an iterator of the contained values
-          * otherwise return an empty `MayBe`
+        * if the iterated `MayBe2` values are not all empty,
+          * return a `MayBe2` of an iterator of the contained values
+          * otherwise return an empty `MayBe2`
 
         """
         item: list[T] = []
@@ -238,12 +238,12 @@ class MayBe[D]:
             if mb_d:
                 item.append(mb_d.get())
             else:
-                return MayBe()
+                return MayBe2()
 
-        return MayBe(iter(item))
+        return MayBe2(iter(item))
 
 
-# -- class Xor -----------------------------------------------------------------
+# -- class Xor2 -----------------------------------------------------------------
 
 L = TypeVar('L', covariant=True)
 R = TypeVar('R', covariant=True)
@@ -252,21 +252,21 @@ LEFT = Left()
 RIGHT = Right()
 
 
-class Xor[L, R]:
+class Xor2[L, R]:
     """Either monad - class semantically containing either a left or a right
     value, but not both.
 
     - implements a left biased Either Monad
-      - `Xor(value: ~L)` or `Xor(value: ~L, LEFT)` produces a left `Xor`
-      - `Xor(value: ~L, RIGHT)` produces a right `Xor`
+      - `Xor2(value: ~L)` or `Xor2(value: ~L, LEFT)` produces a left `Xor2`
+      - `Xor2(value: ~L, RIGHT)` produces a right `Xor2`
     - in a Boolean context
-      - `True` if a left `Xor`
-      - `False` if a right `Xor`
-    - two `Xor` objects compare as equal when
+      - `True` if a left `Xor2`
+      - `False` if a right `Xor2`
+    - two `Xor2` objects compare as equal when
       - both are left values or both are right values whose values
         - are the same object
         - compare as equal
-    - immutable, an `Xor` does not change after being created
+    - immutable, an `Xor2` does not change after being created
       - immutable semantics, map & bind return new instances
         - warning: contained value need not be immutable
         - warning: not hashable if value is mutable
@@ -281,14 +281,14 @@ class Xor[L, R]:
     T = TypeVar('T')
 
     @overload
-    def __new__(cls, value: L) -> Xor[L, R]: ...
+    def __new__(cls, value: L) -> Xor2[L, R]: ...
     @overload
-    def __new__(cls, value: L, side: Right) -> Xor[L, R]: ...
+    def __new__(cls, value: L, side: Right) -> Xor2[L, R]: ...
     @overload
-    def __new__(cls, value: R, side: Left) -> Xor[L, R]: ...
+    def __new__(cls, value: R, side: Left) -> Xor2[L, R]: ...
 
-    def __new__(cls, value: L | R, side: Both = RIGHT) -> Xor[L, R]:
-        return super(Xor, cls).__new__(cls)
+    def __new__(cls, value: L | R, side: Both = RIGHT) -> Xor2[L, R]:
+        return super(Xor2, cls).__new__(cls)
 
     @overload
     def __init__(self, value: L) -> None: ...
@@ -313,8 +313,8 @@ class Xor[L, R]:
 
     def __repr__(self) -> str:
         if self:
-            return 'Xor(' + repr(self._value) + ', LEFT)'
-        return 'Xor(' + repr(self._value) + ', RIGHT)'
+            return 'Xor2(' + repr(self._value) + ', LEFT)'
+        return 'Xor2(' + repr(self._value) + ', RIGHT)'
 
     def __str__(self) -> str:
         if self:
@@ -322,7 +322,7 @@ class Xor[L, R]:
         return '< | ' + str(self._value) + ' >'
 
     def __len__(self) -> int:
-        # An Xor always contains just one value.
+        # An Xor2 always contains just one value.
         return 1
 
     def __eq__(self, other: object) -> bool:
@@ -342,76 +342,76 @@ class Xor[L, R]:
     def get(self) -> L | Never:
         """Get value if a left.
 
-        - if the `Xor` is a "left" Xor
+        - if the `Xor2` is a "left" Xor2
           - return its value
-        - if the `Xor` contains a right value
+        - if the `Xor2` contains a right value
           - raises `ValueError`
-          - best practice is to first check the `Xor` in a boolean context
+          - best practice is to first check the `Xor2` in a boolean context
 
         """
         if self._side == RIGHT:
-            msg = 'Xor: get method called on a right valued Xor'
+            msg = 'Xor2: get method called on a right valued Xor2'
             raise ValueError(msg)
         return cast(L, self._value)
 
-    def get_left(self) -> MayBe[L]:
-        """Get value of `Xor` if a left. Safer version of `get` method.
+    def get_left(self) -> MayBe2[L]:
+        """Get value of `Xor2` if a left. Safer version of `get` method.
 
-        - if `Xor` contains a left value, return it wrapped in a MayBe
-        - if `Xor` contains a right value, return MayBe()
+        - if `Xor2` contains a left value, return it wrapped in a MayBe2
+        - if `Xor2` contains a right value, return MayBe2()
 
         """
         if self._side == LEFT:
-            return MayBe(cast(L, self._value))
-        return MayBe()
+            return MayBe2(cast(L, self._value))
+        return MayBe2()
 
-    def get_right(self) -> MayBe[R]:
-        """Get value of `Xor` if a right
+    def get_right(self) -> MayBe2[R]:
+        """Get value of `Xor2` if a right
 
-        - if `Xor` contains a right value, return it wrapped in a MayBe
-        - if `Xor` contains a left value, return MayBe()
+        - if `Xor2` contains a right value, return it wrapped in a MayBe2
+        - if `Xor2` contains a left value, return MayBe2()
 
         """
         if self._side == RIGHT:
-            return MayBe(cast(R, self._value))
-        return MayBe()
+            return MayBe2(cast(R, self._value))
+        return MayBe2()
 
-    def map_right[V](self, f: Callable[[R], V]) -> Xor[L, V]:
-        """Construct new Xor with a different right."""
+    def map_right[V](self, f: Callable[[R], V]) -> Xor2[L, V]:
+        """Construct new Xor2 with a different right."""
         if self._side == LEFT:
-            return cast(Xor[L, V], self)
-        return Xor[L, V](f(cast(R, self._value)), RIGHT)
+            return cast(Xor2[L, V], self)
+        return Xor2[L, V](f(cast(R, self._value)), RIGHT)
 
-    def map[U](self, f: Callable[[L], U]) -> Xor[U, R]:
+    def map[U](self, f: Callable[[L], U]) -> Xor2[U, R]:
         """Map over if a left value. Return new instance."""
         if self._side == RIGHT:
-            return cast(Xor[U, R], self)
-        return Xor(f(cast(L, self._value)), LEFT)
+            return cast(Xor2[U, R], self)
+        return Xor2(f(cast(L, self._value)), LEFT)
 
-    def bind[U](self, f: Callable[[L], Xor[U, R]]) -> Xor[U, R]:
+    def bind[U](self, f: Callable[[L], Xor2[U, R]]) -> Xor2[U, R]:
         """Flatmap over the left value - propagate right values."""
         if self:
             return f(cast(L, self._value))
-        return cast(Xor[U, R], self)
+        return cast(Xor2[U, R], self)
 
-    def map_except[U](self, f: Callable[[L], U], fallback_right: R) -> Xor[U, R]:
+    def map_except[U](self, f: Callable[[L], U], fallback_right: R) -> Xor2[U, R]:
         """Map over if a left value - with fallback upon exception.
 
-        - if `Xor` is a left then map `f` over its value
-          - if `f` successful return a left `Xor[U, R]`
-          - if `f` unsuccessful return right `Xor[S, R]`
+        - if `Xor2` is a left then map `f` over its value
+          - if `f` successful return a left `Xor2[U, R]`
+          - if `f` unsuccessful return right `Xor2[S, R]`
             - swallows many exceptions `f` may throw at run time
-        - if `Xor` is a right
-          - return new `Xor(right=self._right): Xor[U, R]`
+        - if `Xor2` is a right
+          - return new `Xor2(right=self._right): Xor2[U, R]`
 
         """
         if self._side == RIGHT:
-            return cast(Xor[U, R], self)
+            return cast(Xor2[U, R], self)
 
-        applied: MayBe[Xor[U, R]] = MayBe()
-        fall_back: MayBe[Xor[U, R]] = MayBe()
+        applied: MayBe2[Xor2[U, R]] = MayBe2()
+        fall_back: MayBe2[Xor2[U, R]] = MayBe2()
         try:
-            applied = MayBe(Xor(f(cast(L, self._value)), LEFT))
+            applied = MayBe2(Xor2(f(cast(L, self._value)), LEFT))
         except (
             LookupError,
             ValueError,
@@ -422,27 +422,28 @@ class Xor[L, R]:
             ReferenceError,
             RuntimeError,
         ):
-            fall_back = MayBe(cast(Xor[U, R], Xor(fallback_right, RIGHT)))
+            fall_back = MayBe2(cast(Xor2[U, R], Xor2(fallback_right, RIGHT)))
 
         if fall_back:
             return fall_back.get()
         return applied.get()
 
-    def bind_except[U](self, f: Callable[[L], Xor[U, R]], fallback_right: R) -> Xor[U, R]:
-        """Flatmap `Xor` with function `f` with fallback right
+    def bind_except[U](self, f: Callable[[L], Xor2[U, R]], fallback_right: R) ->
+    Xor2[U, R]:
+        """Flatmap `Xor2` with function `f` with fallback right
 
         - provide fallback right value if exception thrown.
         - WARNING: Swallows exceptions
 
         """
         if self._side == RIGHT:
-            return cast(Xor[U, R], self)
+            return cast(Xor2[U, R], self)
 
-        applied: MayBe[Xor[U, R]] = MayBe()
-        fall_back: MayBe[Xor[U, R]] = MayBe()
+        applied: MayBe2[Xor2[U, R]] = MayBe2()
+        fall_back: MayBe2[Xor2[U, R]] = MayBe2()
         try:
             if self:
-                applied = MayBe(f(cast(L, self._value)))
+                applied = MayBe2(f(cast(L, self._value)))
         except (
             LookupError,
             ValueError,
@@ -453,17 +454,17 @@ class Xor[L, R]:
             ReferenceError,
             RuntimeError,
         ):
-            fall_back = MayBe(cast(Xor[U, R], Xor(fallback_right, RIGHT)))
+            fall_back = MayBe2(cast(Xor2[U, R], Xor2(fallback_right, RIGHT)))
 
         if fall_back:
             return fall_back.get()
         return applied.get()
 
     @staticmethod
-    def call[T, V](f: Callable[[T], V], left: T) -> Xor[V, Exception]:
-        """Return Xor wrapped result of a function call that can fail"""
+    def call[T, V](f: Callable[[T], V], left: T) -> Xor2[V, Exception]:
+        """Return Xor2 wrapped result of a function call that can fail"""
         try:
-            xor = Xor[V, Exception](f(left), LEFT)
+            xor = Xor2[V, Exception](f(left), LEFT)
         except (
             LookupError,
             ValueError,
@@ -474,48 +475,48 @@ class Xor[L, R]:
             ReferenceError,
             RuntimeError,
         ) as exc:
-            xor = Xor(exc, RIGHT)
+            xor = Xor2(exc, RIGHT)
         return xor
 
     @staticmethod
-    def lz_call[T, V](f: Callable[[T], V], arg: T) -> Callable[[], Xor[V, Exception]]:
-        """Return an Xor of a delayed evaluation of a function"""
+    def lz_call[T, V](f: Callable[[T], V], arg: T) -> Callable[[], Xor2[V, Exception]]:
+        """Return an Xor2 of a delayed evaluation of a function"""
 
-        def ret() -> Xor[V, Exception]:
-            return Xor.call(f, arg)
+        def ret() -> Xor2[V, Exception]:
+            return Xor2.call(f, arg)
 
         return ret
 
     @staticmethod
-    def idx[V](v: Sequence[V], ii: int) -> Xor[V, Exception]:
-        """Return an Xor of an indexed value that can fail"""
+    def idx[V](v: Sequence[V], ii: int) -> Xor2[V, Exception]:
+        """Return an Xor2 of an indexed value that can fail"""
         try:
-            xor = Xor[V, Exception](v[ii], LEFT)
+            xor = Xor2[V, Exception](v[ii], LEFT)
         except (
             IndexError,
             TypeError,
             ArithmeticError,
             RuntimeError,
         ) as exc:
-            xor = Xor(exc, RIGHT)
+            xor = Xor2(exc, RIGHT)
         return xor
 
     @staticmethod
-    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[int], Xor[V, Exception]]:
-        """Return an Xor of a delayed indexing of a sequenced type that can fail"""
+    def lz_idx[V](v: Sequence[V], ii: int) -> Callable[[int], Xor2[V, Exception]]:
+        """Return an Xor2 of a delayed indexing of a sequenced type that can fail"""
 
-        def ret(ii: int) -> Xor[V, Exception]:
-            return Xor.idx(v, ii)
+        def ret(ii: int) -> Xor2[V, Exception]:
+            return Xor2.idx(v, ii)
 
         return ret
 
     @staticmethod
-    def sequence(itab_xor_lr: Iterable[Xor[L, R]]) -> Xor[Iterator[L], R]:
-        """Sequence an indexable of type `Xor[~L, ~R]`
+    def sequence(itab_xor_lr: Iterable[Xor2[L, R]]) -> Xor2[Iterator[L], R]:
+        """Sequence an indexable of type `Xor2[~L, ~R]`
 
-        - if the iterated `Xor` values are all lefts, then
-          - return an `Xor` of an iterable of the left values
-        - otherwise return a right Xor containing the first right encountered
+        - if the iterated `Xor2` values are all lefts, then
+          - return an `Xor2` of an iterable of the left values
+        - otherwise return a right Xor2 containing the first right encountered
 
         """
         ts: list[L] = []
@@ -524,6 +525,6 @@ class Xor[L, R]:
             if xor_lr:
                 ts.append(xor_lr.get())
             else:
-                return Xor(xor_lr.get_right().get(), RIGHT)
+                return Xor2(xor_lr.get_right().get(), RIGHT)
 
-        return Xor(iter(ts))
+        return Xor2(iter(ts))

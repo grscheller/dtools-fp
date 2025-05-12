@@ -72,7 +72,7 @@ class NoValue:
       - while `None` represents "returned no values"
       - `NoValue()` represents the absence of a value
     - usage
-      - `import NoValue from dtools.fp.err_handling` and then
+      - `import `NoValue` from `dtools.fp.singletons` and then
         - either use `NoValue()` directly
         - or define `_noValue: Final[NoValue] = NoValue()` don't export it
       - compare using `is` and `is not`
