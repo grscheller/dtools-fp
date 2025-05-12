@@ -385,7 +385,7 @@ class TestBind:
 
         ilist_xor_int_str = ilist(xor41, xor42, xor43)
         ilist_xor_bool_str = ilist_xor_int_str.map(
-            lambda x: x.bind(lt42bool)
+            lambda x: x.bind_except(lt42bool, 'bind failed')
         )
 
         assert ilist_xor_bool_str[0] == Xor[bool, str](True, LEFT)

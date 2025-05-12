@@ -394,7 +394,7 @@ class Xor[L, R]:
             return f(cast(L, self._value))
         return cast(Xor[U, R], self)
 
-    def map_except[U](self, f: Callable[[L], U], fb_right: R) -> Xor[U, R]:
+    def map_except[U](self, f: Callable[[L], U], fallback_right: R) -> Xor[U, R]:
         """Map over if a left value - with fallback upon exception.
 
         - if `Xor` is a left then map `f` over its value
@@ -422,7 +422,38 @@ class Xor[L, R]:
             ReferenceError,
             RuntimeError,
         ):
-            fall_back = MayBe(cast(Xor[U, R], Xor(fb_right, RIGHT)))
+            fall_back = MayBe(cast(Xor[U, R], Xor(fallback_right, RIGHT)))
+
+        if fall_back:
+            return fall_back.get()
+        return applied.get()
+
+    def bind_except[U](self, f: Callable[[L], Xor[U, R]], fallback_right: R) -> Xor[U, R]:
+        """Flatmap `Xor` with function `f` with fallback right
+
+        - provide fallback right value if exception thrown.
+        - WARNING: Swallows exceptions
+
+        """
+        if self._side == RIGHT:
+            return cast(Xor[U, R], self)
+
+        applied: MayBe[Xor[U, R]] = MayBe()
+        fall_back: MayBe[Xor[U, R]] = MayBe()
+        try:
+            if self:
+                applied = MayBe(f(cast(L, self._value)))
+        except (
+            LookupError,
+            ValueError,
+            TypeError,
+            BufferError,
+            ArithmeticError,
+            RecursionError,
+            ReferenceError,
+            RuntimeError,
+        ):
+            fall_back = MayBe(cast(Xor[U, R], Xor(fallback_right, RIGHT)))
 
         if fall_back:
             return fall_back.get()
