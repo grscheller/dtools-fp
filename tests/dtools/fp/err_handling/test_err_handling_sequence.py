@@ -33,12 +33,12 @@ class Test_MB_sequence:
 
         mb_list_int = MB.sequence(list_mb_int).map(list)
         mb_tuple_int = MB.sequence(tuple_mb_int).map(tuple)
-        mb_ftuple_int = MB.sequence(ftuple_mb_int).map(FT)
+        mb_ftuple_int = MB.sequence(ftuple_mb_int).map(lambda ii: FT(*ii))
         mb_dqueue_int = MB.sequence(dqueue_mb_int).map(DQ)
 
         assert mb_list_int == MB(list(range(1, 2501)))
         assert mb_tuple_int == MB(tuple(range(1, 2501)))
-        assert mb_ftuple_int == MB(FT(range(1, 2501)))
+        assert mb_ftuple_int == MB(FT(*range(1, 2501)))
         assert mb_dqueue_int == MB(DQ(range(1, 2501)))
 
     def test_with_empties(self) -> None:
@@ -79,20 +79,20 @@ class Test_Xor_sequence:
 
         xor_listInt_str: Xor[list[int], str] = Xor.sequence(
             list_of_xor_int_str
-        ).map(list, '')
+        ).map(list)
         xor_tupleInt_str: Xor[tuple[int, ...], str] = Xor.sequence(
             tuple_of_xor_int_str
-        ).map(tuple, '')
+        ).map(tuple)
         xor_ftuple_int_str: Xor[FT[int], str] = Xor.sequence(
             ftuple_of_xor_int_str
-            ).map(lambda x: FT(*x), '')
+            ).map(lambda x: FT(*x))
         xor_dqueue_int_str: Xor[DQ[int], str] = Xor.sequence(
             dqueue_of_xor_int_str
-        ).map(DQ, '')
+        ).map(DQ)
 
         assert xor_listInt_str == Xor(list(range(1, 2501)), LEFT)
         assert xor_tupleInt_str == Xor(tuple(range(1, 2501)), LEFT)
-        assert xor_ftuple_int_str == Xor(FT(range(1, 2501)), LEFT)
+        assert xor_ftuple_int_str == Xor(FT(*range(1, 2501)), LEFT)
         assert xor_dqueue_int_str == Xor(DQ(range(1, 2501)), LEFT)
 
     def test_with_a_right(self) -> None:
@@ -110,10 +110,10 @@ class Test_Xor_sequence:
             Xor(1, LEFT), Xor(2, LEFT), Xor(3, LEFT), Xor('4', RIGHT)
         )
 
-        xor_list_int = Xor.sequence(list_of_xor_int_str).map(list, 'No!')
-        xor_tuple_int = Xor.sequence(tuple_of_xor_int_str).map(tuple, 'No!')
-        xor_ftuple_int = Xor.sequence(ftuple_of_xor_int_str).map(FT, 'No!')
-        xor_dqueue_int = Xor.sequence(dqueue_of_xor_int_str).map(DQ, 'No!')
+        xor_list_int = Xor.sequence(list_of_xor_int_str).map(list)
+        xor_tuple_int = Xor.sequence(tuple_of_xor_int_str).map(tuple)
+        xor_ftuple_int = Xor.sequence(ftuple_of_xor_int_str).map(FT)
+        xor_dqueue_int = Xor.sequence(dqueue_of_xor_int_str).map(DQ)
 
         assert xor_list_int == Xor('1', RIGHT)
         assert xor_tuple_int == Xor('2', RIGHT)
@@ -153,11 +153,11 @@ class Test_Xor_sequence:
         data0 = list(map(letter_left, letter_set_0))
         data1 = list(map(letter_left, letter_set_1))
         data2 = list(data1)
-        data2[5] = data2[5].bind(letter_right, 0)
+        data2[5] = data2[5].bind(letter_right)
 
-        sequenced_data0 = Xor.sequence(data0).map(list, 2)
-        sequenced_data1 = Xor.sequence(data1).map(list, 0)
-        sequenced_data2: Letters = Xor.sequence(data2).map(list, -2)
+        sequenced_data0 = Xor.sequence(data0).map(list)
+        sequenced_data1 = Xor.sequence(data1).map(list)
+        sequenced_data2: Letters = Xor.sequence(data2).map(list)
 
         result0: Letters = Xor([], LEFT)
         result1: Letters = Xor(letter_set_1, LEFT)

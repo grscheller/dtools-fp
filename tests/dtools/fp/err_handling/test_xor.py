@@ -32,15 +32,6 @@ def gt42(x: int) -> bool | Never:
     raise ValueError('x = 42')
 
 
-def lt42(x: int) -> Xor[int, str] | Never:
-    """contrived function that fails for 42, returns an Xor"""
-    if x < 42:
-        return Xor(x, LEFT)
-    if x > 42:
-        return Xor(f'{x}', RIGHT)
-    raise ValueError('42 failed')
-
-
 def lt42bool(x: int) -> Xor[bool, str] | Never:
     """contrived function that fails for 42, returns an Xor"""
     if x < 42:
@@ -209,11 +200,11 @@ def chk_str_starts_map(s: str) -> str | Never:
         raise ValueError
 
 
-class TestMapAndNapRight:
-    """Test map and map_right together"""
+class TestMapExcept:
+    """Test map_except"""
 
-    def test_xor_map(self) -> None:
-        """Test map by itself"""
+    def test_xor_map_except_1(self) -> None:
+        """Test 1 map_except"""
         s2 = Xor[int, str](2, LEFT)
         s5 = Xor[int, str](5, LEFT)
         s10 = Xor[int, str](10, LEFT)
@@ -228,30 +219,20 @@ class TestMapAndNapRight:
         assert s10.get_right() == MB()
         assert s_foo_m.get_right() == MB('foo')
 
-        s2 = s2.map(add2ifLT5, 'map failed').map_right(
-            (lambda s: 'The ' + s + '.'), 'The map.right failed!'
-        )
-        s5 = s5.map(add2ifLT5, 'map failed').map_right(
-            (lambda s: 'The ' + s + '.'), 'The map.right failed!'
-        )
-        s10 = s10.map(add2ifLT5, 'map failed').map_right(
-            (lambda s: 'The ' + s + '.'), 'The map.right failed!'
-        )
-        s_foo_m = s_foo_m.map(add2ifLT5, 'map failed').map_right(
-            (lambda s: 'The ' + s + '.'), 'The map.right failed!'
-        )
-        s_foo_cr = s_foo_m.change_right('Foofoo').map_right(
-            (lambda s: s + ' rules!'), 'The map_right failed!'
-        )
+        s2 = s2.map_except(add2ifLT5, 'map_except failed 2')
+        s5 = s5.map_except(add2ifLT5, 'map_except failed 5')
+        s10 = s10.map_except(add2ifLT5, 'map_except failed 10')
+        s_foo_m = s_foo_m.map_except(add2ifLT5, 'map_except failed foo')
+        s_foo_cr = s_foo_m.map_right(lambda s: f'Foo{s} rules!')
 
         assert s2.get_left() == MB(4)
         assert s5.get_left() == MB()
         assert s10.get_left() == MB(10)
         assert s_foo_m.get_left() == MB()
         assert s2.get_right() == MB()
-        assert s5.get_right() == MB('The map failed.')
+        assert s5.get_right() == MB('map_except failed 5')
         assert s10.get_right() == MB()
-        assert s_foo_m.get_right() == MB('The foo.')
+        assert s_foo_m.get_right() == MB('foo')
         assert s_foo_cr.get_right() == MB('Foofoo rules!')
 
         try:
@@ -285,7 +266,7 @@ class TestMapAndNapRight:
             assert False
 
     def test_xor_maps(self) -> None:
-        """Test map and map_right together"""
+        """Test 2 map_except"""
 
         s2 = Xor[int, str](2, LEFT)
         s5 = Xor[int, str](5, LEFT)
@@ -314,18 +295,10 @@ class TestMapAndNapRight:
         assert s10gr == MB()
         assert s_bar_gr == MB('bar')
 
-        s2 = s2.map(add_1_if_gt_5, 'map failed').map_right(
-            chk_str_starts_map, 'The map_right failed!'
-        )
-        s5 = s5.map(add_1_if_gt_5, 'the map failed').map_right(
-            chk_str_starts_map, 'The map_right failed!'
-        )
-        s10 = s10.map(add_1_if_gt_5, 'my map failed').map_right(
-            chk_str_starts_map, 'The map_right failed!'
-        )
-        s_bar = s_bar.map(add_1_if_gt_5, 'my map failed').map_right(
-            chk_str_starts_map, 'The map_right failed!'
-        )
+        s2 = s2.map_except(add_1_if_gt_5, 'map_except failed 2')
+        s5 = s5.map_except(add_1_if_gt_5, 'map_except failed 5')
+        s10 = s10.map_except(add_1_if_gt_5, 'map_except failed 10')
+        s_bar = s_bar.map_except(add_1_if_gt_5, 'map_except failed bar')
 
         s2g = s2.get()
         s10g = s10.get()
@@ -337,7 +310,7 @@ class TestMapAndNapRight:
         s5gr = s5.get_right()
         s10gr = s10.get_right()
         s_bar_gr = s_bar.get_right()
-        
+
         assert s2g == 2
         assert s10g == 11
         assert s2gl == MB(2)
@@ -345,9 +318,9 @@ class TestMapAndNapRight:
         assert s10gl == MB(11)
         assert s_bar_gl == MB()
         assert s2gr == MB()
-        assert s5gr == MB('The map_right failed!')
+        assert s5gr == MB('map_except failed 5')
         assert s10gr == MB()
-        assert s_bar_gr == MB('The map_right failed!')
+        assert s_bar_gr == MB('bar')
 
         try:
             s2g = s2.get()
@@ -411,7 +384,9 @@ class TestBind:
         xor43: Xor[int, str] = Xor(43)
 
         ilist_xor_int_str = ilist(xor41, xor42, xor43)
-        ilist_xor_bool_str = ilist_xor_int_str.map(lambda x: x.bind(lt42bool, 'bind failed'))
+        ilist_xor_bool_str = ilist_xor_int_str.map(
+            lambda x: x.bind(lt42bool)
+        )
 
         assert ilist_xor_bool_str[0] == Xor[bool, str](True, LEFT)
         assert ilist_xor_bool_str[1] == Xor[bool, str]('bind failed', RIGHT)
@@ -423,54 +398,59 @@ class TestBind:
         left7 = Xor[int, str](7, LEFT)
         right: Xor[int, str] = Xor('Nobody home.', RIGHT)
 
-        nobody = right.bind(lessThan2, 'Anybody home?')
+        nobody = right.bind(lessThan2)
         assert nobody == Xor('Nobody home.', RIGHT)
 
-        lt2 = left1.bind(lessThan2, '')
-        lt5 = left1.bind(lessThan5, '')
+        lt2 = left1.bind(lessThan2)
+        lt5 = left1.bind(lessThan5)
         assert lt2 == Xor(1, LEFT)
         assert lt5 == Xor(1, LEFT)
 
-        lt2 = left4.bind(lessThan2, '')
-        lt5 = left4.bind(lessThan5, '')
+        lt2 = left4.bind(lessThan2)
+        lt5 = left4.bind(lessThan5)
         assert lt2 == Xor('4 >= 2', RIGHT)
         assert lt5 == Xor(4)
 
-        lt2 = left7.bind(lessThan2, '')
-        lt5 = left7.bind(lessThan5, '')
+        lt2 = left7.bind(lessThan2)
+        lt5 = left7.bind(lessThan5)
         assert lt2 == Xor('7 >= 2', RIGHT)
         assert lt5 == Xor('7 >= 5', RIGHT)
 
-        nobody = right.bind(lessThan5, '')
+        nobody = right.bind(lessThan5)
         assert nobody == Xor('Nobody home.', RIGHT)
 
-        lt2 = left1.bind(lessThan2, '')
-        lt5 = left1.bind(lessThan5, '')
+        lt2 = left1.bind(lessThan2)
+        lt5 = left1.bind(lessThan5)
         assert lt2 == Xor(1, LEFT)
         assert lt5 == Xor(1, LEFT)
 
-        lt2 = left4.bind(lessThan2, '')
-        lt5 = left4.bind(lessThan5, '')
+        lt2 = left4.bind(lessThan2)
+        lt5 = left4.bind(lessThan5)
         assert lt2 == Xor('4 >= 2', RIGHT)
         assert lt2 != Xor('42 >= 2', RIGHT)
         assert lt5 == Xor(4, LEFT)
         assert lt5 != Xor('5 >= 5', RIGHT)
 
-        lt2 = left7.bind(lessThan2, 'bind failed').map_right(
-            lambda _: 'greater than or equal 2', alt_right='map_right failed'
-        )
-        lt5 = left7.bind(lessThan5, 'bind failed').map_right(
-            lambda s: s + ', greater than or equal 5', 'map_right failed'
-        )
-        assert lt2 == Xor('greater than or equal 2', RIGHT)
-        assert lt5 == Xor('7 >= 5, greater than or equal 5', RIGHT)
+        lt2 = left7.bind(lessThan2).map_right(lambda _: 'greater than 1')
+        lt5 = left7.bind(lessThan5).map_right(lambda s: s + ', greater than 4')
+        assert lt2 == Xor('greater than 1', RIGHT)
+        assert lt5 == Xor('7 >= 5, greater than 4', RIGHT)
 
 
 class TestXorUsecases:
     """Non-systematic tests for ease of use"""
 
     def test_usecase(self) -> None:
-        ""
+        "Get Smart logic"
+
+        def lt42(x: int) -> Xor[int, str] | Never:
+            """contrived function that fails for 42, returns an Xor"""
+            if x < 42:
+                return Xor(x, LEFT)
+            if x > 42:
+                return Xor(f'Agent {x}', RIGHT)
+            raise ValueError('42 failed')
+
         xor_99 = Xor[int, str](99, LEFT)
         xor_86 = Xor[int, str]('Max', RIGHT)
         xor_49 = Xor[int, str](49, LEFT)
@@ -493,45 +473,57 @@ class TestXorUsecases:
         assert xor_86.get_right() == MB('Max')
 
         kaos0: Xor[bool, str] = Xor(True, LEFT)
-        kaos1 = xor_99.map(gt42, 'left 99')
-        kaos2 = xor_49.map(gt42, 'left 49')
+        kaos1 = xor_99.map(gt42)
+        kaos2 = xor_49.map(gt42)
         assert kaos0 == kaos1 == kaos2
 
         kaos0 = Xor(False, LEFT)
-        kaos1 = xor_01.map(gt42, 'failed')
-        kaos2 = xor_86.map(gt42, 'failed')
+        kaos1 = xor_01.map(gt42)
+        kaos2 = xor_86.map(gt42)
         kaos3: Xor[bool, str] = Xor('Max', RIGHT)
         assert kaos0 == kaos1 != kaos2 == kaos3
 
         kaos0 = Xor(False, LEFT)
-        kaos1 = xor_12.map(gt42, 'failed')
-        kaos2 = xor_21.map(gt42, 'failed')
+        kaos1 = xor_12.map(gt42)
+        kaos2 = xor_21.map(gt42)
         assert kaos0 == kaos1 == kaos2
 
-        kaos0 = Xor('map failed', RIGHT)
-        kaos1 = xor_42.map(gt42, 'map failed')
+        kaos0 = Xor('Kaos Reins!', RIGHT)
+        kaos1 = xor_42.map_except(gt42, 'Kaos Reins!' )
         assert kaos0 == kaos1
 
-        chief1 = xor_86.map_right(
-            (lambda s: f'{s}, you idiot!'), 'Not the dome of silence!'
+        # refactored by adding map_right
+        chief1 = xor_86.map(lambda n: f'Agent {n}, you are a genius!').map_right(
+            lambda s: f'{s}, you idiot!'
         )
-        chief2 = xor_42.map(gt42, 'Smart').map_right(
-            (lambda s: f"{s}, you're fired!"), 'Not the dome of silence!'
-        )
-        chief3 = xor_86.map_right(fail_str, 'Not the dome of silence!')
-        chief4 = xor_99.map_right(fail_str, 'Not the dome of silence!')
-        hymie99 = xor_99.map((lambda s: f'Hello agent {s}!'), 'Got some oil?')
-        hymie21 = xor_21.bind(lt42, 'Seigfried').map(
-            (lambda s: f'Hello agent {s}!'), 'Got some oil?'
-        )
-        hymie42 = xor_42.bind(lt42, 'Ratton').map_right(fail_str, 'Got some oil?')
 
-        assert chief1 != chief2
-        assert chief3 != chief4
+        chief2 = xor_86.map_right(lambda s: f'{s}, you idiot!').map(
+            lambda n: f'Agent {n}, you are a genius!'
+        )
+
+        chief3 = xor_99.map(lambda n: f'Agent {n}, you are a genius!').map_right(
+            lambda s: f'{s}, you idiot!'
+        )
+
+        chief4 = xor_99.map_right(lambda s: f'{s}, you idiot!').map(
+            lambda n: f'Agent {n}, you are a genius!'
+        )
+
         assert chief1 == Xor('Max, you idiot!', RIGHT)
-        assert chief2 == Xor("Smart, you're fired!", RIGHT)
-        assert chief3 == Xor('Not the dome of silence!', RIGHT)
-        assert chief4 == Xor(99, LEFT)
-        assert hymie99 == Xor('Hello agent 99!', LEFT)
-        assert hymie21 == Xor('Hello agent 21!', LEFT)
-        assert hymie42 == Xor('Got some oil?', RIGHT)
+        assert chief2 == Xor('Max, you idiot!', RIGHT)
+        assert chief3 == Xor('Agent 99, you are a genius!', LEFT)
+        assert chief4 == Xor('Agent 99, you are a genius!', LEFT)
+
+        hymie42: Xor[str, str] = Xor('I am a robot.', RIGHT)
+        hymie99 = xor_99.bind(lt42).map(lambda n: f'Hey {n}, got some oil?').map_right(lambda s: f'Hello {s}.')
+        hymie21 = xor_21.bind(lt42).map(lambda n: f'Hey {n}, got some oil?').map_right(lambda s: f'Hello {s}.')
+        try:
+            hymie42 = xor_42.bind(lt42).map(lambda n: f'Hey {n}, got some oil?').map_right(lambda s: f'Hello {s}.')
+        except ValueError:
+            assert True
+        else:
+            assert False
+
+        assert hymie99 == Xor('Hello Agent 99.', RIGHT)
+        assert hymie21 == Xor('Hey 21, got some oil?', LEFT)
+        assert hymie42 == Xor('I am a robot.', RIGHT)

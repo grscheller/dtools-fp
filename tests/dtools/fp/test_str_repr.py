@@ -191,12 +191,12 @@ class Test_repr:
         e7 = lt5_or_str(2)
         e8 = lt5_or_str(3)
         e9 = lt5_or_nothing(7)
-        e10 = Xor[int, str](10).bind(lt5_or_str, 'bind_failed')
+        e10 = Xor[int, str](10).bind(lt5_or_str)
 
         assert e6 != e7
         assert e7 != e8
         assert e9 != e10
-        assert e8 == eval(repr(e7)).map(lambda x: x+1, 'Who is John Gult?')
+        assert e8 == eval(repr(e7)).map(lambda x: x+1)
 
         assert repr(e6) ==  "MayBe(2)"
         assert repr(e7) ==  "Xor(2, LEFT)"

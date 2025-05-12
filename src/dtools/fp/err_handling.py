@@ -68,6 +68,9 @@ class MayBe[D]:
     def __init__(self, value: D | Sentinel = Sentinel('MayBe')) -> None:
         self._value: D | Sentinel = value
 
+    def __hash__(self) -> int:
+        return hash((Sentinel('MayBe'), self._value))
+
     def __bool__(self) -> bool:
         return self._value is not Sentinel('MayBe')
 
@@ -298,6 +301,9 @@ class Xor[L, R]:
         self._value = value
         self._side = side
 
+    def __hash__(self) -> int:
+        return hash((Sentinel('XOR'), self._value, self._side))
+
     def __bool__(self) -> bool:
         return self._side == LEFT
 
@@ -370,11 +376,11 @@ class Xor[L, R]:
             return MayBe(cast(R, self._value))
         return MayBe()
 
-    def change_right[T](self, right: T) -> Xor[L, T]:
+    def map_right[V](self, f: Callable[[R], V]) -> Xor[L, V]:
         """Construct new Xor with a different right."""
         if self._side == LEFT:
-            return cast(Xor[L, T], self)
-        return Xor[L, T](right, RIGHT)
+            return cast(Xor[L, V], self)
+        return Xor[L, V](f(cast(R, self._value)), RIGHT)
 
     def map[U](self, f: Callable[[L], U]) -> Xor[U, R]:
         """Map over if a left value. Return new instance."""
