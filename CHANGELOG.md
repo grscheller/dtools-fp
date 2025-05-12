@@ -4,12 +4,20 @@ PyPI dtools.fp project.
 
 - first digit - major event, epoch, or paradigm shift
 - second digit - breaking API changes, major changes
-- third digit - bug fixes, API additions, breaking API in dev env
-- forth digit - commit count changes/regressions (dev environment only)
+- third digit - bug fixes, API additions, docstring changes
 
 ## Releases and Important Milestones
 
-### Version 1.7.0 - Breaking API change 2025-04-22
+### Version 1.8.2 - Breaking API change 2025-05-TBA
+
+- Moved dtools.fp.err_handling to the dtools.containers PyPI project
+  - Moved class MayBe -> module dtools.containers.maybe
+  - Moved class Xor -> module dtools.containers.xor
+- Retaining static methods from err_handling.py
+  - have not yet decided new name for library yet
+  - methods will become functions
+
+### Version 1.7.0 - PyPI release date 2025-04-22
 
 - API changes along the lines of dtools.ca 3.12
 - typing improvements

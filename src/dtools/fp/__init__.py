@@ -18,7 +18,6 @@ Tools to aid with functional programming in Python yet still endeavoring to
 remain Pythonic.
 
 - *module* dtools.fp.bool: boolean with sub-types
-- *module* dtools.fp.err_handling: maybe and either monads
 - *module* dtools.fp.function: tools to combine and partially apply functions
 - *module* dtools.fp.iterables: tools for iterables
 - *module* dtools.fp.lazy: Lazy (non-strict) function evaluation

@@ -32,7 +32,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable, Iterator
 from enum import auto, Enum
 from typing import cast, Never, TypeVar
-from dtools.containers.boxes.box import Box
+from dtools.containers.box import Box
 from .err_handling import MayBe as MB
 from .function import negate, swap
 from .singletons import NoValue
