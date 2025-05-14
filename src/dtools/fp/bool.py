@@ -14,58 +14,49 @@
 
 
 """
-### `_Bool` subclassable boolean
+### Class `Bool` - Subclassable Boolean
 
-Python (at least CPython for Python 3.13) does not permit bool to be subclassed.
-
-- under-the-hood a bool is just an `int` which is inheritable
-- kept very simple to avoid the performance hits
-  - can be compared with `==` to a boolean, don't use `is`
-  - neither `_True()` nor `_False()` are singletons (nor pretend singletons)
-  - don't use in arithmetic expressions
-  - best used as implementation details
-
+Python does not permit bool to be subclassed, but `int` can be subclassed.
+Under-the-hood a `bool` is just an `int`. Though it would be possible to
+make Truth() and Lie() singletons, I did not want to take the performance
+hit to enforce this.
 """
 
 from __future__ import annotations
 
 from typing import Final
 
-__all__ = ['_Bool', '_True', '_False', 'TRUE', 'FALSE' ]
+__all__ = ['Bool', 'Truth', 'Lie', 'TRUTH', 'LIE' ]
 
 
-class _Bool(int):
-    """Subclassable Boolean-like class."""
-    def __new__(cls, val: int = 0) -> _Bool:
-        if val == 0:
-            return super(_Bool, cls).__new__(cls, 0)
-        return super(_Bool, cls).__new__(cls, 1)
+class Bool(int):
+    """Subclassable Boolean-like class.
 
-    def __bool__(self) -> bool:
-        return bool(self)
+    - best practices
+      - compared with `==` or `!=` not `is` or `not is`
+      - only use Bool as a type, not as a constructor 
+
+    """
+    def __new__(cls) -> Bool:
+        return super(Bool, cls).__new__(cls, 0)
 
     def __repr__(self) -> str:
         if self:
-            return '_True()'
-        return '_False()'
-
-    def __str__(self) -> str:
-        if self:
-            return 'True'
-        return 'False'
+            return 'Truth()'
+        return '_Lie()'
 
 
-class _True(_Bool):
-    """Truthy _Bool subclass."""
-    def __new__(cls, val: int = 1) -> _True:
-        return super(_Bool, cls).__new__(cls, 1)
+class Truth(Bool):
+    """Truthy Bool subclass - not a singleton."""
+    def __new__(cls) -> Truth:
+        return super(Bool, cls).__new__(cls, 1)
 
 
-class _False(_Bool):
-    """Falsy _Bool subclass."""
-    def __new__(cls, val: int = 0) -> _False:
-        return super(_Bool, cls).__new__(cls, 0)
+class Lie(Bool):
+    """Falsy Bool subclass - not a singleton."""
+    def __new__(cls) -> Lie:
+        return super(Bool, cls).__new__(cls, 0)
 
 
-TRUE: Final[_True] = _True()
-FALSE: Final[_False] = _False()
+TRUTH: Final[Truth] = Truth()
+LIE: Final[Lie] = Lie()
