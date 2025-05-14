@@ -25,7 +25,7 @@ from __future__ import annotations
 
 __all__ = []
 
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Sequence
 from typing import TypeVar
 from dtools.containers.maybe import MayBe
 from dtools.containers.xor import Xor, LEFT, RIGHT
@@ -140,41 +140,3 @@ def lazy_index_or_error[V](
         return Xor.idx(v, ii)
 
     return ret
-
-
-def sequence_maybe[T](itab_mb_d: Iterable[MayBe[T]]) -> MayBe[Iterator[T]]:
-    """Sequence an indexable of type `MayBe[~T]`
-
-    * if the iterated `MayBe` values are not all empty,
-      * return a `MayBe` of an iterator of the contained values
-      * otherwise return an empty `MayBe`
-
-    """
-    item: list[T] = []
-
-    for mb_d in itab_mb_d:
-        if mb_d:
-            item.append(mb_d.get())
-        else:
-            return MayBe()
-
-    return MayBe(iter(item))
-
-
-def sequence_xor(itab_xor_lr: Iterable[Xor[L, R]]) -> Xor[Iterator[L], R]:
-    """Sequence an indexable of type `Xor[~L, ~R]`
-
-    - if the iterated `Xor` values are all lefts, then
-      - return an `Xor` of an iterable of the left values
-    - otherwise return a right Xor containing the first right encountered
-
-    """
-    ts: list[L] = []
-
-    for xor_lr in itab_xor_lr:
-        if xor_lr:
-            ts.append(xor_lr.get())
-        else:
-            return Xor(xor_lr.get_right().get(), RIGHT)
-
-    return Xor(iter(ts))
