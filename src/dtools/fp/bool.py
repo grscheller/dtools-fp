@@ -35,7 +35,14 @@ class Bool(int):
     - best practices
       - compared with `==` or `!=` not `is` or `not is`
       - only use Bool as a type, not as a constructor 
-
+      - when using Python shortcut logic remember
+        - the `not` statement convert a Bool to a bool
+          - `TRUTH` is truthy, `LIE` is falsy
+            - an instance of `Truth` is truthy
+            - an instance of `Lie` is falsy
+        - shortcut logic is lazy
+          - the last truthy thing evaluated is returned
+          - and it is not converted to a bool
     """
     def __new__(cls) -> Bool:
         return super(Bool, cls).__new__(cls, 0)

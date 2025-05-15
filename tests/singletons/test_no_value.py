@@ -23,4 +23,3 @@ _noValue: Final[NoValue] = NoValue()
 class Test_str:
     def test_noValue_str(self) -> None:
         assert str(_noValue) == 'NoValue()'
-

@@ -16,21 +16,25 @@ from dtools.fp.iterables import reducel, foldl, mb_fold_left, sc_reducel, sc_red
 from dtools.containers.maybe import MayBe as MB
 from dtools.fp.function import swap, partial
 
+
 def add(a: int, b: int) -> int:
     return a + b
+
 
 def ge_n(a: int, n: int) -> bool:
     return a >= n
 
+
 def le_n(a: int, n: int) -> bool:
     return a <= n
+
 
 class Test_fp_folds:
     def test_fold_comuinitive(self) -> None:
         data1 = tuple(range(1, 101))
         data2 = tuple(range(2, 101))
         data3: tuple[int, ...] = ()
-        data4 = 42,
+        data4 = (42,)
 
         assert reducel(data1, add) == 5050
         assert foldl(data1, add, 10) == 5060
@@ -58,15 +62,15 @@ class Test_fp_folds:
 
     def test_fold_noncomuinitive(self) -> None:
         def funcL(acc: int, jj: int) -> int:
-            return (acc - 1)*(jj + 1)
+            return (acc - 1) * (jj + 1)
 
         def funcR(ii: int, acc: int) -> int:
-            return (ii - 1)*(acc + 1)
+            return (ii - 1) * (acc + 1)
 
         data1 = (1, 2, 3, 4, 5)
         data2 = (2, 3, 4, 5)
         data3: list[int] = []
-        data4 = 42,
+        data4 = (42,)
 
         assert reducel(data1, funcL) == -156
         assert reducel(data2, funcL) == 84
@@ -77,18 +81,19 @@ class Test_fp_folds:
         assert reducel(data2, funcL) == 84
         assert reducel(data2, funcL) == 84
 
+
 class Test_fp_mbFolds:
     def test_mbFold(self) -> None:
         def funcL(acc: int, jj: int) -> int:
-            return (acc - 1)*(jj + 1)
+            return (acc - 1) * (jj + 1)
 
         def funcR(ii: int, acc: int) -> int:
-            return (ii - 1)*(acc + 1)
+            return (ii - 1) * (acc + 1)
 
         data1 = tuple(range(1, 101))
         data2 = tuple(range(2, 101))
         data3: tuple[int, ...] = ()
-        data4 = 42,
+        data4 = (42,)
 
         assert mb_fold_left(data1, add) == MB(5050)
         assert mb_fold_left(data1, add, 10) == MB(5060)
@@ -124,8 +129,8 @@ class Test_fp_mbFolds:
         assert mb_fold_left(data6, funcL) == MB(84)
         assert mb_fold_left(data6, funcL).get() == 84
 
-class Test_fp_sc_reducel:
 
+class Test_fp_sc_reducel:
     def test_defaults(self) -> None:
         data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
@@ -151,8 +156,7 @@ class Test_fp_sc_reducel:
         else:
             assert (int9, mb_sum35) == (9, MB(35))
 
-        mb_sum33, it = sc_reducel(data, add, start=ge2, stop=ge8,
-                                  include_start=False)
+        mb_sum33, it = sc_reducel(data, add, start=ge2, stop=ge8, include_start=False)
         try:
             int9 = next(it)
         except StopIteration:
@@ -160,8 +164,7 @@ class Test_fp_sc_reducel:
         else:
             assert (int9, mb_sum33) == (9, MB(33))
 
-        mb_sum27, it = sc_reducel(data, add, start=ge2, stop=ge8,
-                                  include_stop=False)
+        mb_sum27, it = sc_reducel(data, add, start=ge2, stop=ge8, include_stop=False)
         try:
             int8 = next(it)
         except StopIteration:
@@ -179,8 +182,7 @@ class Test_fp_sc_reducel:
         else:
             assert (int9, mb_sum8) == (9, MB(8))
 
-        mb_sum9, it = sc_reducel(data, add, start=ge8, stop=ge2,
-                                 include_start=False)
+        mb_sum9, it = sc_reducel(data, add, start=ge8, stop=ge2, include_start=False)
         try:
             int10 = next(it)
         except StopIteration:
@@ -188,8 +190,7 @@ class Test_fp_sc_reducel:
         else:
             assert (int10, mb_sum9) == (10, MB(9))
 
-        mb_empty, it = sc_reducel(data, add, start=ge8, stop=ge2,
-                                  include_stop=False)
+        mb_empty, it = sc_reducel(data, add, start=ge8, stop=ge2, include_stop=False)
         try:
             int8 = next(it)
         except StopIteration:
@@ -197,8 +198,9 @@ class Test_fp_sc_reducel:
         else:
             assert (int8, mb_empty) == (8, MB())
 
-        mb_empty, it = sc_reducel(data, add, start=ge8, stop=ge2,
-                                  include_start=False, include_stop=False)
+        mb_empty, it = sc_reducel(
+            data, add, start=ge8, stop=ge2, include_start=False, include_stop=False
+        )
         try:
             int9 = next(it)
         except StopIteration:
@@ -206,8 +208,8 @@ class Test_fp_sc_reducel:
         else:
             assert (int9, mb_empty) == (9, MB())
 
-class Test_fp_sc_reducer:
 
+class Test_fp_sc_reducer:
     def test_defaults(self) -> None:
         data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
@@ -234,8 +236,7 @@ class Test_fp_sc_reducer:
         else:
             assert (int8, mb_sum22) == (8, MB(22))
 
-        mb_sum15, it = sc_reducer(data, add, start=ge7, stop=le4,
-                                  include_start=False)
+        mb_sum15, it = sc_reducer(data, add, start=ge7, stop=le4, include_start=False)
         try:
             int7 = next(it)
         except StopIteration:
@@ -243,8 +244,7 @@ class Test_fp_sc_reducer:
         else:
             assert (int7, mb_sum15) == (7, MB(15))
 
-        mb_sum18, it = sc_reducer(data, add, start=ge7, stop=le4,
-                                  include_stop=False)
+        mb_sum18, it = sc_reducer(data, add, start=ge7, stop=le4, include_stop=False)
         try:
             int8 = next(it)
         except StopIteration:
@@ -252,15 +252,15 @@ class Test_fp_sc_reducer:
         else:
             assert (int8, mb_sum18) == (8, MB(18))
 
-        mb_sum11, it = sc_reducer(data, add, start=ge7, stop=le4,
-                                  include_start=False, include_stop=False)
+        mb_sum11, it = sc_reducer(
+            data, add, start=ge7, stop=le4, include_start=False, include_stop=False
+        )
         try:
             int7 = next(it)
         except StopIteration:
             assert False
         else:
             assert (int7, mb_sum11) == (7, MB(11))
-
 
     def test_start_stop_edge_case_all(self) -> None:
         data = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
@@ -275,8 +275,9 @@ class Test_fp_sc_reducer:
             assert True
         assert mb_sum55 == MB(55)
 
-        mb_sum44, it = sc_reducer(data, add, start=ge10, stop=le1,
-                                  include_start=False, include_stop=False)
+        mb_sum44, it = sc_reducer(
+            data, add, start=ge10, stop=le1, include_start=False, include_stop=False
+        )
         try:
             int10 = next(it)
         except StopIteration:
@@ -284,16 +285,14 @@ class Test_fp_sc_reducer:
         finally:
             assert (int10, mb_sum44) == (10, MB(44))
 
-        mb_sum45, it = sc_reducer(data, add, start=ge10, stop=le1,
-                                 include_start=False)
+        mb_sum45, it = sc_reducer(data, add, start=ge10, stop=le1, include_start=False)
         try:
             int10 = next(it)
         except StopIteration:
             assert False
         assert (int10, mb_sum45) == (10, MB(45))
 
-        mb_sum54, it = sc_reducer(data, add, start=ge10, stop=le1,
-                                  include_stop=False)
+        mb_sum54, it = sc_reducer(data, add, start=ge10, stop=le1, include_stop=False)
         try:
             int10 = next(it)
         except StopIteration:
@@ -328,8 +327,9 @@ class Test_fp_sc_reducer:
 
         # ---------------------------------------------------------------
 
-        mb_empty, it = sc_reducer(data, add, start=ge8, stop=le8,
-                                  include_start=False, include_stop=False)
+        mb_empty, it = sc_reducer(
+            data, add, start=ge8, stop=le8, include_start=False, include_stop=False
+        )
         try:
             int8 = next(it)
         except StopIteration:
@@ -338,8 +338,7 @@ class Test_fp_sc_reducer:
 
         # ---------------------------------------------------------------
 
-        mb_empty, it = sc_reducer(data, add, start=ge8, stop=le8,
-                                  include_stop=False)
+        mb_empty, it = sc_reducer(data, add, start=ge8, stop=le8, include_stop=False)
         try:
             int9 = next(it)
         except StopIteration:
@@ -348,21 +347,18 @@ class Test_fp_sc_reducer:
 
         le7 = partial(swap(le_n), 7)
 
-        mb_sum8, it = sc_reducer(data, add, start=ge8, stop=le7,
-                                 include_stop=False)
+        mb_sum8, it = sc_reducer(data, add, start=ge8, stop=le7, include_stop=False)
         try:
             int9 = next(it)
         except StopIteration:
             assert False
         assert (int9, mb_sum8) == (9, MB(8))
 
-        mb_empty, it = sc_reducer(data, add, start=ge8, stop=le7,
-                                  include_start=False, include_stop=False)
+        mb_empty, it = sc_reducer(
+            data, add, start=ge8, stop=le7, include_start=False, include_stop=False
+        )
         try:
             int8 = next(it)
         except StopIteration:
             assert False
         assert (int8, mb_empty) == (8, MB())
-
-        # ---------------------------------------------------------------
-

@@ -35,9 +35,9 @@ from .function import sequenced
 
 __all__ = ['Lazy', 'lazy', 'real_lazy']
 
-D = TypeVar('D')  # Needed only for pdoc documentation generation. When
-R = TypeVar('R')  # used on function and method signatures, linters will
-P = ParamSpec('P')  # show "redefined-outer-name" warnings.
+D = TypeVar('D')
+R = TypeVar('R', contravariant=True)
+P = ParamSpec('P')
 
 
 class Lazy[D, R]:
