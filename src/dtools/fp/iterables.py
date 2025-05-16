@@ -12,19 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.iterables - Iterator related tools
+"""Module fp.iterables - Iterator related tools
 
 Library of iterator related functions and enumerations.
 
 - Concatenating and merging iterables
 - Dropping and taking values from iterables
 - Reducing and accumulating iterables
-
-#### Assumptions
-- iterables are not necessarily iterators
-- at all times iterator protocol is assumed to be followed, that is
-  - all iterators are assumed to be iterable
-  - for all iterators `foo` we assume `iter(foo) is foo`
+- Assumptions
+  - iterables are not necessarily iterators
+  - at all times iterator protocol is assumed to be followed
+    - all iterators are assumed to be iterable
+    - for all iterators `foo` we assume `iter(foo) is foo`
 
 """
 

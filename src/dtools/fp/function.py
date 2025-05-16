@@ -12,19 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""###Module fp.functional - compose and partially apply functions.
+"""Module fp.function - FP tools for functions
 
 Not a replacement for the std library's `functools` which is more about
 modifying function behavior through decorators than functional composition
 and application.
 
-#### FP utilities to manipulate and partially apply functions:
-
-- *function* swap: Swap the arguments of a 2 argument function
-- *function* it: Function returning an iterator of its arguments
-- *function* sequenced: Convert function to take a sequence of its arguments
-- *function* negate: Transforms a predicate to its negation
-- *function* partial: Returns a partially applied function
+- FP utilities to manipulate and partially apply functions
+  - *function* swap: Swap the arguments of a 2 argument function
+  - *function* it: Function returning an iterator of its arguments
+  - *function* sequenced: Convert function to take a sequence of its arguments
+  - *function* negate: Transforms a predicate to its negation
+  - *function* partial: Returns a partially applied function
 
 """
 

@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.state - state monad
+"""Module fp.state - state monad
 
 Handling state functionally.
 
-#### Pure FP State handling type:
-
-#### *class* State
+##### *class* State - Classic FP State Monad
 
 A pure FP immutable implementation for the State Monad.
 

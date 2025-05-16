@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""### Module fp.lazy - lazy function evaluation
+"""Module fp.lazy - lazy function evaluation
 
 Delayed function evaluations. FP tools for "non-strict" function evaluations.
 Useful to delay a function's evaluation until some inner scope.
 
-#### Non-strict delayed function evaluation:
-
-- *class* Lazy: Delay evaluation of function taking & returning single values.
-- *function* lazy: Delay evaluation of a function taking any number of values.
-- *function* real_lazy: Version of `lazy` which caches its result.
+- Non-strict delayed function evaluation:
+  - *class* Lazy: Delay evaluation of functions taking & returning single values
+  - *function* lazy: Delay evaluation of functions taking any number of values
+  - *function* real_lazy: Version of `lazy` which caches its result
 
 """
 
@@ -118,7 +117,7 @@ class Lazy[D, R]:
         raise ValueError(msg)
 
     def get_result(self) -> MB[R]:
-        """Get result only if evaluate and not exceptional."""
+        """Get result only if evaluated and not exceptional."""
         if self._evaluated and self._result:
             return self._result.get_left()
         return MB()

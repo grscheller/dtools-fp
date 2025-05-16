@@ -13,8 +13,7 @@
 # limitations under the License.
 
 
-"""
-### Class `Bool` - Subclassable Boolean
+"""Class `Bool` - Subclassable Boolean
 
 Python does not permit bool to be subclassed, but `int` can be subclassed.
 Under-the-hood a `bool` is just an `int`. Though it would be possible to
