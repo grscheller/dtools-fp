@@ -18,18 +18,10 @@ namespace project.
 
 ## Overview of submodules
 
-### Error handling: dtools.fp.error_wrapping
+### Functions as first class objects
 
-- monadic tools for handling missing values & unexpected events
-  - sequence and friends
-    - lazy versions should go to dtools.fp.lazy
-    - ...
-
-______________________________________________________________________
-
-### Functions as first class objects: dtools.fp.function
-
-  - utilities to manipulate and partially apply functions
+  - dtools.fp.function
+    - utilities to manipulate and partially apply functions
 
 ______________________________________________________________________
 
@@ -49,7 +41,7 @@ ______________________________________________________________________
 
 ### Singletons
 
-- dtools.fp.nothingness
+- dtools.fp.singletons
   - singleton classes representing either a
     - missing value
     - sentinel value

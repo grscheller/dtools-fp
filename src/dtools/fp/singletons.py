@@ -21,7 +21,7 @@ cases. Used mostly for dtools internal implementations.
 
 - Singleton types:
   - *class* NoValue: Singleton instance representing the absence of a value
-  - *Class* Sentinel: Singleton instances used as a "hidden" sentinel value
+  - *class* Sentinel: Singleton instances used as a "hidden" sentinel value
   - *class* Nada: Singleton instance representing & propagating failure
 
 ##### `NoValue` was designed as a None replacement
