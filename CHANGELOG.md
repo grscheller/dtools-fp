@@ -2,20 +2,29 @@
 
 PyPI dtools.fp project.
 
-- first digit - major event, epoch, or paradigm shift
-- second digit - breaking API changes, major changes
-- third digit - bug fixes, API additions, docstring changes
+- Strict 3 digit semantic versioning (adopted 2025-05-19)
+  - MAJOR version for incompatible API changes
+  - MINOR version for backward compatible added functionality
+  - PATCH version for backward compatible bug fixes
 
 ## Releases and Important Milestones
 
-### Version 1.8.2 - Breaking API change 2025-05-TBA
+### Version 2.0.0 - Breaking API change 2025-05-TBA
 
 - Moved dtools.fp.err_handling to the dtools.containers PyPI project
   - Moved class MayBe -> module dtools.containers.maybe
   - Moved class Xor -> module dtools.containers.xor
-- Retaining static methods from err_handling.py
-  - moving to dtools.fp.error_wrapping
-  - methods will become functions
+  - dropped lazy methods
+    - will import dtools.fp.lazy directly for this functionality
+
+### Adapting strict Semantic from this point on - date 2025-05-19
+
+- [Semantic Versioning 2.0.0](https://semver.org/)
+- see top of file
+- previous versioning scheme used
+  - first digit - major event, epoch, or paradigm shift
+  - second digit - breaking API changes, major changes
+  - third digit - bug fixes, API additions
 
 ### Version 1.7.0 - PyPI release date 2025-04-22
 
