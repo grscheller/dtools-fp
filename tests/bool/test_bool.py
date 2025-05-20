@@ -14,12 +14,15 @@
 
 from dtools.fp.bool import Bool, Truth, Lie, TRUTH, LIE
 
-class Test_bool:
+class Testbool:
     """Test class dtools.fp.bool"""
     def test_equality(self) -> None:
         assert TRUTH == TRUTH
         assert LIE == LIE
-        assert TRUTH != LIE  # type: ignore # Non-overlapping equality check
+        assert TRUTH != LIE  # type: ignore # Non-overlapping identity check
+        assert TRUTH is TRUTH
+        assert LIE is LIE
+        assert TRUTH is not LIE  # type: ignore # Non-overlapping identity check
 
         sky_is_blue: Bool = TRUTH
         koalas_eat_meat: Bool = LIE
@@ -30,6 +33,9 @@ class Test_bool:
         assert koalas_eat_meat == ice_is_hot
         assert sky_is_blue != koalas_eat_meat
         assert water_is_wet != ice_is_hot
+
+        assert sky_is_blue is water_is_wet
+        assert koalas_eat_meat is ice_is_hot
 
         if sky_is_blue:
             assert True
@@ -136,3 +142,54 @@ class Test_not:
     assert isinstance(not lutz, int)
     assert isinstance(not lutz, bool)
     assert not isinstance(not lutz, Bool)
+
+class TestTruthsAndLies:
+    fooT: Bool = Truth('foo')
+    fudT: Bool = Truth('foo')
+    fooL: Bool = Lie('foo')
+    fudL: Bool = Lie('foo')
+
+    booT: Bool = Truth('boo')
+    budT: Bool = Truth('boo')
+    booL: Bool = Lie('boo')
+    boobooL: Bool = Lie('boo')
+
+    assert fooT == fooT
+    assert fudT == fudT
+    assert fooT == fudT
+    assert fooL == fooL
+    assert fooL == fudL
+    assert booT == fooT
+    assert booT == fudT
+    assert booL == fooL
+    assert booL == fudL
+
+    assert fooT != fooL
+    assert booT != fudL
+
+    assert fooT is fooT
+    assert fudT is fudT
+    assert fooT is fudT
+    assert fooL is fooL
+    assert fooL is fudL
+    assert booT is not fooT
+    assert booT is not fudT
+    assert booL is not fooL
+    assert booL is not fudL
+
+    assert fooT is not fooL
+    assert booT is not fudL
+
+class TestSuperClassType:
+    mooT: Bool = Truth('my_truth')
+    yooT: Bool = Truth('your_truth')
+    mooL: Bool = Lie('my_lie')
+    yooL: Bool = Lie('your_lie')
+
+    mooT == yooT
+    mooL == yooL
+    mooT != yooL
+
+    mooT is not yooT
+    mooL is not yooL
+    mooT is not yooL
