@@ -14,7 +14,7 @@
 
 from dtools.circular_array import ca, CA
 from dtools.fp.function import partial, sequenced, swap, it
-from dtools.fp.iterables import mb_fold_left, take
+from dtools.iterables import mb_fold_left, take
 
 class Test_function:
     def test_same_type(self) -> None:

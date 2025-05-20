@@ -24,7 +24,6 @@ keywords = [
     "functional programming",
     "fp",
     "monad",
-    "iterators",
     "maybe",
     "either",
     "lazy",

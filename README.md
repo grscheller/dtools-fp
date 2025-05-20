@@ -18,17 +18,12 @@ namespace project.
 
 ## Overview of submodules
 
+______________________________________________________________________
+
 ### Functions as first class objects
 
   - dtools.fp.function
     - utilities to manipulate and partially apply functions
-
-______________________________________________________________________
-
-### Tools for iterables
-
-- dtools.fp.iterables
-  - iteration tools implemented in Python
 
 ______________________________________________________________________
 

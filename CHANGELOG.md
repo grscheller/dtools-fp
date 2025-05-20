@@ -11,6 +11,8 @@ PyPI dtools.fp project.
 
 ### Version 2.0.0 - Breaking API change 2025-05-TBA
 
+- Moved dtools.fp.iterables to its own PyPI project
+  - dtools.iterables
 - Moved dtools.fp.err_handling to the dtools.containers PyPI project
   - Moved class MayBe -> module dtools.containers.maybe
   - Moved class Xor -> module dtools.containers.xor
