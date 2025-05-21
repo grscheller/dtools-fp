@@ -19,7 +19,6 @@ remain Pythonic.
 
 - *module* dtools.fp.bool: boolean with sub-types
 - *module* dtools.fp.function: tools to combine and partially apply functions
-- *module* dtools.fp.iterables: tools for iterables
 - *module* dtools.fp.lazy: Lazy (non-strict) function evaluation
 - *module* dtools.fp.singletons: useful types with but one instance
 - *module* dtools.fp.state: classic implementation of the state monad

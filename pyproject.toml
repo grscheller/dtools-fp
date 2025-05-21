@@ -30,13 +30,14 @@ keywords = [
     "non-strict",
 ]
 dependencies = [
-    "dtools.circular-array>=3.13.0, <3.14",
+    "dtools.circular-array>=3.15.0, <3.16",
     "dtools.containers >=1.0.0, <1.1",
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest >=8.3.5",
+    "dtools.iterables >=2.0.0, <2.1",
     "dtools.queues >=2.0.0, <2.1",
 ]
 
