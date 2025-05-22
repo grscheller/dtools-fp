@@ -1,6 +1,8 @@
 # Developer Tools - Pythonic functional programming
 
-Functional programming tools which endeavor to be Pythonic.
+Functional programming tools which endeavor to be Pythonic. This project
+is part of the [Developer Tools for Python][4] **dtools** namespace
+project.
 
 - **Repositories**
   - [dtools.fp][1] project on *PyPI*
@@ -8,15 +10,14 @@ Functional programming tools which endeavor to be Pythonic.
 - Detailed documentation for dtools.fp
   - [Detailed API documentation][3] on *GH-Pages*
 
-This project is part of the [Developer Tools for Python][4] **dtools**
-namespace project.
+## Overview
 
 - Benefits of FP
   - improved composability
   - avoid hard to refactor exception driven code paths
   - data sharing becomes trivial when immutability leveraged
 
-## Overview of submodules
+The dtools.fp package consists of 4 modules.
 
 ______________________________________________________________________
 
@@ -37,10 +38,10 @@ ______________________________________________________________________
 ### Singletons
 
 - dtools.fp.singletons
-  - singleton classes representing either a
-    - missing value
-    - sentinel value
-    - failed calculation
+  - 3 singleton classes representing
+    - a missing value (actually missing, not potentially missing)
+    - a sentinel value
+    - a failed calculation
 
 ______________________________________________________________________
 
